@@ -7,8 +7,8 @@ export const router = createBrowserRouter([
     path: "/",
     element: <SignInRoute />,
   },
-    {
-        path: "/map",
-        element: <MapRoute />,
-    },
+  {
+    path: "/map",
+    element: <MapRoute />,
+  },
 ]);
