@@ -1,0 +1,15 @@
+.column {
+    float: left;
+    width: 40%;
+}
+
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.csvText {
+    font-size: 15px;
+    text-align: center;
+}
