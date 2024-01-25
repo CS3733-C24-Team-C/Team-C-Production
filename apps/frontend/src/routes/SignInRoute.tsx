@@ -22,7 +22,7 @@ const SignInRoute = () => {
           type="text"
           id="username"
           name="username"
-          placeholder="Usernames"
+          placeholder="Username"
           required
           value={username}
           onChange={(e) => setUsername(e.target.value)}
