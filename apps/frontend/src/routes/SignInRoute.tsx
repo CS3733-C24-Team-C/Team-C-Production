@@ -51,11 +51,11 @@ const SignInRoute = () => {
       </div>
       <button type="submit">Sign In</button>
       <br />
-      <button type="button" onClick={handleResetPassword}>
+      <button type="button" role="link" onClick={handleResetPassword}>
         Reset Password
       </button>
       <br />
-      <button type="button" onClick={handleCreateAccount}>
+      <button type="button" role="link" onClick={handleCreateAccount}>
         Create an Account
       </button>
     </form>
