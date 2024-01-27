@@ -1,6 +1,5 @@
-import React, { FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
 import "./SignInStyles.css";
-//import SignInRoute from "@/routes/SignInRoute.tsx";
 import { useNavigate } from "react-router-dom";
 
 const ResetPasswordRoute = () => {
@@ -12,6 +11,10 @@ const ResetPasswordRoute = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (password !== checkPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
     console.log(username);
     console.log(password);
     navigate("/");
@@ -44,9 +47,9 @@ const ResetPasswordRoute = () => {
       </div>
       <div>
         <input
-          type="new password"
-          id="new password"
-          name="new password"
+          type="password"
+          id="verify-password"
+          name="verify-password"
           placeholder="Verify New Password"
           required
           value={checkPassword}
