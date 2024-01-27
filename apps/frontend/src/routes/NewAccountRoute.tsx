@@ -3,7 +3,7 @@ import "./SignInStyles.css";
 //import SignInRoute from "@/routes/SignInRoute.tsx";
 import { useNavigate } from "react-router-dom";
 
-const ResetPasswordRoute = () => {
+const NewAccountRoute = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
@@ -19,7 +19,7 @@ const ResetPasswordRoute = () => {
 
   return (
     <form onSubmit={handleSubmit} className={"centeredElement"}>
-      <h1>Reset Password</h1>
+      <h1>Create an Account:</h1>
       <div>
         <input
           type="text"
@@ -36,7 +36,7 @@ const ResetPasswordRoute = () => {
           type="password"
           id="password"
           name="password"
-          placeholder="New Password"
+          placeholder="Password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -47,15 +47,15 @@ const ResetPasswordRoute = () => {
           type="new password"
           id="new password"
           name="new password"
-          placeholder="Verify New Password"
+          placeholder="Verify Password"
           required
           value={checkPassword}
           onChange={(e) => setCheckPassword(e.target.value)}
         />
       </div>
-      <button type="submit">Sign In</button>
+      <button type="submit">Create Account</button>
     </form>
   );
 };
 
-export default ResetPasswordRoute;
+export default NewAccountRoute;
