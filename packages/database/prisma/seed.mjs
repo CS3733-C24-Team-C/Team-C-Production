@@ -37,7 +37,7 @@ const main = async () => {
     await prisma.edges.create({
       data: {
         ...edge,
-        weight: edgeWeightEntry.weight, // assuming 'weight' is the correct field in your schema
+        weight: edgeWeightEntry.weight,
       },
     });
   }
