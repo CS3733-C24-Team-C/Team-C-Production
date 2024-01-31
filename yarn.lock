@@ -970,6 +970,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/busboy@npm:*":
+  version: 1.5.3
+  resolution: "@types/busboy@npm:1.5.3"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 9ec0a125723e594816d06f6ddf5a4f8dda4855734719bb6e38bdc6fdaf59416f270744862ee54c755075af26e9f5467cc00db803ae1d88f45c1431f61a48ae58
+  languageName: node
+  linkType: hard
+
 "@types/cacheable-request@npm:^6.0.1":
   version: 6.0.3
   resolution: "@types/cacheable-request@npm:6.0.3"
@@ -1044,6 +1053,16 @@ __metadata:
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
   checksum: 7de6d928dd4010b0e20c6919e1a6c27b61f8d4567befa89252055fad503d587ecb9a1e3eab1b1901f923964d7019796db810b7fd6430acb26c32866d126fd408
+  languageName: node
+  linkType: hard
+
+"@types/express-fileupload@npm:^1":
+  version: 1.4.4
+  resolution: "@types/express-fileupload@npm:1.4.4"
+  dependencies:
+    "@types/busboy": "npm:*"
+    "@types/express": "npm:*"
+  checksum: 6e895ecc453eec7c68c8694b2f2e40f76d8242c7680af656553736a55e4e3bbd7327255e87e8d4026a997a61e128f52c4661880966855fa0dbc0f0d7b5040468
   languageName: node
   linkType: hard
 
@@ -1980,6 +1999,7 @@ __metadata:
     "@swc/helpers": "npm:^0.5.1"
     "@types/cookie-parser": "npm:^1.4.3"
     "@types/express": "npm:^4.17.17"
+    "@types/express-fileupload": "npm:^1"
     "@types/http-errors": "npm:^2.0.1"
     "@types/morgan": "npm:^1.9.4"
     "@types/multer": "npm:^1"
@@ -1992,6 +2012,7 @@ __metadata:
     eslint: "npm:latest"
     eslint-config-custom: "workspace:*"
     express: "npm:5.0.0-beta.1"
+    express-fileupload: "npm:^1.4.3"
     express-oauth2-jwt-bearer: "npm:^1.5.0"
     http-errors: "npm:~1.6.3"
     http-terminator: "npm:^3.2.0"
@@ -2125,7 +2146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"busboy@npm:^1.0.0":
+"busboy@npm:^1.0.0, busboy@npm:^1.6.0":
   version: 1.6.0
   resolution: "busboy@npm:1.6.0"
   dependencies:
@@ -3230,6 +3251,15 @@ __metadata:
   version: 3.1.1
   resolution: "exponential-backoff@npm:3.1.1"
   checksum: 2d9bbb6473de7051f96790d5f9a678f32e60ed0aa70741dc7fdc96fec8d631124ec3374ac144387604f05afff9500f31a1d45bd9eee4cdc2e4f9ad2d9b9d5dbd
+  languageName: node
+  linkType: hard
+
+"express-fileupload@npm:^1.4.3":
+  version: 1.4.3
+  resolution: "express-fileupload@npm:1.4.3"
+  dependencies:
+    busboy: "npm:^1.6.0"
+  checksum: 25ff544e7a1c59e5299061c9a75d4eb50983d82cd1a6d299195a0fd1f1c9bb46a23fda8a8c2c924b578b9a7894da90fe000a9785add7b3c2fbf0166f8ee5b6aa
   languageName: node
   linkType: hard
 
