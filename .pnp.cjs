@@ -3751,14 +3751,14 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["autoprefixer", [\
       ["npm:10.4.17", {\
-        "packageLocation": "./.yarn/cache/autoprefixer-npm-10.4.17-8379be1d95-ac4416e726.zip/node_modules/autoprefixer/",\
+        "packageLocation": "./.yarn/unplugged/autoprefixer-virtual-47a19a9a5b/node_modules/autoprefixer/",\
         "packageDependencies": [\
           ["autoprefixer", "npm:10.4.17"]\
         ],\
         "linkType": "SOFT"\
       }],\
       ["virtual:f7b030241781449f9f163484f540f772ec3707fc5214186cd12bce9e472ad0dbf6db26b799fb1d7d9f7a9e4faeedac41da01e533ee775acb5c8a31c546a0661d#npm:10.4.17", {\
-        "packageLocation": "./.yarn/__virtual__/autoprefixer-virtual-47a19a9a5b/0/cache/autoprefixer-npm-10.4.17-8379be1d95-ac4416e726.zip/node_modules/autoprefixer/",\
+        "packageLocation": "./.yarn/unplugged/autoprefixer-virtual-47a19a9a5b/node_modules/autoprefixer/",\
         "packageDependencies": [\
           ["autoprefixer", "virtual:f7b030241781449f9f163484f540f772ec3707fc5214186cd12bce9e472ad0dbf6db26b799fb1d7d9f7a9e4faeedac41da01e533ee775acb5c8a31c546a0661d#npm:10.4.17"],\
           ["@types/postcss", null],\
@@ -5968,7 +5968,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["flowbite", [\
       ["npm:2.2.1", {\
-        "packageLocation": "./.yarn/cache/flowbite-npm-2.2.1-d8f29c98f2-299964a506.zip/node_modules/flowbite/",\
+        "packageLocation": "./.yarn/unplugged/flowbite-npm-2.2.1-d8f29c98f2/node_modules/flowbite/",\
         "packageDependencies": [\
           ["flowbite", "npm:2.2.1"],\
           ["@popperjs/core", "npm:2.11.8"],\
@@ -5979,14 +5979,14 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["flowbite-react", [\
       ["npm:0.7.2", {\
-        "packageLocation": "./.yarn/cache/flowbite-react-npm-0.7.2-2b6698ba04-cf9e7cbe85.zip/node_modules/flowbite-react/",\
+        "packageLocation": "./.yarn/unplugged/flowbite-react-virtual-b77412fe1e/node_modules/flowbite-react/",\
         "packageDependencies": [\
           ["flowbite-react", "npm:0.7.2"]\
         ],\
         "linkType": "SOFT"\
       }],\
       ["virtual:f7b030241781449f9f163484f540f772ec3707fc5214186cd12bce9e472ad0dbf6db26b799fb1d7d9f7a9e4faeedac41da01e533ee775acb5c8a31c546a0661d#npm:0.7.2", {\
-        "packageLocation": "./.yarn/__virtual__/flowbite-react-virtual-b77412fe1e/0/cache/flowbite-react-npm-0.7.2-2b6698ba04-cf9e7cbe85.zip/node_modules/flowbite-react/",\
+        "packageLocation": "./.yarn/unplugged/flowbite-react-virtual-b77412fe1e/node_modules/flowbite-react/",\
         "packageDependencies": [\
           ["flowbite-react", "virtual:f7b030241781449f9f163484f540f772ec3707fc5214186cd12bce9e472ad0dbf6db26b799fb1d7d9f7a9e4faeedac41da01e533ee775acb5c8a31c546a0661d#npm:0.7.2"],\
           ["@floating-ui/react", "virtual:b77412fe1e2d1bca7781539f674dbf25f8f68bc752714dc0371b42b7547fd9bfa8ca3566ae6b17c6cb882aa69064e1b26567020f23025a2e174232a8ad47122a#npm:0.26.8"],\
@@ -9866,7 +9866,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["postcss", [\
       ["npm:8.4.33", {\
-        "packageLocation": "./.yarn/cache/postcss-npm-8.4.33-6ba8157009-e22a4594c2.zip/node_modules/postcss/",\
+        "packageLocation": "./.yarn/unplugged/postcss-npm-8.4.33-6ba8157009/node_modules/postcss/",\
         "packageDependencies": [\
           ["postcss", "npm:8.4.33"],\
           ["nanoid", "npm:3.3.7"],\
@@ -11846,7 +11846,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["tailwindcss", [\
       ["npm:3.4.1", {\
-        "packageLocation": "./.yarn/cache/tailwindcss-npm-3.4.1-3903e2abcc-bf460657c6.zip/node_modules/tailwindcss/",\
+        "packageLocation": "./.yarn/unplugged/tailwindcss-npm-3.4.1-3903e2abcc/node_modules/tailwindcss/",\
         "packageDependencies": [\
           ["tailwindcss", "npm:3.4.1"],\
           ["@alloc/quick-lru", "npm:5.2.0"],\

@@ -9558,6 +9558,17 @@ __metadata:
     turbo: "npm:latest"
     typescript: "npm:^5.0.4"
     vitest: "npm:^0.33.0"
+  dependenciesMeta:
+    autoprefixer@10.4.17:
+      unplugged: true
+    flowbite-react@0.7.2:
+      unplugged: true
+    flowbite@2.2.1:
+      unplugged: true
+    postcss@8.4.33:
+      unplugged: true
+    tailwindcss@3.4.1:
+      unplugged: true
   languageName: unknown
   linkType: soft
 
