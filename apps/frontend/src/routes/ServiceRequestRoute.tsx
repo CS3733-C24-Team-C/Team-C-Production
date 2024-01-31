@@ -68,6 +68,10 @@ const ServiceRequestRoute = () => {
     }
   }
 
+  function back() {
+    navigate("/");
+  }
+
   return (
     <div className={"dropdown"}>
       <h1>Submit a Service Request</h1>
@@ -114,9 +118,8 @@ const ServiceRequestRoute = () => {
         )}
       </button>
       <div>
-        <button type="submit" onClick={submit}>
-          Submit
-        </button>
+        <button type="submit" onClick={submit}>Submit</button>
+        <button onClick={back}>Back</button>
       </div>
     </div>
   );
