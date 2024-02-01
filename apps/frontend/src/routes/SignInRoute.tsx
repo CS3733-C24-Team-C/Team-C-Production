@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./SignInStyles.css";
 
 const SignInRoute = () => {
   const [username, setUsername] = useState("");

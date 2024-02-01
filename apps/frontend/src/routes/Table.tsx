@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import "./Table.css";
 
 type TableProps = {
   data: Record<string, string | number>[];

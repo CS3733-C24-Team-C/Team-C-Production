@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Table from "./Table";
-import "./CSVData.css";
 import MenuBar from "@/routes/MenuBar.tsx";
 
 export default function CSVDataRoute() {

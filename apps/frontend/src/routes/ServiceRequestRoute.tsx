@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./ServiceRequestStyles.css";
 import { useNavigate } from "react-router-dom";
 import DropDown from "./DropDown";
 import MenuBar from "@/routes/MenuBar.tsx";

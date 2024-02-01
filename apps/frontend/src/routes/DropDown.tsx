@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./DropDown.css";
 
 type DropDownProps = {
   objects: string[];

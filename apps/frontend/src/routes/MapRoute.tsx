@@ -9,7 +9,6 @@ import thirdFloor from "./MapImages/03_thethirdfloor.png";
 import AutofillInput from "./AutofillInput.tsx";
 import { useState } from "react";
 import MenuBar from "@/routes/MenuBar.tsx";
-//import "./MapStyles.css";
 
 const MapRoute = () => {
   const [selectedFloor, setSelectedFloor] = useState("");
