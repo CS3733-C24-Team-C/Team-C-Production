@@ -32,6 +32,7 @@ const CSVData = () => {
     fetchEdges();
   }, []);
 
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -48,12 +49,14 @@ const CSVData = () => {
     }
   };
 
+
   return (
     <>
       <form
         action="/api/map/upload"
         method="post"
         encType="multipart/form-data"
+
         onSubmit={handleSubmit}
       >
         <div className="mb-2 block">

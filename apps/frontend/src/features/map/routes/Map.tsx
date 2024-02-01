@@ -5,8 +5,10 @@ import {
   Sidebar as FlowbiteSidebar,
   Button,
   CustomFlowbiteTheme,
+
 } from "flowbite-react";
 import { LocationSearch } from "../components/LocationSearch";
+
 
 import groundFloor from "../assets/00_thegroundfloor.png";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
@@ -16,6 +18,7 @@ import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
+
   root: {
     base: "h-full",
   },
@@ -39,6 +42,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
         Show navigation
       </Button>
       <FlowbiteSidebar.Logo href="/" img={logoUrl} imgAlt="Hospital logo" />
+      
       <FlowbiteSidebar.Items>
         <FlowbiteSidebar.ItemGroup>
           <FlowbiteSidebar.Item>
