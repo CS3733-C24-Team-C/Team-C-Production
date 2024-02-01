@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Table from "./Table";
 import "./CSVData.css";
+import MenuBar from "@/routes/MenuBar.tsx";
 
 export default function CSVDataRoute() {
   const [nodes, setNodes] = useState([]);
@@ -39,6 +40,7 @@ export default function CSVDataRoute() {
         method="post"
         encType="multipart/form-data"
       >
+      <MenuBar></MenuBar>
         <label htmlFor="csv-upload">Upload new CSV Data:</label>
         <br />
         <input

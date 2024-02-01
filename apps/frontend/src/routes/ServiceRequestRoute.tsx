@@ -1,7 +1,8 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 import "./ServiceRequestStyles.css";
 import { useNavigate } from "react-router-dom";
 import DropDown from "./DropDown";
+import MenuBar from "@/routes/MenuBar.tsx";
 
 const ServiceRequestRoute = () => {
   const [showRoomDropDown, setShowRoomDropDown] = useState<boolean>(false);
@@ -22,11 +23,6 @@ const ServiceRequestRoute = () => {
     ];
   };
   const navigate = useNavigate();
-
-  const handleJanitorialForm = (e: FormEvent) => {
-    e.preventDefault();
-    navigate("/service-request/janitorial");
-  };
 
   const toggleRoomDropDown = () => {
     setShowRoomDropDown(!showRoomDropDown);
@@ -60,8 +56,26 @@ const ServiceRequestRoute = () => {
     setSelectRequest(request);
   };
 
+  function submit() {
+    if (selectRoom !== "" && selectRequest !== "") {
+      const [room] = selectRoom;
+      const [request] = selectRequest;
+      console.log(room);
+      console.log(request);
+    }
+
+    if (selectRequest == "Janitorial") {
+      navigate("/service-request/janitorial");
+    }
+  }
+
+  function back() {
+    navigate("/");
+  }
+
   return (
     <div className={"dropdown"}>
+      <MenuBar></MenuBar>
       <h1>Submit a Service Request</h1>
       <div>
         {selectRoom ? `You selected ${selectRoom}.` : "Select a Room..."}
@@ -106,9 +120,8 @@ const ServiceRequestRoute = () => {
         )}
       </button>
       <div>
-        <button type="submit" onClick={handleJanitorialForm}>
-          Submit
-        </button>
+        <button type="submit" onClick={submit}>Submit</button>
+        <button onClick={back}>Back</button>
       </div>
     </div>
   );
