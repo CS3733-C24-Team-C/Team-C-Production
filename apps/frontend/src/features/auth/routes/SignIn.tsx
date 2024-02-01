@@ -19,12 +19,12 @@ const SignIn = () => {
 
   const handleResetPassword = (e: FormEvent) => {
     e.preventDefault();
-    navigate("/sign-in/reset-password");
+    navigate("/auth/reset-password");
   };
 
-  const handleCreateAccount = (e: FormEvent) => {
+  const handleSignUp = (e: FormEvent) => {
     e.preventDefault();
-    navigate("/sign-in/new-account");
+    navigate("/auth/sign-up");
   };
 
   return (
@@ -58,7 +58,7 @@ const SignIn = () => {
         Reset Password
       </button>
       <br />
-      <button type="button" role="link" onClick={handleCreateAccount}>
+      <button type="button" role="link" onClick={handleSignUp}>
         Create an Account
       </button>
     </form>

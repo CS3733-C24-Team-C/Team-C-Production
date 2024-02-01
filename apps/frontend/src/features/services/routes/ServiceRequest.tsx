@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MenuBar, DropDown } from "@/components";
+import { DropDown } from "@/components";
 
 const ServiceRequest = () => {
   const [showRoomDropDown, setShowRoomDropDown] = useState<boolean>(false);
@@ -73,7 +73,6 @@ const ServiceRequest = () => {
 
   return (
     <div className={"dropdown"}>
-      <MenuBar></MenuBar>
       <h1>Submit a Service Request</h1>
       <div>
         {selectRoom ? `You selected ${selectRoom}.` : "Select a Room..."}
