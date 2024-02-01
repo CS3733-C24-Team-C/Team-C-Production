@@ -3,22 +3,37 @@ import SignInRoute from "./SignInRoute.tsx";
 import MapRoute from "./MapRoute.tsx";
 import ResetPasswordRoute from "./ResetPasswordRoute.tsx";
 import NewAccountRoute from "./NewAccountRoute.tsx";
+import CSVDataRoute from "@/routes/CSVDataRoute.tsx";
+import ServiceRequestRoute from "@/routes/ServiceRequestRoute.tsx";
+import JanitorialFormRoute from "@/routes/JanitorialFormRoute.tsx";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/sign-in",
     element: <SignInRoute />,
   },
   {
-    path: "/map",
+    path: "/",
     element: <MapRoute />,
   },
   {
-    path: "/reset-password",
+    path: "/sign-in/reset-password",
     element: <ResetPasswordRoute />,
   },
   {
-    path: "/new-account",
+    path: "/csv-data",
+    element: <CSVDataRoute />,
+  },
+  {
+    path: "/sign-in/new-account",
     element: <NewAccountRoute />,
+  },
+  {
+    path: "/service-request",
+    element: <ServiceRequestRoute />,
+  },
+  {
+    path: "/service-request/janitorial",
+    element: <JanitorialFormRoute />,
   },
 ]);

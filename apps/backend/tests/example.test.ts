@@ -1,6 +1,7 @@
 import { describe, it, expect, test } from "vitest";
 import { createGraph, dijkstraPathFinder } from "../src/shortestPath.ts";
 
+
 function sum(a: number, b: number) {
     return a + b;
 }
