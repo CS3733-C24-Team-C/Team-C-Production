@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DropDown from "./DropDown";
-import MenuBar from "@/routes/MenuBar.tsx";
+import { MenuBar, DropDown } from "@/components";
 
-const ServiceRequestRoute = () => {
+const ServiceRequest = () => {
   const [showRoomDropDown, setShowRoomDropDown] = useState<boolean>(false);
   const [showRequestDropDown, setShowRequestDropDown] =
     useState<boolean>(false);
@@ -32,7 +31,7 @@ const ServiceRequestRoute = () => {
   };
 
   const dismissRoomHandler = (
-    event: React.FocusEvent<HTMLButtonElement>,
+    event: React.FocusEvent<HTMLButtonElement>
   ): void => {
     if (event.currentTarget === event.target) {
       setShowRoomDropDown(false);
@@ -40,7 +39,7 @@ const ServiceRequestRoute = () => {
   };
 
   const dismissRequestHandler = (
-    event: React.FocusEvent<HTMLButtonElement>,
+    event: React.FocusEvent<HTMLButtonElement>
   ): void => {
     if (event.currentTarget === event.target) {
       setShowRequestDropDown(false);
@@ -119,11 +118,13 @@ const ServiceRequestRoute = () => {
         )}
       </button>
       <div>
-        <button type="submit" onClick={submit}>Submit</button>
+        <button type="submit" onClick={submit}>
+          Submit
+        </button>
         <button onClick={back}>Back</button>
       </div>
     </div>
   );
 };
 
-export default ServiceRequestRoute;
+export { ServiceRequest };

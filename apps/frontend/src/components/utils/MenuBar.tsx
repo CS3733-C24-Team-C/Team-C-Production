@@ -1,4 +1,4 @@
-import React, { FormEvent } from "react";
+import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import "./sideBar.css";
 
@@ -68,4 +68,5 @@ const MenuBar = () => {
     </>
   );
 };
-export default MenuBar;
+
+export { MenuBar };

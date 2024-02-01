@@ -34,4 +34,4 @@ const Table = ({ data }: TableProps) => {
   );
 };
 
-export default Table;
+export { Table };

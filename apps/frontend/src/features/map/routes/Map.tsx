@@ -1,16 +1,14 @@
-import "./sideBar.css";
-
-import groundFloor from "./MapImages/00_thegroundfloor.png";
-import lowerLevel1 from "./MapImages/00_thelowerlevel1.png";
-import lowerLevel2 from "./MapImages/00_thelowerlevel2.png";
-import firstFloor from "./MapImages/01_thefirstfloor.png";
-import secondFloor from "./MapImages/02_thesecondfloor.png";
-import thirdFloor from "./MapImages/03_thethirdfloor.png";
-import AutofillInput from "./AutofillInput.tsx";
 import { useState } from "react";
-import MenuBar from "@/routes/MenuBar.tsx";
 
-const MapRoute = () => {
+import groundFloor from "../assets/00_thegroundfloor.png";
+import lowerLevel1 from "../assets/00_thelowerlevel1.png";
+import lowerLevel2 from "../assets/00_thelowerlevel2.png";
+import firstFloor from "../assets/01_thefirstfloor.png";
+import secondFloor from "../assets/02_thesecondfloor.png";
+import thirdFloor from "../assets/03_thethirdfloor.png";
+import { MenuBar, AutofillInput } from "@/components";
+
+const Map = () => {
   const [selectedFloor, setSelectedFloor] = useState("");
 
   return (
@@ -40,4 +38,5 @@ const MapRoute = () => {
     </>
   );
 };
-export default MapRoute;
+
+export { Map };

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function AutofillInput() {
+const AutofillInput = () => {
   return (
     <div>
       <form>
@@ -9,4 +9,6 @@ export default function AutofillInput() {
       </form>
     </div>
   );
-}
+};
+
+export { AutofillInput };

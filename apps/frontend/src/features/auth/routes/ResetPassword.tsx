@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const NewAccountRoute = () => {
+const ResetPassword = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
@@ -21,7 +21,7 @@ const NewAccountRoute = () => {
 
   return (
     <form onSubmit={handleSubmit} className={"centeredElement"}>
-      <h1>Create an Account:</h1>
+      <h1>Reset Password</h1>
       <div>
         <input
           type="text"
@@ -38,7 +38,7 @@ const NewAccountRoute = () => {
           type="password"
           id="password"
           name="password"
-          placeholder="Password"
+          placeholder="New Password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -49,15 +49,15 @@ const NewAccountRoute = () => {
           type="password"
           id="verify-password"
           name="verify-password"
-          placeholder="Verify Password"
+          placeholder="Verify New Password"
           required
           value={checkPassword}
           onChange={(e) => setCheckPassword(e.target.value)}
         />
       </div>
-      <button type="submit">Create Account</button>
+      <button type="submit">Sign In</button>
     </form>
   );
 };
 
-export default NewAccountRoute;
+export { ResetPassword };

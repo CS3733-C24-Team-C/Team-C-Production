@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DropDown from "./DropDown";
+import { DropDown } from "@/components";
 
-const JanitorialRequestForm = () => {
+const Janitorial = () => {
   const [nameInput, setNameInput] = useState("");
   const [commentInput, setCommentInput] = useState("");
   const [priorityInput, setPriorityInput] = useState<string>("");
@@ -48,7 +48,7 @@ const JanitorialRequestForm = () => {
   };
 
   const dismissPriorityHandler = (
-    e: React.FocusEvent<HTMLButtonElement>,
+    e: React.FocusEvent<HTMLButtonElement>
   ): void => {
     if (e.currentTarget === e.target) {
       setShowPriorityDropDown(false);
@@ -106,4 +106,4 @@ const JanitorialRequestForm = () => {
   );
 };
 
-export default JanitorialRequestForm;
+export { Janitorial };

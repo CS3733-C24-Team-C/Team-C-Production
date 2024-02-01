@@ -1,15 +1,17 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const SignInRoute = () => {
+const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
+
   const navigate = useNavigate();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (username != "admin" || password != "admin") {
-      alert("Wrong Password or Account");
+    if (password !== checkPassword) {
+      alert("Passwords do not match!");
       return;
     }
     console.log(username);
@@ -17,19 +19,9 @@ const SignInRoute = () => {
     navigate("/");
   };
 
-  const handleResetPassword = (e: FormEvent) => {
-    e.preventDefault();
-    navigate("/sign-in/reset-password");
-  };
-
-  const handleCreateAccount = (e: FormEvent) => {
-    e.preventDefault();
-    navigate("/sign-in/new-account");
-  };
-
   return (
     <form onSubmit={handleSubmit} className={"centeredElement"}>
-      <h1>Sign In</h1>
+      <h1>Create an Account:</h1>
       <div>
         <input
           type="text"
@@ -52,17 +44,20 @@ const SignInRoute = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <button type="submit">Sign In</button>
-      <br />
-      <button type="button" role="link" onClick={handleResetPassword}>
-        Reset Password
-      </button>
-      <br />
-      <button type="button" role="link" onClick={handleCreateAccount}>
-        Create an Account
-      </button>
+      <div>
+        <input
+          type="password"
+          id="verify-password"
+          name="verify-password"
+          placeholder="Verify Password"
+          required
+          value={checkPassword}
+          onChange={(e) => setCheckPassword(e.target.value)}
+        />
+      </div>
+      <button type="submit">Create Account</button>
     </form>
   );
 };
 
-export default SignInRoute;
+export { SignUp };

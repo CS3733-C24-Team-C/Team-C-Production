@@ -41,4 +41,4 @@ const DropDown: React.FC<DropDownProps> = ({
   );
 };
 
-export default DropDown;
+export { DropDown };

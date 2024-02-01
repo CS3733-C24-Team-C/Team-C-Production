@@ -1,12 +1,15 @@
 import * as React from "react";
-import { RouterProvider } from "react-router-dom";
-import { router } from "@/routes";
+import { BrowserRouter as RouterProvider } from "react-router-dom";
 import ThemeProvider from "./theme";
 
-export const AppProvider = () => {
+type AppProviderProps = {
+  children: React.ReactNode;
+};
+
+export const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <ThemeProvider>
-      <RouterProvider router={router} />
+      <RouterProvider>{children}</RouterProvider>
     </ThemeProvider>
   );
 };
