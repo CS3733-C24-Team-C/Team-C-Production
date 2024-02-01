@@ -1,12 +1,9 @@
 import express, { Router, Request, Response } from "express";
 import PrismaClient from "../bin/database-connection.ts";
+import multer from "multer";
 import { createGraph, dijkstraPathFinder } from "../shortestPath.ts";
 
 const router: Router = express.Router();
-
-type Graph = Map<string, Array<{ node: string; weight: number }>>;
-
-let graph: Graph | null = null;
 
 router.get("/nodes", async function (req: Request, res: Response) {
     const nodes = await PrismaClient.nodes.findMany();
@@ -28,6 +25,32 @@ async function initializeGraph() {
         graph = null;
     }
 }
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploaded-csvs/"); // Destination folder for uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname); // Unique filename
+  },
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/upload", upload.single("poster"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file was selected");
+  }
+  if (req.file.mimetype != "text/csv") {
+    return res.status(400).send("File type not accepted");
+  }
+
+  res.redirect("/csv-data");
+});
+
+type Graph = Map<string, Array<{ node: string; weight: number }>>;
+
+let graph: Graph | null = null;
 
 initializeGraph()
     .then(() => {
@@ -82,5 +105,7 @@ router.get("/pathfinding", async function (req: Request, res: Response) {
         res.status(500).send("Internal server error");
     }
 });
+
+
 
 export default router;
