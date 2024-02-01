@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 import { CiSearch } from "react-icons/ci";
 import { Nodes } from "database";
@@ -30,28 +30,34 @@ const LocationSearch = () => {
     fetchNodes();
   }, []);
 
-  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const startNodeId = nodes
+      .filter((node) => node["longName"] === startLocation)
+      .map((node) => node.nodeID)[0];
+    const endNodeId = nodes
+      .filter((node) => node["longName"] === endLocation)
+      .map((node) => node.nodeID)[0];
     try {
       const res = await fetch("/api/map/pathfinding", {
         method: "POST",
-        body: formData,
+        body: JSON.stringify({
+          startNodeId,
+          endNodeId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       if (!res.ok) throw new Error(res.statusText);
-      alert("Path found!");
+      alert("Path found: " + (await res.json()).path);
     } catch (error) {
       alert("Failed to find path. Please try again.");
     }
   };
 
   return (
-    <form
-      action="/api/map/pathfinding"
-      method="post"
-      onSubmit={submitHandler}
-      className="flex flex-col space-y-4"
-    >
+    <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
       <div className="relative">
         <Label
           id="startLocation"
