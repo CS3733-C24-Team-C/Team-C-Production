@@ -100,8 +100,6 @@ const CSVData = () => {
           Download Nodes CSV
         </Button>
         <Button onClick={() => downloadCSV("/api/map/download/edges")}>
-          Download Edges CSV
-        </Button>
       </div>
 
       <div className="flex">
