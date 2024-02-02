@@ -1,6 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "@/components";
 import { FileInput, Label, Button } from "flowbite-react";
+import axios from "axios";
+
+/**
+ * Triggers a download of a CSV file from a given endpoint.
+ * @param endpoint The URL endpoint to fetch the CSV file from.
+ */
+async function downloadCSV(endpoint: string): Promise<void> {
+  try {
+    const response = await axios.get(endpoint, { responseType: "blob" });
+
+    // Create a link element, use it to download the blob, and remove it
+    const url = window.URL.createObjectURL(response.data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = endpoint.includes("nodes") ? "L1Nodes.csv" : "L1Edges.csv";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url); // Clean up the URL object
+    a.remove();
+  } catch (error) {
+    console.error("Error downloading CSV:", error);
+  }
+}
 
 const CSVData = () => {
   const [nodes, setNodes] = useState([]);
@@ -32,7 +55,6 @@ const CSVData = () => {
     fetchEdges();
   }, []);
 
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -49,14 +71,12 @@ const CSVData = () => {
     }
   };
 
-
   return (
     <>
       <form
         action="/api/map/upload"
         method="post"
         encType="multipart/form-data"
-
         onSubmit={handleSubmit}
       >
         <div className="mb-2 block">
@@ -75,7 +95,13 @@ const CSVData = () => {
         <Button type="submit">Upload File</Button>
       </form>
 
-      <Button className="my-8">Download CSV Data</Button>
+      <div className="mt-4 flex space-x-4 w-96">
+        <Button onClick={() => downloadCSV("/api/map/download/nodes")}>
+          Download Nodes CSV
+        </Button>
+        <Button onClick={() => downloadCSV("/api/map/download/edges")}>
+      </div>
+
       <div className="flex">
         <Table data={nodes} />
         <div className="w-32" />
