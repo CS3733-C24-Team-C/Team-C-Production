@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import exampleRouter from "./routes/example.ts";
 import mapRouter from "./routes/map.ts";
-import downloadRoute from "./routes/downloadRoute.ts";
 
 const app: Express = express(); // Setup the backend
 
@@ -15,7 +14,7 @@ app.use(
       // This is a "hack" that gets the output to appear in the remote debugger :)
       write: (msg) => console.info(msg),
     },
-  }),
+  })
 ); // This records all HTTP requests
 app.use(express.json()); // This processes requests as JSON
 app.use(express.urlencoded({ extended: false })); // URL parser
@@ -25,7 +24,6 @@ app.use(cookieParser()); // Cookie parser
 // won't be reached by the default proxy and prod setup
 app.use("/api/high-score", exampleRouter);
 app.use("/api/map", mapRouter);
-app.use("/api/download", downloadRoute);
 
 /**
  * Catch all 404 errors, and forward them to the error handler
