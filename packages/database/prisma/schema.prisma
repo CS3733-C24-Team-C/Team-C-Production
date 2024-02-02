@@ -52,6 +52,7 @@ model Requests {
   urgency Urgency
   type    RequestType
   notes   String?
+  isDone  Boolean     @default(false)
 }
 
 enum Urgency {
@@ -66,4 +67,13 @@ enum RequestType {
   MEDI // medicinal
   RELC // patient relocation
   CONS // patient consultation
+}
+
+model Employees {
+  employeeID Int     @id
+  firstName  String
+  lastName   String
+  isAdmin    Boolean
+  login      String
+  password   String
 }
