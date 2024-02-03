@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+//useContext
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 import { CiSearch } from "react-icons/ci";
 import { Nodes } from "database";
+import { DirectionsContext } from "@/features/map/routes/Map.tsx";
 
 const LocationSearch = () => {
   const [nodes, setNodes] = useState<Nodes[]>([]);
@@ -14,10 +16,12 @@ const LocationSearch = () => {
     .slice(0, directions.length - 1)
     .map((ID) => nodes.filter((node) => node["nodeID"] === ID));
 
+  const { path, setPath } = useContext(DirectionsContext);
+
   const locations: { nodeID: string; longName: string }[] = nodes.map(
     (node) => {
       return { nodeID: node.nodeID, longName: node.longName };
-    }
+    },
   );
 
   useEffect(() => {
@@ -57,6 +61,8 @@ const LocationSearch = () => {
       const data = await res.json();
       setDirections(data.path);
       console.log(newDirections);
+      setPath(data.path);
+      console.log(path);
     } catch (error) {
       alert("Failed to find path. Please try again.");
     }
@@ -85,8 +91,8 @@ const LocationSearch = () => {
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
-                    )
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    ),
                 );
               } else {
                 setStartSuggestions([]);
@@ -126,8 +132,8 @@ const LocationSearch = () => {
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
-                    )
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    ),
                 );
               } else {
                 setEndSuggestions([]);
