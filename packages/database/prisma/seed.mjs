@@ -6,48 +6,53 @@ import { calculateEdgeWeights } from "./weightCalculator.mjs";
 const prisma = new PrismaClient();
 const nodesPath = path.join(path.resolve(), "prisma/L1Nodes.csv");
 const edgesPath = path.join(path.resolve(), "prisma/L1Edges.csv");
-//const requestsPath = path.join(path.resolve(), "prisma/services.csv");
 
-const main = async () => {
-  // read csv data
-  const nodes = readCSV(nodesPath);
-  const edges = readCSV(edgesPath);
-  // calculate weight of edges
-  const edgeWeights = calculateEdgeWeights(nodes, edges);
+async function main() {
+    const nodes = readCSV(nodesPath);
+    const edges = readCSV(edgesPath);
 
-  // seed with nodes
-  for (const node of nodes) {
-    await prisma.nodes.create({
-      data: {
-        ...node,
-        xcoord: Number(node.xcoord),
-        ycoord: Number(node.ycoord),
-      },
-    });
-  }
-  for (const edge of edges) {
-    const edgeWeightEntry = edgeWeights.find(
-      (element) => element.edgeID === edge.edgeID,
-    );
+    const edgeWeights = calculateEdgeWeights(nodes, edges);
 
-    if (!edgeWeightEntry) {
-      console.error(`No weight found for edgeID: ${edge.edgeID}`);
-      continue; // Skip this edge if no weight is found
+    const nodesByFloor = {};
+    for (const node of nodes) {
+        if (!nodesByFloor[node.floor]) {
+            nodesByFloor[node.floor] = [];
+        }
+        nodesByFloor[node.floor].push(node);
     }
 
-    await prisma.edges.create({
-      data: {
-        ...edge,
-        weight: edgeWeightEntry.weight,
-      },
-    });
-  }
-};
+    for (const [floor, floorNodes] of Object.entries(nodesByFloor)) {
+        console.log(`Seeding nodes for floor ${floor}`);
+        for (const node of floorNodes) {
+            await prisma.nodes.create({
+                data: {
+                    ...node,
+                    xcoord: Number(node.xcoord),
+                    ycoord: Number(node.ycoord);
+                },
+            });
+        }
+    }
+
+    for (const edge of edges) {
+        const edgeWeightEntry = edgeWeights.find(e => e.edgeID === edge.edgeID);
+        if (!edgeWeightEntry) {
+            console.error(`No weight found for edgeID: ${edge.edgeID}`);
+            continue;
+        }
+        await prisma.edges.create({
+            data: {
+                ...edge,
+                weight: edgeWeightEntry.weight,
+            },
+        });
+    }
+}
 try {
-  await main();
-  await prisma.$disconnect();
+    await main();
+    await prisma.$disconnect();
 } catch (e) {
-  console.error(e);
-  await prisma.$disconnect();
-  process.exit(1);
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
 }
