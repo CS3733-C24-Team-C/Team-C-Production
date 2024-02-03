@@ -46,13 +46,15 @@ enum NodeType {
 }
 
 model Requests {
-  id      Int         @id @default(autoincrement())
-  nodeID  String
-  room    Nodes       @relation(fields: [nodeID], references: [nodeID])
-  urgency Urgency
-  type    RequestType
-  notes   String?
-  isDone  Boolean     @default(false)
+  id           Int           @id @default(autoincrement())
+  nodeID       String
+  room         Nodes         @relation(fields: [nodeID], references: [nodeID])
+  employeeID   Int           @default(0)
+  employeeName Employees     @relation(fields: [employeeID], references: [employeeID])
+  urgency      Urgency
+  type         RequestType
+  notes        String?
+  compStatus   RequestStatus @default(UNSG)
 }
 
 enum Urgency {
@@ -70,10 +72,23 @@ enum RequestType {
 }
 
 model Employees {
-  employeeID Int     @id
+  employeeID Int        @id
   firstName  String
   lastName   String
-  isAdmin    Boolean
+  role       StaffRole
   login      String
   password   String
+  requests   Requests[]
+}
+
+enum RequestStatus {
+  UNSG //unassigned
+  ASGN //assigned
+  PROG //in Progress
+  COMP //completed
+}
+
+enum StaffRole {
+  REG //Regular employee
+  ADM //Admin employee
 }
