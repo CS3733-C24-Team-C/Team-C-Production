@@ -8,13 +8,10 @@ const nodesPath = path.join(path.resolve(), "prisma/L1Nodes.csv");
 const edgesPath = path.join(path.resolve(), "prisma/L1Edges.csv");
 
 async function main() {
-    // Await the resolution of readCSV calls
+
     const nodes = await readCSV(nodesPath);
     const edges = await readCSV(edgesPath);
 
-    // Assuming calculateEdgeWeights is async, you should await its result
-    // If calculateEdgeWeights is not inherently async, this await is not necessary
-    // But it's here assuming you might perform async operations inside it
     const edgeWeights = await calculateEdgeWeights(nodes, edges);
 
     const nodesByFloor = {};
@@ -28,7 +25,7 @@ async function main() {
     for (const [floor, floorNodes] of Object.entries(nodesByFloor)) {
         console.log(`Seeding nodes for floor ${floor}`);
         for (const node of floorNodes) {
-            await prisma.nodes.create({ // Ensure this matches your Prisma schema (node vs nodes)
+            await prisma.nodes.create({
                 data: {
                     ...node,
                     xcoord: Number(node.xcoord),
@@ -44,7 +41,7 @@ async function main() {
             console.error(`No weight found for edgeID: ${edge.edgeID}`);
             continue;
         }
-        await prisma.edges.create({ // Ensure this matches your Prisma schema (edge vs edges)
+        await prisma.edges.create({
             data: {
                 ...edge,
                 weight: edgeWeightEntry.weight,
