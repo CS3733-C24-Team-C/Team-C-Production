@@ -4,7 +4,7 @@
  * @returns {number}
  */
 const mapFloorToNumber = (floorLabel) => {
-    // Define custom mappings for floors
+    // Remap floors to make integers
     const mappings = {
         'L1': -1,
         'L2': -2,
@@ -13,50 +13,56 @@ const mapFloorToNumber = (floorLabel) => {
         '3': 3,
     };
 
-    // Default to 0 if no floor
+    
     return mappings[floorLabel] || 0;
 };
 
 /**
- * Adjusts the distance calculation considering different node types and floor changes with non-standard floor labels.
+ * Adjusts the distance calculation considering different node types, floor changes, and precise alignment for elevators and stairs.
  *
  * @param {Nodes} nodeA
  * @param {Nodes} nodeB
  * @returns {number} The adjusted distance between two nodes.
  */
 const calculateAdjustedDistance = (nodeA, nodeB) => {
-    // Convert floor labels to numbers
+    // Label to number
     const floorA = mapFloorToNumber(nodeA.floor);
     const floorB = mapFloorToNumber(nodeB.floor);
 
-    // Define weights for special transitions
+    // Transitions handling
     const elevatorWeight = 5; // ELEV wait time
-    const stairsWeightPerFloor = 2; // STAI wait time
+    const stairsWeight = 2; // STAIRS efforts/wait time
 
     if (floorA === floorB) {
-        // Horizontal only if on the same floor
+        // Same floor, same plane, do regular calculation
         return Math.sqrt(
             Math.pow(nodeA.xcoord - nodeB.xcoord, 2) +
             Math.pow(nodeA.ycoord - nodeB.ycoord, 2)
         );
     } else {
-        // Take in vertical if on different floors
+        // Y coordinates handling to check if elevators and stairs are connected (aligned/same y coord)
+        const isDirectlyConnected = (nodeA.nodeType === 'ELEV' || nodeA.nodeType === 'STAI') &&
+            (nodeB.nodeType === 'ELEV' || nodeB.nodeType === 'STAI') &&
+            nodeA.ycoord === nodeB.ycoord;
+
+        // Aligned, we calculate the weight by multypling the floor difference to the wait time.
         const floorDifference = Math.abs(floorA - floorB);
-        if (nodeA.nodeType === 'ELEV' || nodeB.nodeType === 'ELEV') {
-            // ADD ELEV WEIGHT
-            //add ycoord to check matching elevator
-            return floorDifference * elevatorWeight;
-        } else if (nodeA.nodeType === 'STAI' || nodeB.nodeType === 'STAI') {
-            // ADD STAI WEIGHT
-            //add y coord to add matching stairs
-            return floorDifference * stairsWeightPerFloor;
-        } else {
-            // Increase routing to avoid this path being taken (if no connection between floors)
-            const discourageRouting = 10000;
-            return discourageRouting;
+        if (isDirectlyConnected) {
+            if (nodeA.nodeType === 'ELEV' && nodeB.nodeType === 'ELEV') {
+                // ADD ELEV WEIGHT
+                return floorDifference * elevatorWeight;
+            } else if (nodeA.nodeType === 'STAI' && nodeB.nodeType === 'STAI') {
+                // ADD STAIRS WEIGHT
+                return floorDifference * stairsWeight;
+            }
         }
+
+        // Increase routing to avoid this path being taken (if no connection between floors)
+        const discourageRouting = 10000;
+        return discourageRouting;
     }
 };
+
 
 
 /**
