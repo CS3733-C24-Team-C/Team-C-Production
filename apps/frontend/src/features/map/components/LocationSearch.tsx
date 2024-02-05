@@ -13,7 +13,6 @@ const LocationSearch = () => {
   const [endLocation, setEndLocation] = useState<string>("");
   const [directions, setDirections] = useState<string[]>([]);
   const newDirections = directions
-    .slice(0, directions.length - 1)
     .map((ID) => nodes.filter((node) => node["nodeID"] === ID));
 
   const { path, setPath } = useContext(DirectionsContext);

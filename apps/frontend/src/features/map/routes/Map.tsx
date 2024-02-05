@@ -22,7 +22,8 @@ import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 
-import Nodes from "@/features/map/components/nodes.tsx";
+//import Nodes from "@/features/map/components/nodes.tsx";
+import Lines from "@/features/map/components/lines.tsx";
 
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
@@ -112,14 +113,17 @@ const MapDisplay = (props: { selectedFloor: string }) => {
           width={"1000"}
           height={"auto"}
         />
-        <Nodes
-          left={coords[0]}
-          right={coords[1]}
-          top={coords[2]}
-          bottom={coords[3]}
-          width={coords[4]}
-          height={coords[5]}
-        />
+        <div style={{ position: "absolute", top: 0, left: 0 }}>
+          <Lines
+            top={coords[2]}
+            left={coords[0]}
+            height={coords[5]}
+            width={coords[4]}
+            bottom={coords[3]}
+            right={coords[1]}
+            selectedFloor={props.selectedFloor}
+          ></Lines>
+        </div>
       </div>
     </>
   );
