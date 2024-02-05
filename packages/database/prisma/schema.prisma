@@ -13,21 +13,21 @@ datasource db {
 }
 
 model Nodes {
-  nodeID    String     @id
-  xcoord    Int
-  ycoord    Int
+  id        String     @id
+  xCoord    Int
+  yCoord    Int
   floor     String
   building  String
-  nodeType  NodeType
+  type      NodeType
   longName  String
   shortName String
   requests  Requests[]
 }
 
 model Edges {
-  edgeID    String @id
-  startNode String
-  endNode   String
+  id        String @id
+  startNode String //foreign key
+  endNode   String //foreign key
   weight    Float
 }
 
@@ -43,23 +43,24 @@ enum NodeType {
   RETL
   SERV
   HALL
+  BATH
 }
 
 model Requests {
-  id           Int           @id @default(autoincrement())
-  nodeID       String
-  room         Nodes         @relation(fields: [nodeID], references: [nodeID])
-  employeeID   Int           @default(0)
-  employeeName Employees     @relation(fields: [employeeID], references: [employeeID])
-  urgency      Urgency
-  type         RequestType
-  notes        String?
-  compStatus   RequestStatus @default(UNSG)
+  id               Int           @id @default(autoincrement())
+  nodeId           String
+  room             Nodes         @relation(fields: [nodeId], references: [id])
+  employeeId       Int           @default(0)
+  employeeName     Employees     @relation(fields: [employeeId], references: [id])
+  urgency          Urgency
+  type             RequestType
+  notes            String?
+  completionStatus RequestStatus @default(UNASSIGNED)
 }
 
 enum Urgency {
-  LOWU // low urgency
-  MEDI // medium urgency
+  LOW // low urgency
+  MEDIUM // medium urgency
   HIGH // high urgency
 }
 
@@ -72,23 +73,23 @@ enum RequestType {
 }
 
 model Employees {
-  employeeID Int        @id
-  firstName  String
-  lastName   String
-  role       StaffRole
-  login      String
-  password   String
-  requests   Requests[]
+  id        Int        @id
+  firstName String
+  lastName  String
+  role      StaffRole
+  login     String
+  password  String
+  requests  Requests[]
 }
 
 enum RequestStatus {
-  UNSG //unassigned
-  ASGN //assigned
-  PROG //in Progress
-  COMP //completed
+  UNASSIGNED //unassigned
+  ASSIGNED //assigned
+  IN_PROGRESS //in progress
+  COMPLETED //completed
 }
 
 enum StaffRole {
-  REG //Regular employee
-  ADM //Admin employee
+  REGULAR //Regular employee
+  ADMIN //Admin employee
 }
