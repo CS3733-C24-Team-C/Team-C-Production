@@ -70,6 +70,7 @@ enum RequestType {
   MEDI // medicinal
   RELC // patient relocation
   CONS // patient consultation
+  CUST // custom request
 }
 
 model Employees {
