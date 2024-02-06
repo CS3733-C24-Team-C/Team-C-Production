@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DropDown, Table } from "@/components";
+import { Button } from "flowbite-react";
 
 const ServiceRequest = () => {
   const [serviceRequests, setServiceRequests] = useState([]);
@@ -24,7 +25,7 @@ const ServiceRequest = () => {
     useState<boolean>(false);
   const [selectRoom, setSelectRoom] = useState<string>("");
   const rooms = () => {
-    return ["Room 1", "Room 2", "Room 3"];
+    return ["Room 1", "Room 2", "Room 3", "Room 4", "Room 5"];
   };
   const [selectRequest, setSelectRequest] = useState<string>("");
   const requests = () => {
@@ -47,7 +48,7 @@ const ServiceRequest = () => {
   };
 
   const dismissRoomHandler = (
-    event: React.FocusEvent<HTMLButtonElement>
+    event: React.FocusEvent<HTMLButtonElement>,
   ): void => {
     if (event.currentTarget === event.target) {
       setShowRoomDropDown(false);
@@ -55,7 +56,7 @@ const ServiceRequest = () => {
   };
 
   const dismissRequestHandler = (
-    event: React.FocusEvent<HTMLButtonElement>
+    event: React.FocusEvent<HTMLButtonElement>,
   ): void => {
     if (event.currentTarget === event.target) {
       setShowRequestDropDown(false);
@@ -90,10 +91,11 @@ const ServiceRequest = () => {
   return (
     <div className={"dropdown"}>
       <h1>Submit a Service Request</h1>
+      <br></br>
       <div>
         {selectRoom ? `You selected ${selectRoom}.` : "Select a Room..."}
       </div>
-      <button
+      <Button
         className={showRoomDropDown ? "active" : undefined}
         onClick={(): void => toggleRoomDropDown()}
         onBlur={(e: React.FocusEvent<HTMLButtonElement>): void =>
@@ -109,13 +111,14 @@ const ServiceRequest = () => {
             objSelection={roomSelection}
           />
         )}
-      </button>
+      </Button>
+      <br></br>
       <div>
         {selectRequest
           ? `You selected a ${selectRequest} request.`
           : "Select a Request..."}
       </div>
-      <button
+      <Button
         className={showRequestDropDown ? "active" : undefined}
         onClick={(): void => toggleRequestDropDown()}
         onBlur={(e: React.FocusEvent<HTMLButtonElement>): void =>
@@ -131,12 +134,12 @@ const ServiceRequest = () => {
             objSelection={requestSelection}
           />
         )}
-      </button>
+      </Button>
+      <br></br>
       <div>
-        <button type="submit" onClick={submit}>
-          Submit
-        </button>
-        <button onClick={back}>Back</button>
+        <Button onClick={submit}>Submit</Button>
+        <br></br>
+        <Button onClick={back}>Back</Button>
       </div>
       <Table data={serviceRequests} />
     </div>
