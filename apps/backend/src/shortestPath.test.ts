@@ -77,5 +77,92 @@ describe("A Star Path Finder", () => {
     const path = shortestPathAStar("A", "D", graph);
 
     expect(path).toEqual([]);
+
+
   });
+});
+
+describe("A Star Path Finder Additional Tests", () => {
+    it("should prefer paths with lower overall weight", () => {
+        const edges = [
+            { startNode: "A", endNode: "B", weight: 4 },
+            { startNode: "B", endNode: "C", weight: 1 },
+            { startNode: "A", endNode: "C", weight: 5 },
+            { startNode: "C", endNode: "D", weight: 1 },
+            { startNode: "B", endNode: "D", weight: 2 },
+        ];
+
+        const graph = createGraph(edges);
+        const path = shortestPathAStar("A", "D", graph);
+
+        expect(path).toEqual(["A", "B", "C", "D"]);
+    });
+
+    it("should avoid paths with high weight if possible", () => {
+        const edges = [
+            { startNode: "A", endNode: "B", weight: 1 },
+            { startNode: "B", endNode: "C", weight: 10 }, // High weight edge
+            { startNode: "A", endNode: "C", weight: 2 },
+            { startNode: "C", endNode: "D", weight: 2 },
+        ];
+
+        const graph = createGraph(edges);
+        const path = shortestPathAStar("A", "D", graph);
+
+        expect(path).toEqual(["A", "C", "D"]);
+    });
+
+    it("handles large graph with multiple paths", () => {
+        const edges = [
+            { startNode: "A", endNode: "B", weight: 2 },
+            { startNode: "B", endNode: "C", weight: 2 },
+            { startNode: "C", endNode: "D", weight: 2 },
+            { startNode: "A", endNode: "E", weight: 1 },
+            { startNode: "E", endNode: "D", weight: 4 },
+            { startNode: "A", endNode: "F", weight: 3 },
+            { startNode: "F", endNode: "D", weight: 3 },
+            { startNode: "B", endNode: "F", weight: 1 },
+            { startNode: "C", endNode: "E", weight: 1 },
+        ];
+
+        const graph = createGraph(edges);
+        const path = shortestPathAStar("A", "D", graph);
+
+        // Expected to find the most efficient path considering all possible routes
+        expect(path).toEqual(["A", "B", "C", "D"]);
+    });
+
+    it("should handle nodes with zero weight paths correctly", () => {
+        const edges = [
+            { startNode: "A", endNode: "B", weight: 0 },
+            { startNode: "B", endNode: "C", weight: 0 },
+            { startNode: "C", endNode: "D", weight: 0 },
+            { startNode: "A", endNode: "D", weight: 1 },
+        ];
+
+        const graph = createGraph(edges);
+        const path = shortestPathAStar("A", "D", graph);
+
+        // Despite the direct path having a weight, zero-weight paths should be considered
+        expect(path).toEqual(["A", "B", "C", "D"]);
+    });
+
+    it("should handle complex graph with multiple optimal paths", () => {
+        const edges = [
+            { startNode: "A", endNode: "B", weight: 3 },
+            { startNode: "B", endNode: "C", weight: 3 },
+            { startNode: "C", endNode: "D", weight: 3 },
+            { startNode: "A", endNode: "E", weight: 3 },
+            { startNode: "E", endNode: "D", weight: 3 },
+            { startNode: "A", endNode: "F", weight: 2 },
+            { startNode: "F", endNode: "G", weight: 2 },
+            { startNode: "G", endNode: "D", weight: 2 },
+        ];
+
+        const graph = createGraph(edges);
+        const path = shortestPathAStar("A", "D", graph);
+
+
+        expect(path).toHaveLength(4); // The shortest path should consist of
+    });
 });
