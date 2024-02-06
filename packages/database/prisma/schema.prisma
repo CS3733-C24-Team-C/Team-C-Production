@@ -13,19 +13,19 @@ datasource db {
 }
 
 model Nodes {
-  id        String     @id
-  xCoord    Int
-  yCoord    Int
+  nodeID    String     @id
+  xcoord    Int
+  ycoord    Int
   floor     String
   building  String
-  type      NodeType
+  nodeType  NodeType
   longName  String
   shortName String
   requests  Requests[]
 }
 
 model Edges {
-  id        String @id
+  edgeID    String @id
   startNode String //foreign key
   endNode   String //foreign key
   weight    Float
@@ -49,7 +49,7 @@ enum NodeType {
 model Requests {
   id               Int           @id @default(autoincrement())
   nodeId           String
-  room             Nodes         @relation(fields: [nodeId], references: [id])
+  room             Nodes         @relation(fields: [nodeId], references: [nodeID])
   employeeId       Int           @default(0)
   employeeName     Employees     @relation(fields: [employeeId], references: [id])
   urgency          Urgency
