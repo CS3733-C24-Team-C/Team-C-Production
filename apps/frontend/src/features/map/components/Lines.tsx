@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { DirectionsContext } from "@/features/map/routes/Map.tsx";
+import { DirectionsContext } from "../components";
 import { Nodes } from "database";
 
 import groundFloor from "../assets/00_thegroundfloor.png";
@@ -9,7 +9,7 @@ import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 
-export default function Lines(props: {
+function Lines(props: {
   left: number;
   top: number;
   width: number;
@@ -21,7 +21,7 @@ export default function Lines(props: {
   const { path } = useContext(DirectionsContext);
   const [nodes, setNodes] = useState<Nodes[]>([]);
   const path2 = path.map((nodeID) =>
-    nodes.filter((node) => node.nodeID == nodeID),
+    nodes.filter((node) => node.nodeID == nodeID)
   );
 
   const floorID = () => {
@@ -155,3 +155,5 @@ export default function Lines(props: {
                   ));
               }))}
  */
+
+export { Lines };
