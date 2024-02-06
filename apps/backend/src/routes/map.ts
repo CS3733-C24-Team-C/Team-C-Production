@@ -1,7 +1,7 @@
 import express, { Router, Request, Response } from "express";
 import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
-import { createGraph, dijkstraPathFinder } from "../shortestPath.ts";
+import { createGraph, shortestPathAStar } from "../shortestPath.ts";
 import { Prisma } from "database";
 
 const router: Router = express.Router();
