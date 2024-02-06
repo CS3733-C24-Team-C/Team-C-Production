@@ -46,15 +46,30 @@ enum NodeType {
   BATH
 }
 
+model Employees {
+  id        Int          @id @default(autoincrement())
+  firstName String
+  lastName  String
+  role      EmployeeRole
+  username  String
+  password  String
+  requests  Requests[]
+}
+
+enum EmployeeRole {
+  ADMIN
+  REGULAR
+}
+
 model Requests {
-  id               Int           @id @default(autoincrement())
-  nodeId           String
-  room             Nodes         @relation(fields: [nodeId], references: [nodeID])
-  employeeId       Int           @default(0)
-  employeeName     Employees     @relation(fields: [employeeId], references: [id])
-  urgency          Urgency
-  type             RequestType
-  notes            String?
+  id         Int         @id @default(autoincrement())
+  nodeID     String
+  employeeID Int
+  room       Nodes       @relation(fields: [nodeID], references: [nodeID])
+  employee   Employees   @relation(fields: [employeeID], references: [id])
+  urgency    Urgency
+  type       RequestType
+  notes      String?
   completionStatus RequestStatus @default(UNASSIGNED)
 }
 
@@ -73,24 +88,9 @@ enum RequestType {
   CUST // custom request
 }
 
-model Employees {
-  id        Int        @id
-  firstName String
-  lastName  String
-  role      StaffRole
-  login     String
-  password  String
-  requests  Requests[]
-}
-
 enum RequestStatus {
   UNASSIGNED //unassigned
   ASSIGNED //assigned
   IN_PROGRESS //in progress
   COMPLETED //completed
-}
-
-enum StaffRole {
-  REGULAR //Regular employee
-  ADMIN //Admin employee
 }
