@@ -7,18 +7,22 @@ const Janitorial = () => {
   const [nameInput, setNameInput] = useState("");
   const [priorityInput, setPriorityInput] = useState<string>("");
   const [statusInput, setStatusInput] = useState("");
+  const [employeeInput, setEmployeeInput] = useState("");
   const [commentInput, setCommentInput] = useState("");
 
-  const [showPriorityDropDown, setShowPriorityDropDown] =
-    useState<boolean>(false);
+  const [showPriorityDropDown, setShowPriorityDropDown] = useState<boolean>(false);
   const priorities = () => {
     return ["LOWU", "MEDI", "HIGH"];
   };
 
   const [showStatusDropDown, setShowStatusDropDown] = useState<boolean>(false);
-
   const statuses = () => {
     return ["UNSG", "ASGN", "PROG", "COMP"];
+  };
+
+  const [showEmployeeDropDown, setShowEmployeeDropDown] = useState<boolean>(false);
+  const employees = () => {
+    return ["Employee 1", "Employee 2", "Employee 3"];
   };
 
   const navigate = useNavigate();
@@ -28,6 +32,7 @@ const Janitorial = () => {
     setCommentInput("");
     prioritySelection("");
     statusSelection("");
+    employeeSelection("");
   }
 
   function back() {
@@ -50,6 +55,10 @@ const Janitorial = () => {
     setShowStatusDropDown(!showStatusDropDown);
   };
 
+  const toggleEmployeeDropDown = () => {
+    setShowEmployeeDropDown(!showEmployeeDropDown);
+  };
+
   const dismissPriorityHandler = (
     e: React.FocusEvent<HTMLButtonElement>,
   ): void => {
@@ -66,12 +75,24 @@ const Janitorial = () => {
     }
   };
 
+  const dismissEmployeeHandler = (
+    e: React.FocusEvent<HTMLButtonElement>,
+  ): void => {
+    if (e.currentTarget === e.target) {
+      setShowEmployeeDropDown(false);
+    }
+  };
+
   const prioritySelection = (priority: string): void => {
     setPriorityInput(priority);
   };
 
   const statusSelection = (status: string): void => {
     setStatusInput(status);
+  };
+
+  const employeeSelection = (employee: string): void => {
+    setEmployeeInput(employee);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -156,6 +177,30 @@ const Janitorial = () => {
                 showDropDown={false}
                 toggleDropDown={(): void => toggleStatusDropDown()}
                 objSelection={statusSelection}
+              />
+            )}
+          </Button>
+          <br></br>
+          <div>
+            {employeeInput
+              ? `You assigned ${employeeInput} to this request.`
+              : "Assign an Employee..."}
+          </div>
+          <Button
+            type={"button"}
+            className={showEmployeeDropDown ? "active" : undefined}
+            onClick={(): void => toggleEmployeeDropDown()}
+            onBlur={(e: React.FocusEvent<HTMLButtonElement>): void =>
+              dismissEmployeeHandler(e)
+            }
+          >
+            <div>{"Employees"}</div>
+            {showEmployeeDropDown && (
+              <DropDown
+                objects={employees()}
+                showDropDown={false}
+                toggleDropDown={(): void => toggleEmployeeDropDown()}
+                objSelection={employeeSelection}
               />
             )}
           </Button>
