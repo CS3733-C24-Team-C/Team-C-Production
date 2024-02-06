@@ -1,11 +1,4 @@
 //createContext
-import React, {
-  Dispatch,
-  createContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
 import logoUrl from "/logo.png";
 import { drawerId } from "../constants";
 import {
@@ -13,8 +6,17 @@ import {
   Button,
   CustomFlowbiteTheme,
 } from "flowbite-react";
-import { LocationSearch } from "@/features/map/components";
-
+import { LocationSearch } from "../components/LocationSearch";
+//createContext
+import React, {
+  Dispatch,
+  createContext,
+  useEffect,
+  useRef,
+  useState,
+  ErrorInfo,
+  ReactNode,
+} from "react";
 import groundFloor from "../assets/00_thegroundfloor.png";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
 import lowerLevel2 from "../assets/00_thelowerlevel2.png";
@@ -25,12 +27,30 @@ import thirdFloor from "../assets/03_thethirdfloor.png";
 //import Nodes from "@/features/map/components/nodes.tsx";
 import Lines from "@/features/map/components/lines.tsx";
 
+class ErrorBoundary extends React.Component<{ children: ReactNode }> {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Component Error:", error, errorInfo);
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
+
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
     base: "h-full",
+    collapsed: {
+      off: "w-200",
+    },
   },
   logo: {
     img: "",
+  },
+  item: {
+    content: {
+      base: "px-3 flex-1", //"px-3 flex-1 whitespace-nowrap"
+    },
   },
 };
 
@@ -49,6 +69,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
         Show navigation
       </Button>
       <FlowbiteSidebar.Logo href="/" img={logoUrl} imgAlt="Hospital logo" />
+
       <FlowbiteSidebar.Items>
         <FlowbiteSidebar.ItemGroup>
           <FlowbiteSidebar.Item>
@@ -67,7 +88,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             </select>
           </FlowbiteSidebar.Item>
           <FlowbiteSidebar.Item>
-            <LocationSearch />
+            <ErrorBoundary>
+              <LocationSearch />
+            </ErrorBoundary>
           </FlowbiteSidebar.Item>
         </FlowbiteSidebar.ItemGroup>
       </FlowbiteSidebar.Items>

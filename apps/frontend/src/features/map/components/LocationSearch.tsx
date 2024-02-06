@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 import { CiSearch } from "react-icons/ci";
 import { Nodes } from "database";
+import "./LocationSearch.css";
 import { DirectionsContext } from "@/features/map/routes/Map.tsx";
 
 const LocationSearch = () => {
@@ -12,8 +13,9 @@ const LocationSearch = () => {
   const [startLocation, setStartLocation] = useState<string>("");
   const [endLocation, setEndLocation] = useState<string>("");
   const [directions, setDirections] = useState<string[]>([]);
-  const newDirections = directions
-    .map((ID) => nodes.filter((node) => node["nodeID"] === ID));
+  const newDirections = directions.map((ID) =>
+    nodes.filter((node) => node["nodeID"] === ID),
+  );
 
   const { path, setPath } = useContext(DirectionsContext);
 
@@ -22,6 +24,77 @@ const LocationSearch = () => {
       return { nodeID: node.nodeID, longName: node.longName };
     },
   );
+
+  function angleBetweenVectors(
+    v1: { x: number; y: number },
+    v2: { x: number; y: number },
+  ): number {
+    // Calculate the angle in radians using the arctangent function
+    const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
+
+    // Convert angle to degrees
+    let angleDegrees = angleRad * (180 / Math.PI);
+
+    // Adjust the angle to be in the range from -180 to 180 degrees
+    if (angleDegrees > 180) {
+      angleDegrees -= 360;
+    } else if (angleDegrees < -180) {
+      angleDegrees += 360;
+    }
+
+    return angleDegrees;
+  }
+
+  function turnDirection(index: number) {
+    let currDirection = null;
+    let prevDirection = null;
+    let nextDirection = null;
+
+    switch (index) {
+      case 0:
+        return "Start at ";
+      case newDirections.length - 1:
+        return "Arrive at ";
+      default:
+        if (
+          newDirections.length > 0 &&
+          index > 0 &&
+          index < newDirections.length
+        ) {
+          prevDirection = newDirections[index - 1][0];
+          currDirection = newDirections[index][0];
+          nextDirection = newDirections[index + 1][0];
+
+          if (currDirection && nextDirection && prevDirection) {
+            const vector1 = {
+              x: currDirection.xcoord - prevDirection.xcoord,
+              y: currDirection.ycoord - prevDirection.ycoord,
+            };
+            const vector2 = {
+              x: nextDirection.xcoord - currDirection.xcoord,
+              y: nextDirection.ycoord - currDirection.ycoord,
+            };
+
+            const angle = angleBetweenVectors(vector1, vector2);
+
+            // Use crossProductValue to determine left or right turn
+            if (angle < -30) {
+              return "Turn left towards ";
+            } else if (angle >= -30 && angle < -15) {
+              return "Bear left towards ";
+            } else if (angle >= -15 && angle < 15) {
+              return "Head straight towards ";
+            } else if (angle >= 15 && angle < 30) {
+              return "Bear right towards ";
+            } else if (angle >= 30) {
+              return "Turn right towards ";
+            } else {
+              return "idk lmfao";
+            }
+          }
+        }
+    }
+  }
 
   useEffect(() => {
     const fetchNodes = async () => {
@@ -158,15 +231,20 @@ const LocationSearch = () => {
         </div>
         <Button type="submit">Submit</Button>
       </form>
-      <table>
-        <tbody style={{ fontSize: "12px" }}>
-          {newDirections.map((row, i) => (
-            <tr key={i}>
-              <td>{row[0].longName}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div>
+        <table>
+          <tbody style={{ fontSize: "12px" }}>
+            {newDirections.map((row, i: number) => (
+              <tr key={i}>
+                <td>
+                  {i < newDirections.length && turnDirection(i)}
+                  {row[0]?.longName}{" "}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
