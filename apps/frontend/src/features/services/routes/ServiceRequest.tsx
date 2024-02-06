@@ -35,6 +35,7 @@ const ServiceRequest = () => {
       "Medicine",
       "Consultation",
       "Patient Relocation",
+      "Custom",
     ];
   };
   const navigate = useNavigate();
