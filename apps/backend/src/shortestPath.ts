@@ -8,7 +8,6 @@ type Graph = Map<string, Array<{ node: string; weight: number }>>;
 
 export function createGraph(edges: Edge[]): Graph {
     const graph = new Map<string, Array<{ node: string; weight: number }>>();
-
     edges.forEach((edge) => {
         if (!graph.has(edge.startNode)) {
             graph.set(edge.startNode, []);
@@ -16,48 +15,50 @@ export function createGraph(edges: Edge[]): Graph {
         if (!graph.has(edge.endNode)) {
             graph.set(edge.endNode, []);
         }
-
-        graph
-            .get(edge.startNode)
-            ?.push({ node: edge.endNode, weight: edge.weight });
-        // If the edges are bidirectional, also add the reverse edge
-        graph
-            .get(edge.endNode)
-            ?.push({ node: edge.startNode, weight: edge.weight });
+        graph.get(edge.startNode)?.push({ node: edge.endNode, weight: edge.weight });
+        // Assuming bidirectional for simplicity
+        graph.get(edge.endNode)?.push({ node: edge.startNode, weight: edge.weight });
     });
-
     return graph;
 }
 
-export function dijkstraPathFinder(
-    start: string,
-    end: string,
-    graph: Graph,
-): string[] {
+// Heuristic function: Needs to be defined based on your specific needs
+function heuristic(node: string, end: string): number {
+    // Placeholder: Implement the actual heuristic logic here
+    return Math.abs(parseInt(node) - parseInt(end)); // Example heuristic
+}
+
+export function shortestPathAStar(start: string, end: string, graph: Graph): string[] {
     const distances = new Map<string, number>();
+    const estimatedDistances = new Map<string, number>();
     const predecessor: { [key: string]: string } = {};
     const pq = new PriorityQueue();
-    pq.enqueue(start, 0);
+    pq.enqueue(start, heuristic(start, end));
 
     graph.forEach((_, node) => {
         distances.set(node, Infinity);
+        estimatedDistances.set(node, Infinity);
     });
     distances.set(start, 0);
+    estimatedDistances.set(start, heuristic(start, end));
 
     while (!pq.isEmpty()) {
-        const { element: currentNode, priority: currentDistance } = pq.dequeue();
+        const { element: currentNode } = pq.dequeue();
 
         if (currentNode === end) {
             return reconstructPath(predecessor, start, end);
         }
 
         graph.get(currentNode)?.forEach((neighbor) => {
-            const distance = currentDistance + neighbor.weight;
+            const gCost = distances.get(currentNode)! + neighbor.weight;
+            const hCost = heuristic(neighbor.node, end);
+            const fCost = gCost + hCost;
 
-            if (distance < (distances.get(neighbor.node) || Infinity)) {
-                distances.set(neighbor.node, distance);
+            if (gCost < (distances.get(neighbor.node) || Infinity)) {
+                distances.set(neighbor.node, gCost);
+                estimatedDistances.set(neighbor.node, fCost);
                 predecessor[neighbor.node] = currentNode;
-                pq.enqueue(neighbor.node, distance);
+                pq.enqueue(neighbor.node, fCost);
             }
         });
     }
@@ -97,12 +98,8 @@ class PriorityQueue {
     }
 }
 
-// Helper function to reconstruct the path from the predecessor map
-function reconstructPath(
-    predecessor: { [key: string]: string },
-    start: string,
-    end: string,
-): string[] {
+
+function reconstructPath(predecessor: { [key: string]: string }, start: string, end: string): string[] {
     const path = [end];
     while (path[0] !== start) {
         path.unshift(predecessor[path[0]]);
