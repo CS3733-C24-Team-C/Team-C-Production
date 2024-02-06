@@ -26,8 +26,8 @@ model Nodes {
 
 model Edges {
   edgeID    String @id
-  startNode String
-  endNode   String
+  startNode String //foreign key watch out for seeding errors when making this a foreign key
+  endNode   String //foreign key watch out for seeding errors when making this a foreign key
   weight    Float
 }
 
@@ -47,17 +47,20 @@ enum NodeType {
 }
 
 model Requests {
-  id      Int         @id @default(autoincrement())
-  nodeID  String
-  room    Nodes       @relation(fields: [nodeID], references: [nodeID])
-  urgency Urgency
-  type    RequestType
-  notes   String?
+  id               Int           @id @default(autoincrement())
+  nodeId           String
+  room             Nodes         @relation(fields: [nodeId], references: [nodeID])
+  employeeId       Int           @default(0)
+  employeeName     Employees     @relation(fields: [employeeId], references: [id])
+  urgency          Urgency
+  type             RequestType
+  notes            String?
+  completionStatus RequestStatus @default(UNASSIGNED)
 }
 
 enum Urgency {
-  LOWU // low urgency
-  MEDI // medium urgency
+  LOW // low urgency
+  MEDIUM // medium urgency
   HIGH // high urgency
 }
 
@@ -67,4 +70,27 @@ enum RequestType {
   MEDI // medicinal
   RELC // patient relocation
   CONS // patient consultation
+  CUST // custom request
+}
+
+model Employees {
+  id        Int        @id
+  firstName String
+  lastName  String
+  role      StaffRole
+  login     String
+  password  String
+  requests  Requests[]
+}
+
+enum RequestStatus {
+  UNASSIGNED //unassigned
+  ASSIGNED //assigned
+  IN_PROGRESS //in progress
+  COMPLETED //completed
+}
+
+enum StaffRole {
+  REGULAR //Regular employee
+  ADMIN //Admin employee
 }
