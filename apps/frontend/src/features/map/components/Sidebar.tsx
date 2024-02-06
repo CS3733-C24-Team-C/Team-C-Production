@@ -46,7 +46,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const [endLocation, setEndLocation] = useState<string>("");
   const [directions, setDirections] = useState<string[]>([]);
   const newDirections = directions.map((ID) =>
-    nodes.filter((node) => node["nodeID"] === ID)
+    nodes.filter((node) => node["nodeID"] === ID),
   );
 
   const { path, setPath } = useContext(DirectionsContext);
@@ -54,12 +54,12 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const locations: { nodeID: string; longName: string }[] = nodes.map(
     (node) => {
       return { nodeID: node.nodeID, longName: node.longName };
-    }
+    },
   );
 
   function angleBetweenVectors(
     v1: { x: number; y: number },
-    v2: { x: number; y: number }
+    v2: { x: number; y: number },
   ): number {
     // Calculate the angle in radians using the arctangent function
     const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
@@ -85,6 +85,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     switch (index) {
       case 0:
         return "Start at ";
+      case 1:
+        return "Head towards ";
       case newDirections.length - 1:
         return "Arrive at ";
       default:
@@ -227,8 +229,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     locations
                       .map((loc) => loc.longName)
                       .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
+                        loc
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase()),
+                      ),
                   );
                 } else {
                   setStartSuggestions([]);
@@ -276,8 +280,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     locations
                       .map((loc) => loc.longName)
                       .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
+                        loc
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase()),
+                      ),
                   );
                 } else {
                   setEndSuggestions([]);
