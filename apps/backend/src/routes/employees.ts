@@ -5,37 +5,20 @@ import { objectsToCSV } from "../utils";
 const router: Router = express.Router();
 
 router.get("/", async function (req: Request, res: Response) {
-  const requests = await PrismaClient.requests.findMany();
+  const requests = await PrismaClient.employees.findMany();
   res.json(requests);
 });
 
 router.get("/download", async function (req: Request, res: Response) {
   try {
-    const services = await PrismaClient.requests.findMany();
-    const csvData = objectsToCSV(services);
+    const employees = await PrismaClient.employees.findMany();
+    const csvData = objectsToCSV(employees);
     res.header("Content-Type", "text/csv");
-    res.attachment("services.csv");
+    res.attachment("employees.csv");
     res.send(csvData);
   } catch (error) {
     res.status(500).send("Internal Server Error");
   }
-});
-
-router.post("/", async (req, res) => {
-  const { type, urgency, notes, nodeID } = req.body;
-  await PrismaClient.requests.create({
-    data: {
-      type,
-      urgency,
-      notes,
-      room: {
-        connect: {
-          nodeID,
-        },
-      },
-    },
-  });
-  res.status(200).send("Service request received");
 });
 
 export default router;
