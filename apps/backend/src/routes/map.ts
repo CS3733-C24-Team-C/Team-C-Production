@@ -1,8 +1,8 @@
 import express, { Router, Request, Response } from "express";
 import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
-import { createGraph, dijkstraPathFinder } from "../shortestPath.ts";
 import { objectsToCSV } from "../utils";
+import { createGraph, shortestPathAStar } from "../shortestPath.ts";
 
 const router: Router = express.Router();
 
@@ -90,7 +90,7 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
     // Both nodes exist; proceed with finding the path
     const edges = await PrismaClient.edges.findMany();
     const graph = createGraph(edges);
-    const pathNodeIds = dijkstraPathFinder(
+    const pathNodeIds = shortestPathAStar(
       startNodeId as string,
       endNodeId as string,
       graph
