@@ -22,15 +22,22 @@ router.get("/download", async function (req: Request, res: Response) {
 });
 
 router.post("/", async (req, res) => {
-  const { type, urgency, notes, nodeID } = req.body;
+  const { type, urgency, notes, completionStatus, nodeID, employeeID } =
+    req.body;
   await PrismaClient.requests.create({
     data: {
       type,
       urgency,
       notes,
+      completionStatus,
       room: {
         connect: {
           nodeID,
+        },
+      },
+      employee: {
+        connect: {
+          id: employeeID,
         },
       },
     },
