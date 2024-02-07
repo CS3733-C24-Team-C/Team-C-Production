@@ -1,8 +1,12 @@
-import { Edges } from "database";
+type Edge = {
+  startNode: string;
+  endNode: string;
+  weight: number;
+};
 
 type Graph = Map<string, Array<{ node: string; weight: number }>>;
 
-export function createGraph(edges: Edges[]): Graph {
+export function createGraph(edges: Edge[]): Graph {
   const graph = new Map<string, Array<{ node: string; weight: number }>>();
   edges.forEach((edge) => {
     if (!graph.has(edge.startNode)) {

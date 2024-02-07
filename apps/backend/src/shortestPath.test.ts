@@ -77,25 +77,21 @@ describe("A Star Path Finder", () => {
     const path = shortestPathAStar("A", "D", graph);
 
     expect(path).toEqual([]);
-
-
   });
 });
 
 describe("A Star Path Finder Additional Tests", () => {
+  it("should avoid paths with high weight if possible", () => {
+    const edges = [
+      { startNode: "A", endNode: "B", weight: 1 },
+      { startNode: "B", endNode: "C", weight: 10 }, // High weight edge
+      { startNode: "A", endNode: "C", weight: 2 },
+      { startNode: "C", endNode: "D", weight: 2 },
+    ];
 
-    it("should avoid paths with high weight if possible", () => {
-        const edges = [
-            { startNode: "A", endNode: "B", weight: 1 },
-            { startNode: "B", endNode: "C", weight: 10 }, // High weight edge
-            { startNode: "A", endNode: "C", weight: 2 },
-            { startNode: "C", endNode: "D", weight: 2 },
-        ];
+    const graph = createGraph(edges);
+    const path = shortestPathAStar("A", "D", graph);
 
-        const graph = createGraph(edges);
-        const path = shortestPathAStar("A", "D", graph);
-
-        expect(path).toEqual(["A", "C", "D"]);
-    });
-
+    expect(path).toEqual(["A", "C", "D"]);
+  });
 });
