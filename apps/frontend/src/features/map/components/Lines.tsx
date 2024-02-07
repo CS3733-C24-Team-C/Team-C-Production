@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { DirectionsContext } from "../components";
-import { Nodes } from "database";
+import { Nodes, Edges } from "database";
 
 import groundFloor from "../assets/00_thegroundfloor.png";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
@@ -20,9 +20,11 @@ function Lines(props: {
 }) {
   const { path } = useContext(DirectionsContext);
   const [nodes, setNodes] = useState<Nodes[]>([]);
+  const [edges, setEdges] = useState<Edges[]>([]);
   const path2 = path.map((nodeID) =>
-    nodes.filter((node) => node.nodeID == nodeID)
+    nodes.filter((node) => node.nodeID == nodeID),
   );
+  const [displayV, setdisplayV] = useState(false);
 
   const floorID = () => {
     if (props.selectedFloor == groundFloor) {
@@ -38,6 +40,7 @@ function Lines(props: {
     } else if (props.selectedFloor == thirdFloor) {
       return "3";
     }
+    return "";
   };
 
   let paths = { G: [], L1: [], L2: [], "1": [], "2": [], "3": [] };
@@ -71,7 +74,18 @@ function Lines(props: {
         console.error("Failed to fetch nodes:", error);
       }
     };
+    const fetchEdges = async () => {
+      try {
+        const res = await fetch("/api/map/edges");
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        setEdges(data);
+      } catch (error) {
+        console.error("Failed to fetch edges:", error);
+      }
+    };
     fetchNodes();
+    fetchEdges();
   }, []);
 
   function stylePost(c: number, d: string) {
@@ -82,22 +96,34 @@ function Lines(props: {
     }
   }
 
-  function pathToPoints(path: Nodes[][]) {
-    let pathPoints =
+  function pathToPoints(path: Nodes[][]): {
+    pathData: string;
+    pathLength: number;
+  } {
+    let pathData =
       "M" +
       stylePost(path[0][0].xcoord, "x") +
       "," +
       stylePost(path[0][0].ycoord, "y") +
       " ";
-    path.slice(1, path.length).map((node) => {
-      pathPoints +=
+    path.slice(1, path.length).forEach((node) => {
+      pathData +=
         "L" +
         (stylePost(node[0].xcoord, "x") +
           "," +
           stylePost(node[0].ycoord, "y") +
           " ");
     });
-    return pathPoints;
+
+    const pathElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path",
+    );
+    pathElement.setAttribute("d", pathData);
+
+    const pathLength = pathElement.getTotalLength();
+
+    return { pathData, pathLength };
   }
 
   return (
@@ -107,53 +133,77 @@ function Lines(props: {
         height={props.height}
         xmlns="http://www.w3.org/2000/svg"
       >
-        {
-          //@ts-expect-error error typing
-          paths[floorID()].length > 0 &&
-            //@ts-expect-error error typing
-            paths[floorID()].map((currentPath, i) => (
-              <path
-                id={"movePath" + i.toString()}
-                d={pathToPoints(currentPath)}
-                stroke="green"
-                fill="none"
-                strokeWidth={1}
+        {floorID() != "G" &&
+          displayV &&
+          edges
+            .map((edge) => [
+              nodes.filter((node) => node.nodeID == edge.startNode),
+              nodes.filter((node) => node.nodeID == edge.endNode),
+            ])
+            .filter(
+              (edge) =>
+                edge[0][0].floor == floorID() &&
+                edge[0][0].floor == edge[1][0].floor,
+            )
+            .map((edge, i) => (
+              <line
+                key={i}
+                x1={stylePost(edge[0][0].xcoord, "x")}
+                x2={stylePost(edge[1][0].xcoord, "x")}
+                y1={stylePost(edge[0][0].ycoord, "y")}
+                y2={stylePost(edge[1][0].ycoord, "y")}
+                stroke="blue"
               />
+            ))}
+        {
+          // @ts-expect-error type error
+          paths[floorID()].length > 0 &&
+            // @ts-expect-error type error
+            paths[floorID()].map((currentPath, i) => (
+              <g key={i}>
+                <path
+                  id={"movePath" + i.toString()}
+                  d={pathToPoints(currentPath).pathData}
+                  stroke="green"
+                  fill="none"
+                  strokeWidth={1}
+                />
+                {(() => {
+                  const pathLength = pathToPoints(currentPath).pathLength;
+                  const numDots = Math.floor(pathLength / 1.5);
+                  return [...Array(numDots)].map((_, index) => (
+                    <>
+                      <circle key={index} r={0.5} fill="yellow">
+                        <animateMotion
+                          dur={10}
+                          repeatCount="indefinite"
+                          begin={index * 0.5}
+                          path={pathToPoints(currentPath).pathData}
+                        ></animateMotion>
+                      </circle>
+                    </>
+                  ));
+                })()}
+              </g>
             ))
         }
-        {nodes
-          .filter((Node) => Node.floor == floorID())
-          .map((node, i) => (
-            <circle
-              key={i}
-              r={0.5}
-              cy={stylePost(node.ycoord, "y")}
-              cx={stylePost(node.xcoord, "x")}
-              stroke={"black"}
-              onClick={() => alert(node.longName)}
-            />
-          ))}
+        {displayV &&
+          nodes
+            .filter((Node) => Node.floor == floorID())
+            .map((node, i) => (
+              <circle
+                key={i}
+                r={0.5}
+                cy={stylePost(node.ycoord, "y")}
+                cx={stylePost(node.xcoord, "x")}
+                stroke={"black"}
+                onClick={() => alert(node.longName)}
+              />
+            ))}
       </svg>
+      <button onClick={() => setdisplayV(!displayV)}>Display Toggle</button>
     </>
   );
 }
-
-/*
-{paths[floorID()].length > 0 && (paths[floorID()].map((currentPath, i) => {
-                  let pathLength = 0;
-                  if (document.getElementById('movePath')){
-                  // @ts-expect-error null exception crap
-                  pathLength = document.getElementById('movePath').getTotalLength();}
-                  const numDots = Math.floor(pathLength / 1.5);
-
-                  return [...Array(numDots)].map((_, index) => (
-                      <circle key={index} r={.5} fill="yellow">
-                          <animateMotion dur={30} repeatCount="indefinite" begin={index * .5}>
-                              <mpath href="#movePath"/>
-                          </animateMotion>
-                      </circle>
-                  ));
-              }))}
- */
 
 export { Lines };
