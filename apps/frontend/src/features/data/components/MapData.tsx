@@ -37,7 +37,7 @@ const MapData = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     try {
-      const res = await fetch("/api/map/upload", {
+      const res = await fetch("/api/map/upload/nodes", {
         method: "POST",
         body: formData,
       });
@@ -52,7 +52,7 @@ const MapData = () => {
   return (
     <>
       <form
-        action="/api/map/upload"
+        action="/api/map/upload/nodes"
         method="post"
         encType="multipart/form-data"
         onSubmit={handleSubmit}
