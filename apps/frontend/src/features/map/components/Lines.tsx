@@ -156,6 +156,7 @@ function Lines(props: {
               />
             ))}
         {
+
           // @ts-expect-error type error
           paths[floorID()].length > 0 &&
             // @ts-expect-error type error
