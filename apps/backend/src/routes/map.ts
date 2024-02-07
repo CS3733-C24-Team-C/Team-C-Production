@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from "express";
 import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
 import { objectsToCSV } from "../utils";
-import { createGraph, shortestPathAStar } from "../shortestPath.ts";
+import { createGraph, shortestPathAStar, bfsShortestPath, dijkstraShortestPath } from "../shortestPath.ts";
 
 const router: Router = express.Router();
 
