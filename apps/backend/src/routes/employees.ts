@@ -23,7 +23,6 @@ router.post("/upload", upload.single("csv-upload"), async (req, res) => {
   if (req.file.mimetype != "text/csv") {
     return res.status(400).send("Invalid file type");
   }
-  console.log(req.file);
   const newEmployees = readCSV(req.file.path);
   newEmployees.forEach((employee) => {
     employee.id = Number(employee.id);

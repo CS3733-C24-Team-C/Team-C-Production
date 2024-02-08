@@ -1,7 +1,6 @@
 import express, { Router, Request, Response } from "express";
 import PrismaClient from "../bin/database-connection.ts";
-import { objectsToCSV } from "../utils";
-import { readCSV } from "../utils/readCSVforService.ts";
+import { objectsToCSV, readCSV } from "../utils";
 import multer from "multer";
 import { Prisma } from "database";
 
@@ -70,8 +69,6 @@ router.post("/upload", upload.single("csv-upload"), async (req, res) => {
     return res.status(400).send("Invalid file type");
   }
 
-  console.log(req.file);
-
   const newRequests = readCSV(req.file.path);
   newRequests.forEach((request) => {
     request.id = Number(request.id);
@@ -84,7 +81,7 @@ router.post("/upload", upload.single("csv-upload"), async (req, res) => {
       const existingEdges = await tx.edges.findMany();
       const existingEmployees = await tx.employees.findMany();
       // const existingRequests = await tx.requests.findMany();
-        console.log("duma3");
+
       // 2. Drop all the tables in the order of foreign key dependencies
       await tx.edges.deleteMany();
       await tx.requests.deleteMany();

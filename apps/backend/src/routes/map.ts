@@ -34,7 +34,6 @@ router.post("/upload/nodes", upload.single("csv-upload"), async (req, res) => {
   if (req.file.mimetype != "text/csv") {
     return res.status(400).send("Invalid file type");
   }
-  console.log(req.file);
   const newNodes = readCSV(req.file.path);
   newNodes.forEach((node) => {
     node.xcoord = Number(node.xcoord);
@@ -87,7 +86,6 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
   if (req.file.mimetype != "text/csv") {
     return res.status(400).send("Invalid file type");
   }
-  console.log(req.file);
   const newEdges = readCSV(req.file.path);
   newEdges.forEach((edge) => {
     edge.weight = Number(edge.weight);

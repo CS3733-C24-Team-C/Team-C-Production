@@ -1,19 +1,6 @@
 import { readFileSync } from "fs";
 
 /**
- * Escapes a value for use in a CSV file
- */
-function escapeCSV(value: string | number | boolean) {
-  if (typeof value === "string") {
-    value = value.replace(/"/g, '""'); // Escape double quotes
-    if (value.includes(",") || value.includes("\n")) {
-      value = `"${value}"`; // Quote fields with commas or newlines
-    }
-  }
-  return value;
-}
-
-/**
  * Parses data from a CSV file. Expects a CSV file with a header row, where each
  * column header is unique, and has LF line endings.
  *
@@ -32,12 +19,56 @@ const readCSV = (filePath: string): Record<string, unknown>[] => {
   const headers = lines[0].split(",");
 
   return lines.slice(1).map((line) => {
-    const values = line.split(",");
+    const values = parseCSVLine(line);
     return headers.reduce((obj, header, index) => {
       obj[header] = values[index];
       return obj;
     }, {} as Record<string, unknown>);
   });
+};
+
+/**
+ * Escapes a value for use in a CSV file
+ */
+function escapeCSV(value: string | number | boolean) {
+  if (typeof value === "string") {
+    value = value.replace(/"/g, '""'); // Escape double quotes
+    if (value.includes(",") || value.includes("\n")) {
+      value = `"${value}"`; // Quote fields with commas or newlines
+    }
+  }
+  return value;
+}
+
+const parseCSVLine = (line: string): string[] => {
+  const values: string[] = [];
+  let currentField = "";
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === "," && !isWithinQuotes(line, i)) {
+      values.push(currentField.trim());
+      currentField = "";
+    } else {
+      currentField += char;
+    }
+  }
+
+  // Add the last field after the loop
+  values.push(currentField.trim());
+
+  return values;
+};
+
+const isWithinQuotes = (line: string, index: number): boolean => {
+  let withinQuotes = false;
+  for (let i = 0; i < index; i++) {
+    if (line[i] === '"') {
+      withinQuotes = !withinQuotes;
+    }
+  }
+  return withinQuotes;
 };
 
 function objectsToCSV(data: object[]): string {
