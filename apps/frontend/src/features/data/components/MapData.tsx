@@ -6,7 +6,8 @@ import { downloadCSV } from "../utils";
 const MapData = () => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
-  const [file, setFile] = useState("");
+  const [nodesFile, setNodesFile] = useState("");
+  const [edgesFile, setEdgesFile] = useState("");
 
   useEffect(() => {
     const fetchNodes = async () => {
@@ -42,7 +43,7 @@ const MapData = () => {
         body: formData,
       });
       if (!res.ok) throw new Error(res.statusText);
-      setFile("");
+      setNodesFile("");
       alert("File uploaded successfully!");
     } catch (error) {
       alert("Failed to upload file. Please try again.");
@@ -58,7 +59,7 @@ const MapData = () => {
         body: formData,
       });
       if (!res.ok) throw new Error(res.statusText);
-      setFile("");
+      setNodesFile("");
       alert("File uploaded successfully!");
     } catch (error) {
       alert("Failed to upload file. Please try again.");
@@ -82,9 +83,9 @@ const MapData = () => {
             id="csv-upload"
             name="csv-upload"
             accept="text/csv"
-            value={file}
+            value={nodesFile}
             helperText="CSV files only."
-            onChange={(e) => setFile(e.target.value)}
+            onChange={(e) => setNodesFile(e.target.value)}
           />
           <br />
           <Button type="submit">Upload File</Button>
@@ -103,9 +104,9 @@ const MapData = () => {
             id="csv-upload"
             name="csv-upload"
             accept="text/csv"
-            value={file}
+            value={edgesFile}
             helperText="CSV files only."
-            onChange={(e) => setFile(e.target.value)}
+            onChange={(e) => setEdgesFile(e.target.value)}
           />
           <br />
           <Button type="submit">Upload File</Button>
