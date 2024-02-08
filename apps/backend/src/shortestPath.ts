@@ -18,13 +18,14 @@ export function createGraph(edges: Edge[]): Graph {
     graph
       .get(edge.startNode)
       ?.push({ node: edge.endNode, weight: edge.weight });
-    //
+    // 
     graph
       .get(edge.endNode)
       ?.push({ node: edge.startNode, weight: edge.weight });
   });
   return graph;
 }
+
 
 function heuristic(node: string, end: string): number {
   // Placeholder: Implement the actual heuristic logic here
@@ -34,7 +35,7 @@ function heuristic(node: string, end: string): number {
 export function shortestPathAStar(
   start: string,
   end: string,
-  graph: Graph,
+  graph: Graph
 ): string[] {
   const distances = new Map<string, number>();
   const estimatedDistances = new Map<string, number>();
@@ -108,7 +109,7 @@ class PriorityQueue {
 function reconstructPath(
   predecessor: { [key: string]: string },
   start: string,
-  end: string,
+  end: string
 ): string[] {
   const path = [end];
   while (path[0] !== start) {
@@ -117,87 +118,77 @@ function reconstructPath(
   return path;
 }
 
-export function bfsShortestPath(
-  start: string,
-  end: string,
-  graph: Graph,
-): string[] {
-  const visited = new Set<string>();
-  const queue: Array<{ node: string; path: string[] }> = [
-    { node: start, path: [start] },
-  ];
-  visited.add(start);
+export function bfsShortestPath(start: string, end: string, graph: Graph): string[] {
+    const visited = new Set<string>();
+    const queue: Array<{ node: string; path: string[] }> = [{ node: start, path: [start] }];
+    visited.add(start);
 
-  while (queue.length > 0) {
-    const { node, path } = queue.shift()!;
-    if (node === end) {
-      return path;
+    while (queue.length > 0) {
+        const { node, path } = queue.shift()!;
+        if (node === end) {
+            return path;
+        }
+
+        const neighbors = graph.get(node) || [];
+        neighbors.forEach(({ node: neighbor }) => {
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                queue.push({ node: neighbor, path: path.concat(neighbor) });
+            }
+        });
     }
 
-    const neighbors = graph.get(node) || [];
-    neighbors.forEach(({ node: neighbor }) => {
-      if (!visited.has(neighbor)) {
-        visited.add(neighbor);
-        queue.push({ node: neighbor, path: path.concat(neighbor) });
-      }
-    });
-  }
-
-  return [];
+    return [];
 }
 
-export function dijkstraShortestPath(
-  start: string,
-  end: string,
-  graph: Graph,
-): string[] {
-  const distances = new Map<string, number>();
-  const predecessors: { [key: string]: string } = {};
-  const pq = new PriorityQueue();
-  const visited = new Set<string>();
+export function dijkstraShortestPath(start: string, end: string, graph: Graph): string[] {
+    const distances = new Map<string, number>();
+    const predecessors: { [key: string]: string } = {};
+    const pq = new PriorityQueue();
+    const visited = new Set<string>();
 
-  // Initialize distances and enqueue the start node
-  graph.forEach((_, node) => {
-    distances.set(node, Infinity);
-  });
-  distances.set(start, 0);
-  pq.enqueue(start, 0);
+    // Initialize distances and enqueue the start node
+    graph.forEach((_, node) => {
+        distances.set(node, Infinity);
+    });
+    distances.set(start, 0);
+    pq.enqueue(start, 0);
 
-  while (!pq.isEmpty()) {
-    const { element: currentNode } = pq.dequeue();
-    if (visited.has(currentNode)) continue;
-    visited.add(currentNode);
+    while (!pq.isEmpty()) {
+        const { element: currentNode } = pq.dequeue();
+        if (visited.has(currentNode)) continue;
+        visited.add(currentNode);
 
-    if (currentNode === end) {
-      break;
+        if (currentNode === end) {
+            break;
+        }
+
+        const neighbors = graph.get(currentNode) || [];
+        neighbors.forEach(({ node: neighbor, weight }) => {
+            const newDistance = distances.get(currentNode)! + weight;
+            if (newDistance < (distances.get(neighbor) || Infinity)) {
+                distances.set(neighbor, newDistance);
+                predecessors[neighbor] = currentNode;
+                pq.enqueue(neighbor, newDistance);
+            }
+        });
     }
 
-    const neighbors = graph.get(currentNode) || [];
-    neighbors.forEach(({ node: neighbor, weight }) => {
-      const newDistance = distances.get(currentNode)! + weight;
-      if (newDistance < (distances.get(neighbor) || Infinity)) {
-        distances.set(neighbor, newDistance);
-        predecessors[neighbor] = currentNode;
-        pq.enqueue(neighbor, newDistance);
-      }
-    });
-  }
-
-  return reconstructPathDijkstra(predecessors, start, end);
+    return reconstructPathDijkstra(predecessors, start, end);
 }
 
-function reconstructPathDijkstra(
-  predecessors: { [key: string]: string },
-  start: string,
-  end: string,
-): string[] {
-  const path = [];
-  let current = end;
-  while (current !== start) {
-    if (predecessors[current] === undefined) return [];
-    path.unshift(current);
-    current = predecessors[current];
-  }
-  path.unshift(start);
-  return path;
+function reconstructPathDijkstra(predecessors: { [key: string]: string }, start: string, end: string): string[] {
+    const path = [];
+    let current = end;
+    while (current !== start) {
+        if (predecessors[current] === undefined) return [];
+        path.unshift(current);
+        current = predecessors[current];
+    }
+    path.unshift(start);
+    return path;
 }
+
+
+
+

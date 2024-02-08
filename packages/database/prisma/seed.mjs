@@ -33,7 +33,7 @@ const main = async () => {
 
   for (const edge of edges) {
     const edgeWeightEntry = edgeWeights.find(
-      (element) => element.edgeID === edge.edgeID,
+      (element) => element.edgeID === edge.edgeID
     );
 
     if (!edgeWeightEntry) {

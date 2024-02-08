@@ -43,7 +43,7 @@ const calculateAdjustedDistance = (nodeA, nodeB) => {
   } else {
     return Math.sqrt(
       Math.pow(nodeA.xcoord - nodeB.xcoord, 2) +
-        Math.pow(nodeA.ycoord - nodeB.ycoord, 2),
+        Math.pow(nodeA.ycoord - nodeB.ycoord, 2)
     );
   }
 };
@@ -60,7 +60,7 @@ export const calculateEdgeWeights = (nodes, edges) => {
       ycoord: Number(node.ycoord),
       floor: mapFloorToNumber(node.floor),
       nodeType: node.nodeType,
-    }),
+    })
   );
 
   const edgeWeights = edges.map((edge) => {

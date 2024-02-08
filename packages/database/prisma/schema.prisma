@@ -62,14 +62,14 @@ enum EmployeeRole {
 }
 
 model Requests {
-  id               Int           @id @default(autoincrement())
-  nodeID           String
-  employeeID       Int
-  room             Nodes         @relation(fields: [nodeID], references: [nodeID])
-  employee         Employees     @relation(fields: [employeeID], references: [id])
-  urgency          Urgency
-  type             RequestType
-  notes            String?
+  id         Int         @id @default(autoincrement())
+  nodeID     String
+  employeeID Int
+  room       Nodes       @relation(fields: [nodeID], references: [nodeID])
+  employee   Employees   @relation(fields: [employeeID], references: [id])
+  urgency    Urgency
+  type       RequestType
+  notes      String?
   completionStatus RequestStatus @default(UNASSIGNED)
 }
 
