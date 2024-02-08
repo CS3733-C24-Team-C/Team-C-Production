@@ -79,54 +79,53 @@ router.post("/upload/nodes", upload.single("csv-upload"), async (req, res) => {
   res.status(200).send("File uploaded successfully");
 });
 
-
 router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
   if (!req.file) {
-      return res.status(400).send("No file was selected");
+    return res.status(400).send("No file was selected");
   }
 
   if (req.file.mimetype != "text/csv") {
-      return res.status(400).send("Invalid file type");
+    return res.status(400).send("Invalid file type");
   }
   console.log(req.file);
   const newEdges = readCSV(req.file.path);
   newEdges.forEach((edge) => {
-      edge.weight = Number(edge.weight);
+    edge.weight = Number(edge.weight);
   });
   try {
-      await PrismaClient.$transaction(async (tx) => {
-          // 1. Get all the existing data and hold them in-memory
-          // const existingNodes = await tx.nodes.findMany();
-          const existingNodes = await tx.nodes.findMany();
-          const existingEmployees = await tx.employees.findMany();
-          const existingRequests = await tx.requests.findMany();
+    await PrismaClient.$transaction(async (tx) => {
+      // 1. Get all the existing data and hold them in-memory
+      // const existingNodes = await tx.nodes.findMany();
+      const existingNodes = await tx.nodes.findMany();
+      const existingEmployees = await tx.employees.findMany();
+      const existingRequests = await tx.requests.findMany();
 
-          // 2. Drop all the tables in the order of foreign key dependencies
-          await tx.edges.deleteMany();
-          await tx.requests.deleteMany();
-          await tx.employees.deleteMany();
-          await tx.nodes.deleteMany();
+      // 2. Drop all the tables in the order of foreign key dependencies
+      await tx.edges.deleteMany();
+      await tx.requests.deleteMany();
+      await tx.employees.deleteMany();
+      await tx.nodes.deleteMany();
 
-          // 3. Re-seed the database
-          await tx.nodes.createMany({
-              data: existingNodes,
-          });
-
-          await tx.edges.createMany({
-              data: newEdges as unknown as Prisma.EdgesCreateManyInput,
-          });
-
-          await tx.employees.createMany({
-              data: existingEmployees,
-          });
-
-          await tx.requests.createMany({
-              data: existingRequests,
-          });
+      // 3. Re-seed the database
+      await tx.nodes.createMany({
+        data: existingNodes,
       });
+
+      await tx.edges.createMany({
+        data: newEdges as unknown as Prisma.EdgesCreateManyInput,
+      });
+
+      await tx.employees.createMany({
+        data: existingEmployees,
+      });
+
+      await tx.requests.createMany({
+        data: existingRequests,
+      });
+    });
   } catch (error) {
-      console.error("Error processing file upload:", error);
-      return res.status(400).send("Bad request");
+    console.error("Error processing file upload:", error);
+    return res.status(400).send("Bad request");
   }
 
   res.status(200).send("File uploaded successfully");
