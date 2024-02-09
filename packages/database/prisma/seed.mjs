@@ -112,6 +112,17 @@ const generateEmployee = (nodeIds) => {
         },
       ],
     },
+    jobs: {
+        create: [
+            {
+           job: faker.helpers.arrayElement([
+               "JANITOR",
+               "DOCTOR",
+               "NURSE",
+           ]),
+            },
+        ],
+    },
   };
 };
 
