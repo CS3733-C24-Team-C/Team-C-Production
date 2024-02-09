@@ -11,7 +11,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "EmployeeJob" AS ENUM ('NULL', 'JANITOR', 'DOCTOR', 'NURSE');
+CREATE TYPE "EmployeeJob" AS ENUM ('NULL', 'JANITOR', 'DOCTOR', 'NURSE', 'OFFICEADMIN');
 
 -- CreateEnum
 CREATE TYPE "EmployeeRole" AS ENUM ('ADMIN', 'REGULAR');

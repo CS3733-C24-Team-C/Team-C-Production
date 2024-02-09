@@ -70,6 +70,7 @@ enum EmployeeJob {
     JANITOR
     DOCTOR
     NURSE
+    OFFICEADMIN
 }
 
 enum EmployeeRole {

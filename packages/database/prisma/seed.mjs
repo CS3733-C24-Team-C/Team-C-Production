@@ -19,6 +19,7 @@ const main = async () => {
   // drop existing data
   await prisma.edges.deleteMany();
   await prisma.requests.deleteMany();
+  await prisma.employeeJobs.deleteMany();
   await prisma.employees.deleteMany();
   await prisma.nodes.deleteMany();
 
@@ -83,6 +84,9 @@ const main = async () => {
 };
 
 const generateEmployee = (nodeIds) => {
+
+    let jobnum = getRandomInt(1,3);
+
   return {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
@@ -117,14 +121,25 @@ const generateEmployee = (nodeIds) => {
             {
            job: faker.helpers.arrayElement([
                "JANITOR",
-               "DOCTOR",
-               "NURSE",
+               "OFFICEADMIN",
            ]),
             },
+            {
+                job: faker.helpers.arrayElement([
+                    "DOCTOR",
+                    "NURSE",
+                ]),
+            }
         ],
     },
   };
 };
+
+function getRandomInt(min, max) {       //get number of jobs that a specific employee will have
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 try {
   await main();
