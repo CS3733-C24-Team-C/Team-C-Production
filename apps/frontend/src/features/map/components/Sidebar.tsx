@@ -27,7 +27,7 @@ const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
     base: "h-full",
     collapsed: {
-      off: "w-96",
+      off: "w-80",
     },
   },
   logo: {
@@ -89,11 +89,13 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     let prevDirection = null;
     let nextDirection = null;
 
+    currDirection = newDirections[index][0];
+
     switch (index) {
       case 0:
-        return "Start at ";
+        return "Start at " + currDirection.longName;
       case 1:
-        return "Head towards ";
+        return "Head towards " + currDirection.longName;
       case newDirections.length - 1:
         return "Arrive at ";
       default:
@@ -103,10 +105,18 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           index < newDirections.length
         ) {
           prevDirection = newDirections[index - 1][0];
-          currDirection = newDirections[index][0];
           nextDirection = newDirections[index + 1][0];
 
           if (currDirection && nextDirection && prevDirection) {
+            if (currDirection.floor != nextDirection.floor) {
+              return (
+                "Take " +
+                currDirection.longName +
+                " to Floor " +
+                nextDirection.floor
+              );
+            }
+
             const vector1 = {
               x: currDirection.xcoord - prevDirection.xcoord,
               y: currDirection.ycoord - prevDirection.ycoord,
@@ -117,18 +127,17 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             };
 
             const angle = angleBetweenVectors(vector1, vector2);
-
             // Use crossProductValue to determine left or right turn
             if (angle < -30) {
-              return "Turn left towards ";
+              return "Turn left towards " + currDirection.longName;
             } else if (angle >= -30 && angle < -15) {
-              return "Bear left towards ";
+              return "Bear left towards " + currDirection.longName;
             } else if (angle >= -15 && angle < 15) {
-              return "Head straight towards ";
+              return "Head straight towards " + currDirection.longName;
             } else if (angle >= 15 && angle < 30) {
-              return "Bear right towards ";
+              return "Bear right towards " + currDirection.longName;
             } else if (angle >= 30) {
-              return "Turn right towards ";
+              return "Turn right towards " + currDirection.longName;
             } else {
               return "idk lmfao";
             }
@@ -271,27 +280,28 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
               }
             }}
           />
-          <Dropdown
-            label={`Search Method${algorithm ? `: ${algorithm}` : ""}`}
-            dismissOnClick={true}
-          >
-            <Dropdown.Item onClick={() => handleItemClick("AStar")}>
-              AStar
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleItemClick("BFS")}>
-              BFS
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleItemClick("Dijkstra")}>
-              Dijkstra
-            </Dropdown.Item>
-          </Dropdown>
+          <div className="w-full">
+            <Dropdown
+              label={`Search Method${algorithm ? `: ${algorithm}` : ""}`}
+              dismissOnClick={true}
+            >
+              <Dropdown.Item onClick={() => handleItemClick("AStar")}>
+                AStar
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick("BFS")}>
+                BFS
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick("Dijkstra")}>
+                Dijkstra
+              </Dropdown.Item>
+            </Dropdown>
+          </div>
           <Button type="submit">Submit</Button>
         </form>
         <List ordered>
           {newDirections.map((row, i: number) => (
             <List.Item key={i}>
               {i < newDirections.length && turnDirection(i)}
-              {row[0]?.longName}{" "}
             </List.Item>
           ))}
         </List>
