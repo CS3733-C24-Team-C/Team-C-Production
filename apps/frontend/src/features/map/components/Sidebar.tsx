@@ -14,7 +14,7 @@ import {
 import { CiMenuBurger, CiSearch } from "react-icons/ci";
 import React, { useContext, useEffect, useState } from "react";
 import { Nodes } from "database";
-import { DirectionsContext } from "../components";
+import { DirectionsContext, StartContext, EndContext } from "../components";
 
 import groundFloor from "../assets/00_thegroundfloor.png";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
@@ -44,14 +44,16 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const [nodes, setNodes] = useState<Nodes[]>([]);
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
-  const [startLocation, setStartLocation] = useState<string>("");
-  const [endLocation, setEndLocation] = useState<string>("");
+  //const [startLocation, setStartLocation] = useState<string>("");
+  //const [endLocation, setEndLocation] = useState<string>("");
   const [directions, setDirections] = useState<string[]>([]);
   const [algorithm, setAlgorithm] = useState<string | null>("AStar");
   const newDirections = directions.map((ID) =>
     nodes.filter((node) => node["nodeID"] === ID),
   );
 
+  const { start, setStart } = useContext(StartContext);
+  const { end, setEnd } = useContext(EndContext);
   const { path, setPath } = useContext(DirectionsContext);
 
   const locations: { nodeID: string; longName: string }[] = nodes.map(
@@ -154,10 +156,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const startNodeId = nodes
-      .filter((node) => node["longName"] === startLocation)
+      .filter((node) => node["longName"] === start)
       .map((node) => node.nodeID)[0];
     const endNodeId = nodes
-      .filter((node) => node["longName"] === endLocation)
+      .filter((node) => node["longName"] === end)
       .map((node) => node.nodeID)[0];
     try {
       const res = await fetch("/api/map/pathfinding", {
@@ -220,8 +222,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           <Autocomplete
             suggestions={startSuggestions}
             setSuggestions={setStartSuggestions}
-            value={startLocation}
-            setValue={setStartLocation}
+            value={start}
+            setValue={setStart}
             id="startLocation"
             htmlFor="startLocation"
             label="Enter starting point"
@@ -229,7 +231,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             required
             rightIcon={CiSearch}
             onChange={(e) => {
-              setStartLocation(e.target.value);
+              setStart(e.target.value);
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   locations
@@ -247,8 +249,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           <Autocomplete
             suggestions={endSuggestions}
             setSuggestions={setEndSuggestions}
-            value={endLocation}
-            setValue={setEndLocation}
+            value={end}
+            setValue={setEnd}
             id="endLocation"
             htmlFor="endLocation"
             label="Enter destination"
@@ -256,7 +258,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             required
             rightIcon={CiSearch}
             onChange={(e) => {
-              setEndLocation(e.target.value);
+              setEnd(e.target.value);
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   locations

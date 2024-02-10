@@ -1,0 +1,18 @@
+.styled-button {
+    padding: 10px 20px;
+    border: 2px solid #000000; /* Border color */
+    background-color: #d9c7c7; /* Background color */
+    color: #000000; /* Text color */
+    font-size: 16px;
+    cursor: pointer;
+    width: 150px;
+    border-radius: 5px; /* Border radius to make it rounded */
+  }
+  
+  .map-bottom-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 10px;
+  }
+  
