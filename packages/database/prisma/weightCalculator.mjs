@@ -20,33 +20,54 @@ const mapFloorToNumber = (floorLabel) => {
 };
 
 /**
- * Adjusts the distance calculation for elevators and stairs based on floor changes.
+ * Extracts the elevator shaft identifier from a node ID.
+ * @param {string} nodeId The node ID of an elevator.
+ * @returns {string} The extracted elevator shaft identifier.
+ */
+const extractElevatorShaftId = (nodeId) => {
+    const match = nodeId.match(/^[A-Z]+/);
+    return match ? match[0] : '';
+};
+
+/**
+ * Adjusts the distance calculation for elevators and stairs based on floor changes,
+ * including a penalty for switching elevators.
  *
  * @param {Nodes} nodeA
  * @param {Nodes} nodeB
  * @returns {number} The adjusted weight for the edge.
  */
 const calculateAdjustedDistance = (nodeA, nodeB) => {
-  const floorA = mapFloorToNumber(nodeA.floor);
-  const floorB = mapFloorToNumber(nodeB.floor);
-  const elevatorWeightPerFloor = 10000;
-  const stairsWeightPerFloor = 15000;
+    const floorA = mapFloorToNumber(nodeA.floor);
+    const floorB = mapFloorToNumber(nodeB.floor);
+    const elevatorWeightPerFloor = 10000;
+    const stairsWeightPerFloor = 15000;
+    const elevatorSwitchPenalty = 50000; // Example penalty value
 
-  if (nodeA.nodeType === "ELEV" && nodeB.nodeType === "ELEV") {
-    // ADD ELEV WEIGHT
-    const floorDifference = Math.abs(floorA - floorB);
-    return floorDifference * elevatorWeightPerFloor;
-  } else if (nodeA.nodeType === "STAI" && nodeB.nodeType === "STAI") {
-    // ADD STAI WEIGHT
-    const floorDifference = Math.abs(floorA - floorB);
-    return floorDifference * stairsWeightPerFloor;
-  } else {
-    return Math.sqrt(
-      Math.pow(nodeA.xcoord - nodeB.xcoord, 2) +
-        Math.pow(nodeA.ycoord - nodeB.ycoord, 2)
-    );
-  }
+    if (nodeA.nodeType === "ELEV" && nodeB.nodeType === "ELEV") {
+        const floorDifference = Math.abs(floorA - floorB);
+        let weight = floorDifference * elevatorWeightPerFloor;
+        
+        const elevatorShaftIdA = extractElevatorShaftId(nodeA.nodeID);
+        const elevatorShaftIdB = extractElevatorShaftId(nodeB.nodeID);
+
+        
+        if (elevatorShaftIdA !== elevatorShaftIdB) {
+            weight += elevatorSwitchPenalty;
+        }
+
+        return weight;
+    } else if (nodeA.nodeType === "STAI" && nodeB.nodeType === "STAI") {
+        const floorDifference = Math.abs(floorA - floorB);
+        return floorDifference * stairsWeightPerFloor;
+    } else {
+        return Math.sqrt(
+            Math.pow(nodeA.xcoord - nodeB.xcoord, 2) +
+            Math.pow(nodeA.ycoord - nodeB.ycoord, 2)
+        );
+    }
 };
+
 
 /**
  * Updates the calculateEdgeWeights function to use the new distance calculation, considering node types.
