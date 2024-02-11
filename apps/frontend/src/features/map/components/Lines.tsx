@@ -74,7 +74,6 @@ function Lines(props: {
         console.error("Failed to fetch nodes:", error);
       }
     };
-
     const fetchEdges = async () => {
       try {
         const res = await fetch("/api/map/edges");
@@ -188,16 +187,6 @@ function Lines(props: {
               </g>
             ))
         }
-        {path2.map((node, i) => (
-          <circle
-            key={i}
-            r={0.5}
-            cy={stylePost(node[0].ycoord, "y")}
-            cx={stylePost(node[0].xcoord, "x")}
-            stroke={"black"}
-            onClick={() => alert(node[0].longName)}
-          />
-        ))}
         {nodes
           .filter((Node) => Node.floor == floorID())
           .map((node, i) => (

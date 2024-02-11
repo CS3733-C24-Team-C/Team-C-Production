@@ -70,6 +70,17 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
   const handleFloorClick = (floor: string) => {
     setOpenFloor((prevFloor) => (prevFloor === floor ? null : floor));
+    if (floor == "L1") {
+      setSelectedFloor(lowerLevel1);
+    } else if (floor == "L2") {
+      setSelectedFloor(lowerLevel2);
+    } else if (floor == "1") {
+      setSelectedFloor(firstFloor);
+    } else if (floor == "2") {
+      setSelectedFloor(secondFloor);
+    } else if (floor == "3") {
+      setSelectedFloor(thirdFloor);
+    }
   };
 
   function angleBetweenVectors(
@@ -104,15 +115,14 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
     const currDirection = floorDirections[index];
     const prevDirection = index > 0 ? floorDirections[index - 1] : null;
-    let nextDirection =
+    const nextDirection =
       index < floorDirections.length - 1 ? floorDirections[index + 1] : null;
 
     //currDirection = newDirections[index];
 
     if (nextDirection === null && index === floorDirections.length - 1) {
       // Assuming the next direction is already present in newDirections
-      nextDirection =
-        newDirections.find((direction) => direction.floor !== floor) || null;
+      return "Arrive at " + currDirection.longName;
     }
 
     switch (index) {
