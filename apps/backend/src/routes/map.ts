@@ -178,7 +178,6 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
     }
 
     try {
-        // Fetch both start and end nodes to check existence and determine floors
         const nodes = await PrismaClient.nodes.findMany({
             where: {
                 nodeID: {
@@ -194,19 +193,15 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
         const startNode = nodes.find(node => node.nodeID === startNodeId);
         const endNode = nodes.find(node => node.nodeID === endNodeId);
 
-        // Convert node floor labels to numerical values for comparison
         const startNodeFloor = mapFloorToNumber(startNode.floor);
         const endNodeFloor = mapFloorToNumber(endNode.floor);
         const includeElevators = startNodeFloor !== endNodeFloor;
 
-        // Fetch all edges
         const edges = await PrismaClient.edges.findMany();
 
-        // Fetch all nodes for creating a graph with nodeType information
         const allNodes = await PrismaClient.nodes.findMany();
         const nodesMap = new Map(allNodes.map(node => [node.nodeID, node]));
 
-        // Create graph with or without elevator edges as appropriate
         const graph = createGraph(edges, nodesMap, includeElevators);
         let pathNodeIds = [];
 
@@ -221,7 +216,6 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
                 pathNodeIds = dijkstraShortestPath(startNodeId as string, endNodeId as string, graph);
                 break;
             default:
-                // This case is already handled by the initial check, but kept for completeness
                 return res.status(400).send("Unsupported algorithm");
         }
 
