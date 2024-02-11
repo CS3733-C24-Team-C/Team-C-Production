@@ -133,11 +133,6 @@ const generateEmployee = (nodeIds) => {
   };
 };
 
-function getRandomInt(min, max) {       //get number of jobs that a specific employee will have
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 try {
   await main();
