@@ -25,7 +25,7 @@ const ServiceRequest = () => {
   const [status, setStatus] = useState<RequestStatus>("UNASSIGNED");
   const [notes, setNotes] = useState<string>();
 
-  // const [maintenanceType, setMaintenanceType] = useState<string>("");
+  const [maintenanceType, setMaintenanceType] = useState<string>("");
 
   // const [medicineName, setMedicineName] = useState<string>("");
   // const [medicineDosage, setMedicineDosage] = useState<string>("");
@@ -141,9 +141,9 @@ const ServiceRequest = () => {
                   return loc.longName;
                 })
                 .filter((loc) =>
-                  loc.toLowerCase().includes(e.target.value.toLowerCase())
+                  loc.toLowerCase().includes(e.target.value.toLowerCase()),
                 )
-                .slice(0, 10)
+                .slice(0, 10),
             );
           } else {
             setRoomSuggestions([]);
@@ -171,9 +171,9 @@ const ServiceRequest = () => {
                     return loc.longName;
                   })
                   .filter((loc) =>
-                    loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    loc.toLowerCase().includes(e.target.value.toLowerCase()),
                   )
-                  .slice(0, 10)
+                  .slice(0, 10),
               );
             } else {
               setRoomToSuggestions([]);
@@ -199,15 +199,31 @@ const ServiceRequest = () => {
               employees
                 .map((emp) => emp.firstName + " " + emp.lastName)
                 .filter((emp) =>
-                  emp.toLowerCase().includes(e.target.value.toLowerCase())
+                  emp.toLowerCase().includes(e.target.value.toLowerCase()),
                 )
-                .slice(0, 10)
+                .slice(0, 10),
             );
           } else {
             setEmployeeSuggestions([]);
           }
         }}
       />
+      {type === "MECH" && (
+        <div className="space-y-2">
+          <Label htmlFor="maintenanceType">Maintenence Type</Label>
+          <Select
+            id="maintenanceType"
+            required
+            value={maintenanceType}
+            onChange={(e) => setMaintenanceType(e.target.value as string)}
+          >
+            <option value="ELEC">Electrical</option>
+            <option value="LOCK">Locksmith</option>
+            <option value="PLUM">Plumbing</option>
+            <option value="TECH">Technology</option>
+          </Select>
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="urgency">Urgency</Label>
         <Select
