@@ -85,8 +85,6 @@ const main = async () => {
 
 const generateEmployee = (nodeIds) => {
 
-    let jobnum = getRandomInt(1,3);
-
   return {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
