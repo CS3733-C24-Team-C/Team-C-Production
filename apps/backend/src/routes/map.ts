@@ -5,6 +5,7 @@ import { readCSV, objectsToCSV } from "../utils";
 import { Prisma } from "database";
 import { createGraph, shortestPathAStar, bfsShortestPath, dijkstraShortestPath } from "../shortestPath.ts";
 
+
 const router: Router = express.Router();
 
 router.get("/nodes", async function (req: Request, res: Response) {
@@ -153,6 +154,18 @@ router.get("/download/edges", async function (req: Request, res: Response) {
   }
 });
 
+const mapFloorToNumber = (floorLabel: string): number => {
+    const mappings: { [key: string]: number } = {
+        L1: -1,
+        L2: -2,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+    };
+    return mappings[floorLabel] || 0;
+};
+
+
 router.post("/pathfinding", async function (req: Request, res: Response) {
     const { startNodeId, endNodeId, algorithm } = req.body;
 
@@ -165,27 +178,36 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
     }
 
     try {
-        // Check if the startNodeId exists
-        const startNodeExists = await PrismaClient.nodes.findUnique({
-            where: { nodeID: startNodeId as string },
+        // Fetch both start and end nodes to check existence and determine floors
+        const nodes = await PrismaClient.nodes.findMany({
+            where: {
+                nodeID: {
+                    in: [startNodeId, endNodeId],
+                },
+            },
         });
 
-        if (!startNodeExists) {
-            return res.status(404).send("Start node ID not found");
+        if (nodes.length < 2) {
+            return res.status(404).send("One or both node IDs not found");
         }
 
-        // Check if the endNodeId exists
-        const endNodeExists = await PrismaClient.nodes.findUnique({
-            where: { nodeID: endNodeId as string },
-        });
+        const startNode = nodes.find(node => node.nodeID === startNodeId);
+        const endNode = nodes.find(node => node.nodeID === endNodeId);
 
-        if (!endNodeExists) {
-            return res.status(404).send("End node ID not found");
-        }
+        // Convert node floor labels to numerical values for comparison
+        const startNodeFloor = mapFloorToNumber(startNode.floor);
+        const endNodeFloor = mapFloorToNumber(endNode.floor);
+        const includeElevators = startNodeFloor !== endNodeFloor;
 
-        // Both nodes exist; proceed with finding the path
+        // Fetch all edges
         const edges = await PrismaClient.edges.findMany();
-        const graph = createGraph(edges);
+
+        // Fetch all nodes for creating a graph with nodeType information
+        const allNodes = await PrismaClient.nodes.findMany();
+        const nodesMap = new Map(allNodes.map(node => [node.nodeID, node]));
+
+        // Create graph with or without elevator edges as appropriate
+        const graph = createGraph(edges, nodesMap, includeElevators);
         let pathNodeIds = [];
 
         switch (algorithm) {
@@ -199,6 +221,7 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
                 pathNodeIds = dijkstraShortestPath(startNodeId as string, endNodeId as string, graph);
                 break;
             default:
+                // This case is already handled by the initial check, but kept for completeness
                 return res.status(400).send("Unsupported algorithm");
         }
 
@@ -208,5 +231,6 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
         res.status(500).send("Internal server error");
     }
 });
+
 
 export default router;
