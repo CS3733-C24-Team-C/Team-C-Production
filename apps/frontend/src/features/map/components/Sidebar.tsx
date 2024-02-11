@@ -1,5 +1,3 @@
-import { Autocomplete } from "@/components";
-
 import logoUrl from "/logo.png";
 import { drawerId } from "../constants";
 import {
@@ -22,6 +20,7 @@ import lowerLevel2 from "../assets/00_thelowerlevel2.png";
 import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
+import { Autocomplete } from "@/components";
 
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
@@ -48,9 +47,14 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const [endLocation, setEndLocation] = useState<string>("");
   const [directions, setDirections] = useState<string[]>([]);
   const [algorithm, setAlgorithm] = useState<string | null>("AStar");
-  const newDirections = directions.map((ID) =>
-    nodes.filter((node) => node["nodeID"] === ID),
+
+  const [openFloor, setOpenFloor] = useState<string | null>(null);
+
+  const newDirections = directions.map(
+    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
+
+  console.log(newDirections);
 
   const { path, setPath } = useContext(DirectionsContext);
 
@@ -62,6 +66,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
   const handleItemClick = (value: string) => {
     setAlgorithm(value);
+  };
+
+  const handleFloorClick = (floor: string) => {
+    setOpenFloor((prevFloor) => (prevFloor === floor ? null : floor));
   };
 
   function angleBetweenVectors(
@@ -84,12 +92,28 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     return angleDegrees;
   }
 
-  function turnDirection(index: number) {
-    let currDirection = null;
-    let prevDirection = null;
-    let nextDirection = null;
+  function turnDirection(floor: string, index: number) {
+    const floorDirections = newDirections.filter(
+      (direction, i, arr) =>
+        direction?.floor === floor ||
+        (i > 0 && arr[i - 1].floor === floor) ||
+        (i === arr.length - 1 && arr[i].floor === floor),
+    );
 
-    currDirection = newDirections[index][0];
+    console.log(floorDirections);
+
+    const currDirection = floorDirections[index];
+    const prevDirection = index > 0 ? floorDirections[index - 1] : null;
+    let nextDirection =
+      index < floorDirections.length - 1 ? floorDirections[index + 1] : null;
+
+    //currDirection = newDirections[index];
+
+    if (nextDirection === null && index === floorDirections.length - 1) {
+      // Assuming the next direction is already present in newDirections
+      nextDirection =
+        newDirections.find((direction) => direction.floor !== floor) || null;
+    }
 
     switch (index) {
       case 0:
@@ -97,50 +121,41 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
       case 1:
         return "Head towards " + currDirection.longName;
       case newDirections.length - 1:
-        return "Arrive at ";
+        return "Arrive at " + currDirection.longName;
       default:
-        if (
-          newDirections.length > 0 &&
-          index > 0 &&
-          index < newDirections.length
-        ) {
-          prevDirection = newDirections[index - 1][0];
-          nextDirection = newDirections[index + 1][0];
+        if (currDirection && nextDirection && prevDirection) {
+          if (currDirection.floor != nextDirection.floor) {
+            return (
+              "Take " +
+              currDirection.longName +
+              " to Floor " +
+              nextDirection.floor
+            );
+          }
 
-          if (currDirection && nextDirection && prevDirection) {
-            if (currDirection.floor != nextDirection.floor) {
-              return (
-                "Take " +
-                currDirection.longName +
-                " to Floor " +
-                nextDirection.floor
-              );
-            }
+          const vector1 = {
+            x: currDirection.xcoord - prevDirection.xcoord,
+            y: currDirection.ycoord - prevDirection.ycoord,
+          };
+          const vector2 = {
+            x: nextDirection.xcoord - currDirection.xcoord,
+            y: nextDirection.ycoord - currDirection.ycoord,
+          };
 
-            const vector1 = {
-              x: currDirection.xcoord - prevDirection.xcoord,
-              y: currDirection.ycoord - prevDirection.ycoord,
-            };
-            const vector2 = {
-              x: nextDirection.xcoord - currDirection.xcoord,
-              y: nextDirection.ycoord - currDirection.ycoord,
-            };
-
-            const angle = angleBetweenVectors(vector1, vector2);
-            // Use crossProductValue to determine left or right turn
-            if (angle < -30) {
-              return "Turn left towards " + currDirection.longName;
-            } else if (angle >= -30 && angle < -15) {
-              return "Bear left towards " + currDirection.longName;
-            } else if (angle >= -15 && angle < 15) {
-              return "Head straight towards " + currDirection.longName;
-            } else if (angle >= 15 && angle < 30) {
-              return "Bear right towards " + currDirection.longName;
-            } else if (angle >= 30) {
-              return "Turn right towards " + currDirection.longName;
-            } else {
-              return "idk lmfao";
-            }
+          const angle = angleBetweenVectors(vector1, vector2);
+          // Use crossProductValue to determine left or right turn
+          if (angle < -30) {
+            return "Turn left towards " + currDirection.longName;
+          } else if (angle >= -30 && angle < -15) {
+            return "Bear left towards " + currDirection.longName;
+          } else if (angle >= -15 && angle < 15) {
+            return "Head straight towards " + currDirection.longName;
+          } else if (angle >= 15 && angle < 30) {
+            return "Bear right towards " + currDirection.longName;
+          } else if (angle >= 30) {
+            return "Turn right towards " + currDirection.longName;
+          } else {
+            return "idk lmfao";
           }
         }
     }
@@ -298,13 +313,36 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           </div>
           <Button type="submit">Submit</Button>
         </form>
-        <List ordered>
-          {newDirections.map((row, i: number) => (
-            <List.Item key={i}>
-              {i < newDirections.length && turnDirection(i)}
-            </List.Item>
+        {/* Displaying directions organized by floor */}
+        <div className="mt-4 space-y-2">
+          {Array.from(
+            new Set(newDirections.map((direction) => direction?.floor)),
+          ).map((floor) => (
+            <div key={floor}>
+              <Button
+                className="w-full"
+                outline
+                label={`Floor ${floor}`}
+                onClick={() => handleFloorClick(floor)}
+              >
+                {openFloor === floor
+                  ? `Click to Hide Directions for Floor ${floor}`
+                  : `Click To Show Directions for Floor ${floor}`}
+              </Button>
+              {openFloor === floor && (
+                <List ordered>
+                  {newDirections
+                    .filter((direction) => direction?.floor === floor)
+                    .map((row, i: number) => (
+                      <List.Item key={i}>
+                        {i < newDirections.length && turnDirection(floor, i)}
+                      </List.Item>
+                    ))}
+                </List>
+              )}
+            </div>
           ))}
-        </List>
+        </div>
       </div>
     </FlowbiteSidebar>
   );
