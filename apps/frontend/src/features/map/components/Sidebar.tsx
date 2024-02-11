@@ -21,7 +21,29 @@ import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 import { Autocomplete } from "@/components";
-
+import {
+  HiChevronUp,
+  HiChevronDown,
+  HiLocationMarker,
+  HiArrowCircleUp,
+  HiArrowCircleLeft,
+  HiArrowCircleRight,
+} from "react-icons/hi";
+//import { TbElevator } from "react-icons/tb";
+import { MdElevator } from "react-icons/md";
+/*
+const customStyles = {
+    li: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    '.custom-arrow-icon': {
+        height: '1.5rem',
+        width: '1.5rem',
+        marginRight: '1.0rem !important',
+    },
+};
+*/
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
     base: "h-full",
@@ -122,24 +144,50 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
     if (nextDirection === null && index === floorDirections.length - 1) {
       // Assuming the next direction is already present in newDirections
-      return "Arrive at " + currDirection.longName;
+      return (
+        <>
+          <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
+          {"Arrive at " + currDirection.longName}
+        </>
+      );
     }
 
     switch (index) {
       case 0:
-        return "Start at " + currDirection.longName;
-      case 1:
-        return "Head towards " + currDirection.longName;
+        return (
+          <>
+            <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
+            {"Start at " + currDirection.longName}
+          </>
+        );
+      case 1000:
+        return (
+          <>
+            <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline " />
+            {"Head towards " + currDirection.longName}
+          </>
+        );
       case newDirections.length - 1:
-        return "Arrive at " + currDirection.longName;
+        return (
+          <>
+            {"Arrive at " + currDirection.longName}
+            <HiLocationMarker
+              className="mr-2 ml-1 h-4 w-4 inline "
+              style={{ color: "blue" }}
+            />
+          </>
+        );
       default:
         if (currDirection && nextDirection && prevDirection) {
           if (currDirection.floor != nextDirection.floor) {
             return (
-              "Take " +
-              currDirection.longName +
-              " to Floor " +
-              nextDirection.floor
+              <>
+                <MdElevator className="mr-2 ml-1 h-4 w-4 inline" />
+                {"Take " +
+                  currDirection.longName +
+                  " to Floor " +
+                  nextDirection.floor}
+              </>
             );
           }
 
@@ -155,15 +203,31 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           const angle = angleBetweenVectors(vector1, vector2);
           // Use crossProductValue to determine left or right turn
           if (angle < -30) {
-            return "Turn left towards " + currDirection.longName;
+            return (
+              <>
+                <HiArrowCircleLeft className="mr-2 ml-1 w-4 h-4 inline" />
+                {"Turn left towards " + currDirection.longName}
+              </>
+            );
           } else if (angle >= -30 && angle < -15) {
             return "Bear left towards " + currDirection.longName;
           } else if (angle >= -15 && angle < 15) {
-            return "Head straight towards " + currDirection.longName;
+            return (
+              <>
+                <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline" />
+                {"Continue Straight towards " + currDirection.longName}
+              </>
+            );
+            //return "Head straight towards " + currDirection.longName;
           } else if (angle >= 15 && angle < 30) {
             return "Bear right towards " + currDirection.longName;
           } else if (angle >= 30) {
-            return "Turn right towards " + currDirection.longName;
+            return (
+              <>
+                <HiArrowCircleRight className="mr-2 ml-1 w-4 h-4 inline" />
+                {"Turn right towards " + currDirection.longName}
+              </>
+            );
           } else {
             return "idk lmfao";
           }
@@ -216,6 +280,19 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
       alert("Failed to find path. Please try again.");
     }
   };
+
+  function colorPicker(i: number, dark: number) {
+    if (dark) {
+      if (i % 2 == 0) {
+        return "gray-700";
+      }
+      return "gray-800";
+    }
+    if (i % 2 == 0) {
+      return "gray-50";
+    }
+    return "gray-200";
+  }
 
   return (
     <FlowbiteSidebar aria-label="Map sidebar" theme={sidebarTheme}>
@@ -335,18 +412,28 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                 label={`Floor ${floor}`}
                 onClick={() => handleFloorClick(floor)}
               >
-                {openFloor === floor
-                  ? `Click to Hide Directions for Floor ${floor}`
-                  : `Click To Show Directions for Floor ${floor}`}
+                {openFloor === floor ? (
+                  <>
+                    {`Hide Directions for Floor ${floor}`}
+                    <HiChevronUp className="ml-4 h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    {`Show Directions for Floor ${floor}`}
+                    <HiChevronDown className="ml-4 h-4 w-4" />
+                  </>
+                )}
               </Button>
               {openFloor === floor && (
-                <List ordered>
+                <List>
                   {newDirections
                     .filter((direction) => direction?.floor === floor)
                     .map((row, i: number) => (
-                      <List.Item key={i}>
+                      <List
+                        className={`bg-${colorPicker(i, 0)} dark:bg-${colorPicker(i, 1)}`}
+                      >
                         {i < newDirections.length && turnDirection(floor, i)}
-                      </List.Item>
+                      </List>
                     ))}
                 </List>
               )}
