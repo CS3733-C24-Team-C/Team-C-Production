@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Label, Select, Textarea } from "flowbite-react";
-import { FaPerson } from "react-icons/fa6";
+import { FaPerson, FaLocationDot } from "react-icons/fa6";
 import { CiLocationOn } from "react-icons/ci";
 import {
   Nodes,
@@ -24,6 +24,14 @@ const ServiceRequest = () => {
   const [urgency, setUrgency] = useState<Urgency>("LOW");
   const [status, setStatus] = useState<RequestStatus>("UNASSIGNED");
   const [notes, setNotes] = useState<string>();
+
+  // const [maintenanceType, setMaintenanceType] = useState<string>("");
+
+  // const [medicineName, setMedicineName] = useState<string>("");
+  // const [medicineDosage, setMedicineDosage] = useState<string>("");
+
+  const [roomTo, setRoomTo] = useState<string>("");
+  const [roomToSuggestions, setRoomToSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchNodes = async () => {
@@ -97,6 +105,22 @@ const ServiceRequest = () => {
       onSubmit={handleSubmit}
     >
       <h1 className="text-2xl font-bold">Request Service Form</h1>
+      <div className="space-y-2">
+        <Label htmlFor="type">Service type</Label>
+        <Select
+          id="type"
+          required
+          value={type}
+          onChange={(e) => setType(e.target.value as RequestType)}
+        >
+          <option value="JANI">Janitorial</option>
+          <option value="MECH">Maintenance request</option>
+          <option value="MEDI">Medicine delivery</option>
+          <option value="RELC">Patient relocation</option>
+          <option value="CONS">Patient consulation</option>
+          <option value="CUST">Other</option>
+        </Select>
+      </div>
       <Autocomplete
         suggestions={roomSuggestions}
         setSuggestions={setRoomSuggestions}
@@ -104,7 +128,7 @@ const ServiceRequest = () => {
         setValue={setRoom}
         id="room"
         htmlFor="room"
-        label="Assign to room"
+        label={type === "RELC" ? "Start room" : "Assign to room"}
         placeholder="Nuclear Medicine Floor L1"
         required
         rightIcon={CiLocationOn}
@@ -126,6 +150,37 @@ const ServiceRequest = () => {
           }
         }}
       />
+      {type === "RELC" && (
+        <Autocomplete
+          suggestions={roomToSuggestions}
+          setSuggestions={setRoomToSuggestions}
+          value={roomTo}
+          setValue={setRoomTo}
+          id="room-to"
+          htmlFor="room-to"
+          label="Destination room"
+          placeholder="Jen Center for Primary Care"
+          required
+          rightIcon={FaLocationDot}
+          onChange={(e) => {
+            setRoomTo(e.target.value);
+            if (e.target.value.length > 0) {
+              setRoomToSuggestions(
+                nodes
+                  .map((loc) => {
+                    return loc.longName;
+                  })
+                  .filter((loc) =>
+                    loc.toLowerCase().includes(e.target.value.toLowerCase())
+                  )
+                  .slice(0, 10)
+              );
+            } else {
+              setRoomToSuggestions([]);
+            }
+          }}
+        />
+      )}
       <Autocomplete
         suggestions={employeeSuggestions}
         setSuggestions={setEmployeeSuggestions}
@@ -153,22 +208,6 @@ const ServiceRequest = () => {
           }
         }}
       />
-      <div className="space-y-2">
-        <Label htmlFor="type">Service type</Label>
-        <Select
-          id="type"
-          required
-          value={type}
-          onChange={(e) => setType(e.target.value as RequestType)}
-        >
-          <option value="JANI">Janitorial</option>
-          <option value="MECH">Mechanical</option>
-          <option value="MEDI">Medicinal</option>
-          <option value="RELC">Patient relocation</option>
-          <option value="CONS">Patient consultation</option>
-          <option value="CUST">Other</option>
-        </Select>
-      </div>
       <div className="space-y-2">
         <Label htmlFor="urgency">Urgency</Label>
         <Select
