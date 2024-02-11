@@ -84,7 +84,6 @@ const main = async () => {
 };
 
 const generateEmployee = (nodeIds) => {
-
   return {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
@@ -115,24 +114,15 @@ const generateEmployee = (nodeIds) => {
       ],
     },
     jobs: {
-        create: [
-            {
-           job: faker.helpers.arrayElement([
-               "JANITOR",
-               "OFFICEADMIN",
-           ]),
-            },
-            {
-                job: faker.helpers.arrayElement([
-                    "DOCTOR",
-                    "NURSE",
-                ]),
-            }
-        ],
+      create: faker.helpers.arrayElements([
+        { job: "JANITOR" },
+        { job: "OFFICE_ADMIN" },
+        { job: "DOCTOR" },
+        { job: "NURSE" },
+      ]),
     },
   };
 };
-
 
 try {
   await main();

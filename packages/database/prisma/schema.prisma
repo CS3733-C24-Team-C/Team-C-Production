@@ -66,11 +66,10 @@ model EmployeeJobs {
 }
 
 enum EmployeeJob {
-    NULL        //for use in generic users (such as admin)
-    JANITOR
-    DOCTOR
-    NURSE
-    OFFICEADMIN
+  JANITOR
+  DOCTOR
+  NURSE
+  OFFICE_ADMIN
 }
 
 enum EmployeeRole {
