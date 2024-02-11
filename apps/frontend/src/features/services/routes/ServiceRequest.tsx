@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Label, Select, Textarea } from "flowbite-react";
+import { Button, Label, Select, Textarea, TextInput } from "flowbite-react";
 import { FaPerson, FaLocationDot } from "react-icons/fa6";
 import { CiLocationOn } from "react-icons/ci";
 import {
@@ -26,9 +26,8 @@ const ServiceRequest = () => {
   const [notes, setNotes] = useState<string>();
 
   const [maintenanceType, setMaintenanceType] = useState<string>("");
-
-  // const [medicineName, setMedicineName] = useState<string>("");
-  // const [medicineDosage, setMedicineDosage] = useState<string>("");
+  const [medicineName, setMedicineName] = useState<string>("");
+  const [medicineDosage, setMedicineDosage] = useState<string>("");
 
   const [roomTo, setRoomTo] = useState<string>("");
   const [roomToSuggestions, setRoomToSuggestions] = useState<string[]>([]);
@@ -100,10 +99,18 @@ const ServiceRequest = () => {
   };
 
   return (
+
     <form
       className="mx-auto py-8 flex flex-col space-y-4 max-w-md"
       onSubmit={handleSubmit}
     >
+        {type === "JANI" ? <p> Request page created by Phil </p> :
+        type === "MECH" ? <p> Request page created by Abe and Miya </p> :
+        type === "MEDI" ? <p> Request page created by HIEN </p> :
+        type === "RELC" ? <p> Request page created by Felix and Daniel </p> :
+        type === "CONS" ? <p> Request page created by Oliver and Matt </p> :
+        <p> Request page created by Felix </p>
+        }
       <h1 className="text-2xl font-bold">Request Service Form</h1>
       <div className="space-y-2">
         <Label htmlFor="type">Service type</Label>
@@ -117,7 +124,7 @@ const ServiceRequest = () => {
           <option value="MECH">Maintenance request</option>
           <option value="MEDI">Medicine delivery</option>
           <option value="RELC">Patient relocation</option>
-          <option value="CONS">Patient consulation</option>
+          <option value="CONS">Patient consultation</option>
           <option value="CUST">Other</option>
         </Select>
       </div>
@@ -128,7 +135,8 @@ const ServiceRequest = () => {
         setValue={setRoom}
         id="room"
         htmlFor="room"
-        label={type === "RELC" ? "Start room" : "Assign to room"}
+        label={type === "RELC" ? "Start room" :
+            type === "MEDI" ? "Deliver to room" : "Assign to room"}
         placeholder="Nuclear Medicine Floor L1"
         required
         rightIcon={CiLocationOn}
@@ -150,6 +158,7 @@ const ServiceRequest = () => {
           }
         }}
       />
+
       {type === "RELC" && (
         <Autocomplete
           suggestions={roomToSuggestions}
@@ -181,20 +190,50 @@ const ServiceRequest = () => {
           }}
         />
       )}
-      <Autocomplete
-        suggestions={employeeSuggestions}
-        setSuggestions={setEmployeeSuggestions}
-        value={employee}
-        setValue={setEmployee}
-        id="employee"
-        htmlFor="employee"
-        label="Assign to employee"
-        placeholder="John Doe"
-        required
-        rightIcon={FaPerson}
-        onChange={(e) => {
-          setEmployee(e.target.value);
-          if (e.target.value.length > 0) {
+    {type === "MEDI" && (
+        <div>
+            <label htmlFor="medicineName"
+            >Medicine to be delivered
+                <TextInput
+                    type="text"
+                    name="medicineName"
+                    id="medicineName"
+                    placeholder="Ibuprofen"
+                    value={medicineName}
+                    onChange={(event) => {
+                        setMedicineName(event.target.value);
+                    }}
+                /></label>
+            <br/>
+            <label htmlFor="medicineDosage"
+            >Dosage
+                <TextInput
+                    type="number"
+                    name="medicineDosage"
+                    id="medicineDosage"
+                    placeholder="0"
+                    value={medicineDosage}
+                    onChange={(event) => {
+                        const inputValue = Math.max(0, parseInt(event.target.value));
+                        setMedicineDosage(inputValue.toString());
+                    }}
+                /></label>
+        </div>
+    )}
+        <Autocomplete
+            suggestions={employeeSuggestions}
+            setSuggestions={setEmployeeSuggestions}
+            value={employee}
+            setValue={setEmployee}
+            id="employee"
+            htmlFor="employee"
+            label="Assign to employee"
+            placeholder="John Doe"
+            required
+            rightIcon={FaPerson}
+            onChange={(e) => {
+                setEmployee(e.target.value);
+                if (e.target.value.length > 0) {
             setEmployeeSuggestions(
               employees
                 .map((emp) => emp.firstName + " " + emp.lastName)
