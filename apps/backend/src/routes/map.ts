@@ -4,9 +4,12 @@ import multer from "multer";
 import { readCSV, objectsToCSV } from "../utils";
 import { Prisma } from "database";
 import { createGraph, shortestPathAStar, bfsShortestPath, dijkstraShortestPath } from "../shortestPath.ts";
+import uniqueGraph from "../uniqueGraph.ts";
 
 
 const router: Router = express.Router();
+
+
 
 router.get("/nodes", async function (req: Request, res: Response) {
   const nodes = await PrismaClient.nodes.findMany();
@@ -190,19 +193,8 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
             return res.status(404).send("One or both node IDs not found");
         }
 
-        const startNode = nodes.find(node => node.nodeID === startNodeId);
-        const endNode = nodes.find(node => node.nodeID === endNodeId);
-
-        const startNodeFloor = mapFloorToNumber(startNode.floor);
-        const endNodeFloor = mapFloorToNumber(endNode.floor);
-        const includeElevators = startNodeFloor !== endNodeFloor;
-
-        const edges = await PrismaClient.edges.findMany();
-
-        const allNodes = await PrismaClient.nodes.findMany();
-        const nodesMap = new Map(allNodes.map(node => [node.nodeID, node]));
-
-        const graph = createGraph(edges, nodesMap, includeElevators);
+        const graph = await uniqueGraph.getInstance();
+        //console.log(uniqueGraph.getInitializationCount());
         let pathNodeIds = [];
 
         switch (algorithm) {
