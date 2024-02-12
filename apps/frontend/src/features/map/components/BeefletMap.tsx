@@ -31,8 +31,8 @@ export default function BeefletMap(props: { selectedFloor: string }) {
   const [nodes, setNodes] = useState<Nodes[]>([]);
   const [edges, setEdges] = useState<Edges[]>([]);
   const { path, setPath} = useContext(DirectionsContext);
-  const { start, setStart } = useContext(StartContext);
-  const { end, setEnd } = useContext(EndContext);
+  const { startLocation, setStartLocation } = useContext(StartContext);
+  const { endLocation, setEndLocation } = useContext(EndContext);
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID),
   );
@@ -206,18 +206,18 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                     key={i}
                     center={[-node.ycoord, node.xcoord]}
                     radius={(() => {
-                      if (node.longName == start) {
+                      if (node.longName == startLocation) {
                         return 10;
-                      } else if (node.longName == end) {
+                      } else if (node.longName == endLocation) {
                         return 10;
                       }
                       return 7;
                     })()}
                     pathOptions={{
                       color: (() => {
-                        if (node.longName == start) {
+                        if (node.longName == startLocation) {
                           return "blue";
-                        } else if (node.longName == end) {
+                        } else if (node.longName == endLocation) {
                           return "red";
                         }
                         return "green";
@@ -237,9 +237,9 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                       click: async (e) => {
                         if (clicked || e.originalEvent.ctrlKey) {
                             e.target.closePopup();
-                            setStart(node.longName);
+                            setStartLocation(node.longName);
                             console.log("1");
-                            await handleSubmit(node.longName, end);
+                            await handleSubmit(node.longName, endLocation);
                             return;
                         }
                         setClicked(true);
@@ -247,8 +247,8 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                       contextmenu: async (e) => {
                           //e.target.preventDefault();
                           e.target.closePopup();
-                          setEnd(node.longName);
-                          await handleSubmit(start, node.longName);
+                          setEndLocation(node.longName);
+                          await handleSubmit(startLocation, node.longName);
                       },
                     }}
                     fillOpacity={.8}
@@ -257,12 +257,12 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                       {clicked ? (
                           <div className={"flex flex-col space-y-2"}>
                               <Button
-                                  onClick={async () => {setStart(node.longName); await handleSubmit(node.longName, end);}}
+                                  onClick={async () => {setStartLocation(node.longName); await handleSubmit(node.longName, endLocation);}}
                                   className={"custom-button"}>
                                   Set Start
                               </Button>
                               <Button
-                                  onClick={async () => {setEnd(node.longName); await handleSubmit(start, node.longName);}}
+                                  onClick={async () => {setEndLocation(node.longName); await handleSubmit(startLocation, node.longName);}}
                                   className={"custom-button"}>
                                   Set End
                               </Button>
@@ -286,10 +286,10 @@ export default function BeefletMap(props: { selectedFloor: string }) {
               );
             })}
         </FeatureGroup>
-          {nodes.filter((node) => node.longName == start && node.floor == floorID()).map((node) => (
+          {nodes.filter((node) => node.longName == startLocation && node.floor == floorID()).map((node) => (
               <Marker position={[-node.ycoord, node.xcoord]}></Marker>
           ))}
-          {nodes.filter((node) => node.longName == end && node.floor == floorID()).map((node) => (
+          {nodes.filter((node) => node.longName == endLocation && node.floor == floorID()).map((node) => (
               <Marker position={[-node.ycoord, node.xcoord]}></Marker>
           ))}
           <CustomButton

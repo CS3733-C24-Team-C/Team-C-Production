@@ -52,8 +52,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     nodes.filter((node) => node["nodeID"] === ID),
   );
 
-  const { start, setStart } = useContext(StartContext);
-  const { end, setEnd } = useContext(EndContext);
+  const { startLocation, setStartLocation } = useContext(StartContext);
+  const { endLocation, setEndLocation } = useContext(EndContext);
   const { path, setPath } = useContext(DirectionsContext);
 
   path;
@@ -157,10 +157,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const startNodeId = nodes
-      .filter((node) => node["longName"] === start)
+      .filter((node) => node["longName"] === startLocation)
       .map((node) => node.nodeID)[0];
     const endNodeId = nodes
-      .filter((node) => node["longName"] === end)
+      .filter((node) => node["longName"] === endLocation)
       .map((node) => node.nodeID)[0];
     try {
       const res = await fetch("/api/map/pathfinding", {
@@ -221,8 +221,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           <Autocomplete
             suggestions={startSuggestions}
             setSuggestions={setStartSuggestions}
-            value={start}
-            setValue={setStart}
+            value={startLocation}
+            setValue={setStartLocation}
             id="startLocation"
             htmlFor="startLocation"
             label="Enter starting point"
@@ -230,7 +230,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             required
             rightIcon={CiSearch}
             onChange={(e) => {
-              setStart(e.target.value);
+              setStartLocation(e.target.value);
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   locations
@@ -248,8 +248,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
           <Autocomplete
             suggestions={endSuggestions}
             setSuggestions={setEndSuggestions}
-            value={end}
-            setValue={setEnd}
+            value={endLocation}
+            setValue={setEndLocation}
             id="endLocation"
             htmlFor="endLocation"
             label="Enter destination"
@@ -257,7 +257,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             required
             rightIcon={CiSearch}
             onChange={(e) => {
-              setEnd(e.target.value);
+              setEndLocation(e.target.value);
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   locations

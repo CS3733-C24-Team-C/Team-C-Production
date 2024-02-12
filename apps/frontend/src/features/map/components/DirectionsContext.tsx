@@ -1,28 +1,28 @@
 import { createContext, Dispatch, SetStateAction } from "react";
 
 const DirectionsContext = createContext<{
-  path: string[];
-  setPath: Dispatch<string[]>;
+    path: string[];
+    setPath: Dispatch<string[]>;
 }>({
-  path: [],
-  // eslint-disable-next-line no-empty-function
-  setPath: () => {},
+    path: [],
+    // eslint-disable-next-line no-empty-function
+    setPath: () => {},
 });
 
 const StartContext = createContext<{
-  start: string;
-  setStart: Dispatch<SetStateAction<string>>;
+    startLocation: string;
+    setStartLocation: Dispatch<SetStateAction<string>>;
 }>({
-  start: "",
-  setStart: () => {},
+    startLocation: "",
+    setStartLocation: () => {},
 });
 
 const EndContext = createContext<{
-  end: string;
-  setEnd: Dispatch<SetStateAction<string>>;
+    endLocation: string;
+    setEndLocation: Dispatch<SetStateAction<string>>;
 }>({
-  end: "",
-  setEnd: () => {},
+    endLocation: "",
+    setEndLocation: () => {},
 });
 
 export { DirectionsContext, StartContext, EndContext };
