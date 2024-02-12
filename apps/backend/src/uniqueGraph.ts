@@ -1,6 +1,8 @@
 import PrismaClient from "./bin/database-connection.ts";
 import {createGraph} from "./shortestPath.ts";
 
+type Graph = Map<string, Array<{ node: string; weight: number }>>;
+
 class uniqueGraph {
     private static instance: Graph;
     private static initializationCount = 0;
