@@ -157,17 +157,6 @@ router.get("/download/edges", async function (req: Request, res: Response) {
   }
 });
 
-const mapFloorToNumber = (floorLabel: string): number => {
-    const mappings: { [key: string]: number } = {
-        L1: -1,
-        L2: -2,
-        "1": 1,
-        "2": 2,
-        "3": 3,
-    };
-    return mappings[floorLabel] || 0;
-};
-
 
 router.post("/pathfinding", async function (req: Request, res: Response) {
     const { startNodeId, endNodeId, algorithm } = req.body;
