@@ -1,70 +1,34 @@
-import { FormEvent, useState } from "react";
+import React from "react";
+import { LoginButton } from "@/features/auth/components/LoginButton.tsx";
+import { LogoutButton } from "@/features/auth/components/LogoutButton.tsx";
+import { SignupButton } from "@/features/auth/components/SignupButton.tsx";
+import { Auth0Provider } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (
-      !(username === "admin" && password === "admin") &&
-      !(username === "softengc24C@gmail.com" && password === "cs3733c24C!")
-    ) {
-      alert("Wrong Password or Account");
-      return;
-    }
-    console.log(username);
-    console.log(password);
-    navigate("/");
-  };
-
-  const handleResetPassword = (e: FormEvent) => {
-    e.preventDefault();
-    navigate("/auth/reset-password");
-  };
-
-  const handleSignUp = (e: FormEvent) => {
-    e.preventDefault();
-    navigate("/auth/sign-up");
-  };
-
   return (
-    <form onSubmit={handleSubmit} className={"centeredElement"}>
-      <h1>Sign In</h1>
-      <div>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          placeholder="Username"
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <button type="submit">Sign In</button>
-      <br />
-      <button type="button" role="link" onClick={handleResetPassword}>
-        Reset Password
-      </button>
-      <br />
-      <button type="button" role="link" onClick={handleSignUp}>
-        Create an Account
-      </button>
-    </form>
+    <Auth0Provider
+      useRefreshTokens
+      cacheLocation="localstorage"
+      domain="dev-njtak837ng1u41nc.us.auth0.com"
+      clientId="C2UCnUwHJvf1DIbyZHjMGqNyyo56oKS5"
+      onRedirectCallback={(appState) => {
+        navigate(appState?.returnTo || window.location.pathname);
+      }}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+      }}
+    >
+      <h1>Sign In Page:</h1>
+      <br></br>
+      <LoginButton />
+      <br></br>
+      <LogoutButton />
+      <br></br>
+      <SignupButton />
+    </Auth0Provider>
   );
 };
 

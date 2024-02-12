@@ -21,7 +21,7 @@ const SignUp = () => {
 
   return (
     <form onSubmit={handleSubmit} className={"centeredElement"}>
-      <h1>Create an Account:</h1>
+      <h1>Sign Up</h1>
       <div>
         <input
           type="text"
