@@ -30,12 +30,14 @@ export default function BeefletMap(props: { selectedFloor: string }) {
   const imageBounds = new LatLngBounds([0, 0], [-3400, 5000]);
   const [nodes, setNodes] = useState<Nodes[]>([]);
   const [edges, setEdges] = useState<Edges[]>([]);
-  const { path } = useContext(DirectionsContext);
+  const { path, setPath} = useContext(DirectionsContext);
   const { start, setStart } = useContext(StartContext);
   const { end, setEnd } = useContext(EndContext);
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID),
   );
+
+  const [algorithm] = useState<string | null>("AStar");
 
   const [toggled, setToggled] = useState(false);
 
@@ -62,7 +64,6 @@ export default function BeefletMap(props: { selectedFloor: string }) {
   }
 
     useEffect(() => {
-
         const fetchNodes = async () => {
             try {
                 const res = await fetch("/api/map/nodes");
@@ -106,9 +107,44 @@ export default function BeefletMap(props: { selectedFloor: string }) {
   floorID();
   // Define a custom CRS for x and y coordinates
 
+    function sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
   function nav(dest: string) {
       navigate(dest);
   }
+
+    const handleSubmit = async (s: string, e: string) => {
+      sleep(200);
+      return;
+      if (s === "" || e === "") {console.log("Not attempting Pathfinder"); return;}
+        const startNodeId = nodes
+            .filter((node) => node["longName"] === s)
+            .map((node) => node.nodeID)[0];
+        const endNodeId = nodes
+            .filter((node) => node["longName"] === e)
+            .map((node) => node.nodeID)[0];
+        try {
+            const res = await fetch("/api/map/pathfinding", {
+                method: "POST",
+                body: JSON.stringify({
+                    startNodeId,
+                    endNodeId,
+                    algorithm,
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            if (!res.ok) throw new Error(res.statusText);
+            const data = await res.json();
+            //setDirections(data.path);
+            setPath(data.path);
+        } catch (error) {
+            alert("Failed to find path. Please try again.");
+        }
+    };
 
   return (
     <div className="w-full h-full">
@@ -198,18 +234,21 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                         }
                         e.target.closePopup();
                       },
-                      click: (e) => {
+                      click: async (e) => {
                         if (clicked || e.originalEvent.ctrlKey) {
                             e.target.closePopup();
                             setStart(node.longName);
+                            console.log("1");
+                            await handleSubmit(node.longName, end);
                             return;
                         }
                         setClicked(true);
                       },
-                      contextmenu: (e) => {
+                      contextmenu: async (e) => {
                           //e.target.preventDefault();
                           e.target.closePopup();
                           setEnd(node.longName);
+                          await handleSubmit(start, node.longName);
                       },
                     }}
                     fillOpacity={.8}
@@ -218,12 +257,12 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                       {clicked ? (
                           <div className={"flex flex-col space-y-2"}>
                               <Button
-                                  onClick={() => setStart(node.longName)}
+                                  onClick={async () => {setStart(node.longName); await handleSubmit(node.longName, end);}}
                                   className={"custom-button"}>
                                   Set Start
                               </Button>
                               <Button
-                                  onClick={() => setEnd(node.longName)}
+                                  onClick={async () => {setEnd(node.longName); await handleSubmit(start, node.longName);}}
                                   className={"custom-button"}>
                                   Set End
                               </Button>
