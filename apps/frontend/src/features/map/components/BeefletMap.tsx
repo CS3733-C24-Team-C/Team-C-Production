@@ -9,6 +9,7 @@ import {
     Marker,
     LayerGroup,
     Tooltip,
+    SVGOverlay,
 } from "react-leaflet";
 import { LatLngBounds, CRS } from "leaflet";
 import {Edges, Nodes} from "database";
@@ -61,6 +62,7 @@ export default function BeefletMap(props: { selectedFloor: string }) {
   }
 
     useEffect(() => {
+
         const fetchNodes = async () => {
             try {
                 const res = await fetch("/api/map/nodes");
@@ -121,8 +123,8 @@ export default function BeefletMap(props: { selectedFloor: string }) {
         bounceAtZoomLimits={true}
         doubleClickZoom={false}
       >
-        <ImageOverlay url={props.selectedFloor} bounds={imageBounds} />
         <LayerGroup>
+            <ImageOverlay url={props.selectedFloor} bounds={imageBounds} />
             {toggled &&
                 edges
                     .map((edge) => [
@@ -155,6 +157,9 @@ export default function BeefletMap(props: { selectedFloor: string }) {
                 ))
             }
         </LayerGroup>
+        <SVGOverlay bounds={imageBounds}>
+
+        </SVGOverlay>
         <FeatureGroup>
           {nodes
             .filter((node) => node.floor == floorID())
