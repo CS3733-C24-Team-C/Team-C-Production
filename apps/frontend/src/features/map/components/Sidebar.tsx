@@ -61,6 +61,17 @@ type SidebarProps = {
   setSelectedFloor: (value: string) => void;
 };
 
+// A class to temporarily hold nodes with an associated floorID, so that nodes on separate areas of the same floor can be differentiated
+class nodeFloorID {
+  node: Nodes;
+  floorID: string;
+
+  constructor(node: Nodes, floorID: string) {
+    this.node = node;
+    this.floorID = floorID;
+  }
+}
+
 const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   const [nodes, setNodes] = useState<Nodes[]>([]);
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
@@ -76,7 +87,24 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
 
-  console.log(newDirections);
+  //assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
+  function separateFloors(newDirections: Nodes[]) {
+    let lastFloor = "";
+    const floors: nodeFloorID[] = [];
+    let floorID = 0;
+    for (const node of newDirections) {
+      if (lastFloor != node.floor) {
+        lastFloor = node.floor;
+        floorID = (floorID + 1) % 10;
+      }
+      floors.push(new nodeFloorID(node, node.floor + floorID));
+    }
+    return floors;
+  }
+
+  const splitDirections = separateFloors(newDirections);
+
+  console.log(splitDirections);
 
   const { path, setPath } = useContext(DirectionsContext);
 
@@ -90,8 +118,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     setAlgorithm(value);
   };
 
-  const handleFloorClick = (floor: string) => {
-    setOpenFloor((prevFloor) => (prevFloor === floor ? null : floor));
+  const handleFloorClick = (floorID: string) => {
+    setOpenFloor((prevFloor) => (prevFloor === floorID ? null : floorID));
+    const floor = floorID.substring(0, floorID.length - 1);
     if (floor == "L1") {
       setSelectedFloor(lowerLevel1);
     } else if (floor == "L2") {
@@ -126,11 +155,12 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   }
 
   function turnDirection(floor: string, index: number) {
-    const floorDirections = newDirections.filter(
+    //const floor = floorID.substring(0,floorID.length-1);
+    const floorDirections = splitDirections.filter(
       (direction, i, arr) =>
-        direction?.floor === floor ||
-        (i > 0 && arr[i - 1].floor === floor) ||
-        (i === arr.length - 1 && arr[i].floor === floor),
+        direction?.floorID === floor ||
+        (i > 0 && arr[i - 1].floorID === floor) ||
+        (i === arr.length - 1 && arr[i].floorID === floor),
     );
 
     console.log(floorDirections);
@@ -147,91 +177,95 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
       return (
         <>
           <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
-          {"Arrive at " + currDirection.longName}
+          {"Arrive at " + currDirection.node.longName}
         </>
       );
     }
 
-    switch (index) {
-      case 0:
-        return (
-          <>
-            <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
-            {"Start at " + currDirection.longName}
-          </>
-        );
-      case 1000:
-        return (
-          <>
-            <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline " />
-            {"Head towards " + currDirection.longName}
-          </>
-        );
-      case newDirections.length - 1:
-        return (
-          <>
-            {"Arrive at " + currDirection.longName}
-            <HiLocationMarker
-              className="mr-2 ml-1 h-4 w-4 inline "
-              style={{ color: "blue" }}
-            />
-          </>
-        );
-      default:
-        if (currDirection && nextDirection && prevDirection) {
-          if (currDirection.floor != nextDirection.floor) {
-            return (
-              <>
-                <MdElevator className="mr-2 ml-1 h-4 w-4 inline" />
-                {"Take " +
-                  currDirection.longName +
-                  " to Floor " +
-                  nextDirection.floor}
-              </>
-            );
-          }
+    if (currDirection) {
+      switch (index) {
+        case 0:
+          return (
+            <>
+              <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
+              {"Start at " + currDirection.node.longName}
+            </>
+          );
+        case 1000:
+          return (
+            <>
+              <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline " />
+              {"Head towards " + currDirection.node.longName}
+            </>
+          );
+        case newDirections.length - 1:
+          return (
+            <>
+              {"Arrive at " + currDirection.node.longName}
+              <HiLocationMarker
+                className="mr-2 ml-1 h-4 w-4 inline "
+                style={{ color: "blue" }}
+              />
+            </>
+          );
+        default:
+          if (currDirection && nextDirection && prevDirection) {
+            if (currDirection.floorID != nextDirection.floorID) {
+              return (
+                <>
+                  <MdElevator className="mr-2 ml-1 h-4 w-4 inline" />
+                  {"Take " +
+                    currDirection.node.longName +
+                    " to Floor " +
+                    nextDirection.floorID}
+                </>
+              );
+            }
 
-          const vector1 = {
-            x: currDirection.xcoord - prevDirection.xcoord,
-            y: currDirection.ycoord - prevDirection.ycoord,
-          };
-          const vector2 = {
-            x: nextDirection.xcoord - currDirection.xcoord,
-            y: nextDirection.ycoord - currDirection.ycoord,
-          };
+            const vector1 = {
+              x: currDirection.node.xcoord - prevDirection.node.xcoord,
+              y: currDirection.node.ycoord - prevDirection.node.ycoord,
+            };
+            const vector2 = {
+              x: nextDirection.node.xcoord - currDirection.node.xcoord,
+              y: nextDirection.node.ycoord - currDirection.node.ycoord,
+            };
 
-          const angle = angleBetweenVectors(vector1, vector2);
-          // Use crossProductValue to determine left or right turn
-          if (angle < -30) {
-            return (
-              <>
-                <HiArrowCircleLeft className="mr-2 ml-1 w-4 h-4 inline" />
-                {"Turn left towards " + currDirection.longName}
-              </>
-            );
-          } else if (angle >= -30 && angle < -15) {
-            return "Bear left towards " + currDirection.longName;
-          } else if (angle >= -15 && angle < 15) {
-            return (
-              <>
-                <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline" />
-                {"Continue Straight towards " + currDirection.longName}
-              </>
-            );
-            //return "Head straight towards " + currDirection.longName;
-          } else if (angle >= 15 && angle < 30) {
-            return "Bear right towards " + currDirection.longName;
-          } else if (angle >= 30) {
-            return (
-              <>
-                <HiArrowCircleRight className="mr-2 ml-1 w-4 h-4 inline" />
-                {"Turn right towards " + currDirection.longName}
-              </>
-            );
-          } else {
-            return "idk lmfao";
+            const angle = angleBetweenVectors(vector1, vector2);
+            // Use crossProductValue to determine left or right turn
+            if (angle < -30) {
+              return (
+                <>
+                  <HiArrowCircleLeft className="mr-2 ml-1 w-4 h-4 inline" />
+                  {"Turn left towards " + currDirection.node.longName}
+                </>
+              );
+            } else if (angle >= -30 && angle < -15) {
+              return "Bear left towards " + currDirection.node.longName;
+            } else if (angle >= -15 && angle < 15) {
+              return (
+                <>
+                  <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline" />
+                  {"Continue Straight towards " + currDirection.node.longName}
+                </>
+              );
+              //return "Head straight towards " + currDirection.longName;
+            } else if (angle >= 15 && angle < 30) {
+              return "Bear right towards " + currDirection.node.longName;
+            } else if (angle >= 30) {
+              return (
+                <>
+                  <HiArrowCircleRight className="mr-2 ml-1 w-4 h-4 inline" />
+                  {"Turn right towards " + currDirection.node.longName}
+                </>
+              );
+            } else {
+              return "idk lmfao";
+            }
           }
-        }
+      }
+    } else {
+      return "Oh no! Something went wrong!";
     }
   }
 
@@ -403,7 +437,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
           {Array.from(
-            new Set(newDirections.map((direction) => direction?.floor)),
+            new Set(splitDirections.map((direction) => direction?.floorID)),
           ).map((floor) => (
             <div key={floor}>
               <Button
@@ -414,20 +448,20 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
               >
                 {openFloor === floor ? (
                   <>
-                    {`Hide Directions for Floor ${floor}`}
+                    {`Hide Directions for Floor ${floor.substring(0, floor.length - 1)}`}
                     <HiChevronUp className="ml-4 h-4 w-4" />
                   </>
                 ) : (
                   <>
-                    {`Show Directions for Floor ${floor}`}
+                    {`Show Directions for Floor ${floor.substring(0, floor.length - 1)}`}
                     <HiChevronDown className="ml-4 h-4 w-4" />
                   </>
                 )}
               </Button>
               {openFloor === floor && (
                 <List>
-                  {newDirections
-                    .filter((direction) => direction?.floor === floor)
+                  {splitDirections
+                    .filter((direction) => direction?.floorID === floor)
                     .map((row, i: number) => (
                       <List
                         className={`bg-${colorPicker(i, 0)} dark:bg-${colorPicker(i, 1)}`}
