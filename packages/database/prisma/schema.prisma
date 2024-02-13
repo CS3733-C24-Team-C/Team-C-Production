@@ -101,6 +101,12 @@ model Requests {
   // Patient Relocation Request
   roomTo    String?
   newRoomID Nodes?  @relation("destination", fields: [roomTo], references: [nodeID])
+
+  //Janitorial Request
+  hazardousWaste   Boolean?
+
+  //Patient Consultation
+  department       MedicalDepartment?
 }
 
 enum Urgency {
@@ -131,4 +137,13 @@ enum MaintenanceType {
   PLUM // plumbling
   LOCK // locksmith
   TECH // technology
+}
+
+enum MedicalDepartment {
+  NEURO // Neurological
+  ORTHO // Orthopedics
+  PEDIA // Pediatric
+  CARDI // Cardiovascular
+  ONCOL // Oncology
+  INTER // Internal Medicine
 }
