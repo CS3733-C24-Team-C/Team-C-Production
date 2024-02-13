@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { DataTable, DataTableColumnHeader } from "@/components";
-import {
-  FileInput,
-  Label,
-  Button,
-  Select,
-  Checkbox,
-  Dropdown,
-} from "flowbite-react";
+import { FileInput, Label, Button, Select, Checkbox } from "flowbite-react";
 import { downloadCSV } from "../utils";
 import { RequestStatus, Requests } from "database";
-import { ColumnDef } from "@tanstack/react-table";
-import { MdMoreHoriz } from "react-icons/md";
-import { FaDownload, FaTrash } from "react-icons/fa";
-// import { RxCaretSort } from "react-icons/rx";
+import { ColumnDef, Row } from "@tanstack/react-table";
+import { useNavigate } from "react-router-dom";
+
+const ServicesContext = createContext<{
+  services: Requests[];
+  setServices: React.Dispatch<React.SetStateAction<Requests[]>>;
+}>({
+  services: [],
+  // eslint-disable-next-line no-empty-function
+  setServices: () => {},
+});
 
 const ServicesData = () => {
   const [services, setServices] = useState<Requests[]>([]);
   const [file, setFile] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -46,30 +47,6 @@ const ServicesData = () => {
       alert("File uploaded successfully!");
     } catch (error) {
       alert("Failed to upload file. Please try again.");
-    }
-  };
-
-  const changeCompletionStatus = async (
-    id: number,
-    newStatus: RequestStatus
-  ) => {
-    try {
-      const res = await fetch(`/api/services/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ completionStatus: newStatus }),
-      });
-      if (!res.ok) throw new Error(res.statusText);
-      const updatedServices = services.map((service) =>
-        service.id === id
-          ? { ...service, completionStatus: newStatus }
-          : service
-      );
-      setServices(updatedServices);
-    } catch (error) {
-      console.error("Failed to update service request:", error);
     }
   };
 
@@ -104,36 +81,14 @@ const ServicesData = () => {
       </div>
 
       <div className="flex">
-        <DataTable
-          columns={requestsTableColumns}
-          data={services}
-          searchColumn="id"
-        />
-        <div>
-          <h6 className="font-bold mb-2">Completion Status</h6>
-          <div className="flex flex-col gap-2 ml-2">
-            {services.map((service) => (
-              <Select
-                id="status"
-                sizing="sm"
-                required
-                key={service.id}
-                defaultValue={service.completionStatus}
-                onChange={(e) =>
-                  changeCompletionStatus(
-                    service.id,
-                    e.target.value as RequestStatus
-                  )
-                }
-              >
-                <option value="UNASSIGNED">Unassigned</option>
-                <option value="ASSIGNED">Assigned</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-              </Select>
-            ))}
-          </div>
-        </div>
+        <ServicesContext.Provider value={{ services, setServices }}>
+          <DataTable
+            columns={requestsTableColumns}
+            data={services}
+            searchColumn="id"
+            onAddRow={() => navigate("/services")}
+          />
+        </ServicesContext.Provider>
       </div>
     </>
   );
@@ -218,22 +173,61 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: () => {
-      return (
-        <Dropdown
-          label="Actions"
-          renderTrigger={() => (
-            <Button outline pill size="xs">
-              <MdMoreHoriz className="h-4 w-4" />
-            </Button>
-          )}
-        >
-          <Dropdown.Item icon={FaDownload}>Download track</Dropdown.Item>
-          <Dropdown.Item icon={FaTrash}>Delete track</Dropdown.Item>
-        </Dropdown>
-      );
+    cell: ({ row }) => {
+      return <ServicesActions row={row} />;
     },
   },
 ];
+
+type ServicesActionsProps = {
+  row: Row<Requests>;
+};
+
+const ServicesActions = ({ row }: ServicesActionsProps) => {
+  const { services, setServices } = useContext(ServicesContext);
+
+  const changeCompletionStatus = async (
+    id: number,
+    newStatus: RequestStatus
+  ) => {
+    try {
+      const res = await fetch(`/api/services/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ completionStatus: newStatus }),
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      const updatedServices = services.map((service) =>
+        service.id === id
+          ? { ...service, completionStatus: newStatus }
+          : service
+      );
+      setServices(updatedServices);
+    } catch (error) {
+      alert("Failed to update completion status. Please try again.");
+    }
+  };
+
+  return (
+    <Select
+      id="status"
+      sizing="sm"
+      required
+      className="w-32"
+      key={row.original.id}
+      defaultValue={row.original.completionStatus}
+      onChange={(e) =>
+        changeCompletionStatus(row.original.id, e.target.value as RequestStatus)
+      }
+    >
+      <option value="UNASSIGNED">Unassigned</option>
+      <option value="ASSIGNED">Assigned</option>
+      <option value="IN_PROGRESS">In Progress</option>
+      <option value="COMPLETED">Completed</option>
+    </Select>
+  );
+};
 
 export { ServicesData };
