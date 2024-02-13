@@ -388,17 +388,29 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             required
             rightIcon={CiSearch}
             onFocus={(e) => {
-              setStartSuggestions(
-                locations
-                  .map((loc) => loc.longName)
-                  .filter((loc) =>
-                    loc.toLowerCase().includes(e.target.value.toLowerCase()),
-                  )
-                  .sort(),
-              );
+              setStartLocation(e.target.value);
+              if (e.target.value.length > 0) {
+                setStartSuggestions(
+                  locations
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    )
+                    .slice(0, 10),
+                );
+              } else {
+                setStartSuggestions(
+                  locations
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    )
+                    .sort(),
+                );
+              }
             }}
             onBlur={() => {
-              setStartSuggestions([]);
+              setTimeout(() => setStartSuggestions([]), 200);
             }}
             onChange={(e) => {
               setStartLocation(e.target.value);
@@ -443,17 +455,29 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
               }
             }}
             onFocus={(e) => {
-              setEndSuggestions(
-                locations
-                  .map((loc) => loc.longName)
-                  .filter((loc) =>
-                    loc.toLowerCase().includes(e.target.value.toLowerCase()),
-                  )
-                  .sort(),
-              );
+              setEndLocation(e.target.value);
+              if (e.target.value.length > 0) {
+                setEndSuggestions(
+                  locations
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    )
+                    .slice(0, 10),
+                );
+              } else {
+                setEndSuggestions(
+                  locations
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    )
+                    .sort(),
+                );
+              }
             }}
             onBlur={() => {
-              setEndSuggestions([]);
+              setTimeout(() => setEndSuggestions([]), 200);
             }}
           />
           <div className="w-full">
