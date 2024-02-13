@@ -20,10 +20,13 @@ const readCSV = (filePath: string): Record<string, unknown>[] => {
 
   return lines.slice(1).map((line) => {
     const values = parseCSVLine(line);
-    return headers.reduce((obj, header, index) => {
-      obj[header] = values[index];
-      return obj;
-    }, {} as Record<string, unknown>);
+    return headers.reduce(
+      (obj, header, index) => {
+        obj[header] = values[index];
+        return obj;
+      },
+      {} as Record<string, unknown>,
+    );
   });
 };
 

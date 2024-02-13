@@ -28,7 +28,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@auth0/auth0-react@npm:^2.1.1":
+"@auth0/auth0-react@npm:^2.2.4":
   version: 2.2.4
   resolution: "@auth0/auth0-react@npm:2.2.4"
   dependencies:
@@ -2873,10 +2873,10 @@ __metadata:
     eslint-config-custom: "workspace:*"
     express: "npm:5.0.0-beta.1"
     express-fileupload: "npm:^1.4.3"
-    express-oauth2-jwt-bearer: "npm:^1.5.0"
+    express-oauth2-jwt-bearer: "npm:^1.6.0"
     http-errors: "npm:~1.6.3"
     http-terminator: "npm:^3.2.0"
-    jose: "npm:^4.14.4"
+    jose: "npm:^5.2.2"
     morgan: "npm:~1.9.1"
     multer: "npm:^1.4.5-lts.1"
     nodemon: "npm:latest"
@@ -4529,7 +4529,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-oauth2-jwt-bearer@npm:^1.5.0":
+"express-oauth2-jwt-bearer@npm:^1.6.0":
   version: 1.6.0
   resolution: "express-oauth2-jwt-bearer@npm:1.6.0"
   dependencies:
@@ -4892,7 +4892,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "frontend@workspace:apps/frontend"
   dependencies:
-    "@auth0/auth0-react": "npm:^2.1.1"
+    "@auth0/auth0-react": "npm:^2.2.4"
     "@popperjs/core": "npm:^2.11.8"
     "@tanstack/react-table": "npm:^8.9.3"
     "@types/bootstrap": "npm:^5.2.6"
@@ -5972,10 +5972,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^4.13.1, jose@npm:^4.14.4":
+"jose@npm:^4.13.1":
   version: 4.15.4
   resolution: "jose@npm:4.15.4"
   checksum: 20fa941597150dffc7af3f41d994500cc3e71cd650b755243dbd80d91cf26c1053f95b78af588f05cfc4371e492a67c5c7a48f689b8605145a8fe28b484d725b
+  languageName: node
+  linkType: hard
+
+"jose@npm:^5.2.2":
+  version: 5.2.2
+  resolution: "jose@npm:5.2.2"
+  checksum: 174b2e955fe829f42d74feae0779028deb44323ff4febf84d22c7d3169cf302a3e9b085bdc13504d04f1073790e9bcaa845a6012a2cb1cd422f1617fdbaf1bff
   languageName: node
   linkType: hard
 
@@ -9637,6 +9644,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "softeng-starter-code@workspace:."
   dependencies:
+    "@auth0/auth0-spa-js": "npm:^2.1.3"
     "@types/react": "npm:^18.0.37"
     "@types/react-dom": "npm:^18.0.11"
     "@vitest/ui": "npm:^0.33.0"

@@ -11,15 +11,18 @@ import { readFileSync } from "fs";
  *                                      column headers in the CSV file.
  **/
 export const readCSV = (filePath) => {
-    const fileContent = readFileSync(filePath, "utf8");
-    const lines = fileContent.split("\n").map(line => line.trim()).filter(line => line);
-    const headers = lines[0].split(",");
+  const fileContent = readFileSync(filePath, "utf8");
+  const lines = fileContent
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line);
+  const headers = lines[0].split(",");
 
-    return lines.slice(1).map(line => {
-        const values = line.split(",");
-        return headers.reduce((obj, header, index) => {
-            obj[header] = values[index];
-            return obj;
-        }, {});
-    });
+  return lines.slice(1).map((line) => {
+    const values = line.split(",");
+    return headers.reduce((obj, header, index) => {
+      obj[header] = values[index];
+      return obj;
+    }, {});
+  });
 };

@@ -117,9 +117,9 @@ const ServiceRequest = () => {
                   return loc.longName;
                 })
                 .filter((loc) =>
-                  loc.toLowerCase().includes(e.target.value.toLowerCase())
+                  loc.toLowerCase().includes(e.target.value.toLowerCase()),
                 )
-                .slice(0, 10)
+                .slice(0, 10),
             );
           } else {
             setRoomSuggestions([]);
@@ -144,9 +144,9 @@ const ServiceRequest = () => {
               employees
                 .map((emp) => emp.firstName + " " + emp.lastName)
                 .filter((emp) =>
-                  emp.toLowerCase().includes(e.target.value.toLowerCase())
+                  emp.toLowerCase().includes(e.target.value.toLowerCase()),
                 )
-                .slice(0, 10)
+                .slice(0, 10),
             );
           } else {
             setEmployeeSuggestions([]);

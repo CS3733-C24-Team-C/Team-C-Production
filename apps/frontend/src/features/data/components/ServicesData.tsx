@@ -40,7 +40,7 @@ const ServicesData = () => {
 
   const changeCompletionStatus = async (
     id: number,
-    newStatus: RequestStatus
+    newStatus: RequestStatus,
   ) => {
     try {
       const res = await fetch(`/api/services/${id}`, {
@@ -54,7 +54,7 @@ const ServicesData = () => {
       const updatedServices = services.map((service) =>
         service.id === id
           ? { ...service, completionStatus: newStatus }
-          : service
+          : service,
       );
       setServices(updatedServices);
     } catch (error) {
@@ -115,7 +115,7 @@ const ServicesData = () => {
                 onChange={(e) =>
                   changeCompletionStatus(
                     service.id,
-                    e.target.value as RequestStatus
+                    e.target.value as RequestStatus,
                   )
                 }
               >

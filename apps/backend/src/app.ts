@@ -5,6 +5,7 @@ import logger from "morgan";
 import mapRouter from "./routes/map.ts";
 import servicesRouter from "./routes/services.ts";
 import employeesRouter from "./routes/employees.ts";
+import { auth } from "express-oauth2-jwt-bearer";
 
 const app: Express = express(); // Setup the backend
 
@@ -15,7 +16,7 @@ app.use(
       // This is a "hack" that gets the output to appear in the remote debugger :)
       write: (msg) => console.info(msg),
     },
-  })
+  }),
 ); // This records all HTTP requests
 app.use(express.json()); // This processes requests as JSON
 app.use(express.urlencoded({ extended: false })); // URL parser
@@ -46,5 +47,17 @@ app.use((err: HttpError, req: Request, res: Response): void => {
   // Reply with the error
   res.status(err.status || 500);
 });
+
+// For Auth0 enforcement
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+if (!process.env["VITETEST"]) {
+  app.use(
+    auth({
+      audience: "/api",
+      issuerBaseURL: "https://dev-njtak837ng1u41nc.us.auth0.com/",
+      tokenSigningAlg: "RS256",
+    }),
+  );
+}
 
 export default app; // Export the backend, so that www.ts can start it

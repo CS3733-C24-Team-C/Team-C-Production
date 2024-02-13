@@ -61,6 +61,7 @@ const RAW_RUNTIME_STATE =
       [null, {\
         "packageLocation": "./",\
         "packageDependencies": [\
+          ["@auth0/auth0-spa-js", "npm:2.1.3"],\
           ["@types/react", "npm:18.2.48"],\
           ["@types/react-dom", "npm:18.2.18"],\
           ["@vitest/ui", "virtual:f7b030241781449f9f163484f540f772ec3707fc5214186cd12bce9e472ad0dbf6db26b799fb1d7d9f7a9e4faeedac41da01e533ee775acb5c8a31c546a0661d#npm:0.33.0"],\
@@ -3874,7 +3875,7 @@ const RAW_RUNTIME_STATE =
           ["express-oauth2-jwt-bearer", "npm:1.6.0"],\
           ["http-errors", "npm:1.6.3"],\
           ["http-terminator", "npm:3.2.0"],\
-          ["jose", "npm:4.15.4"],\
+          ["jose", "npm:5.2.2"],\
           ["morgan", "npm:1.9.1"],\
           ["multer", "npm:1.4.5-lts.1"],\
           ["nodemon", "npm:3.0.3"],\
@@ -7415,6 +7416,13 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/jose-npm-4.15.4-c518ec3da8-20fa941597.zip/node_modules/jose/",\
         "packageDependencies": [\
           ["jose", "npm:4.15.4"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:5.2.2", {\
+        "packageLocation": "./.yarn/cache/jose-npm-5.2.2-e921996149-174b2e955f.zip/node_modules/jose/",\
+        "packageDependencies": [\
+          ["jose", "npm:5.2.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -11585,6 +11593,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["softeng-starter-code", "workspace:."],\
+          ["@auth0/auth0-spa-js", "npm:2.1.3"],\
           ["@types/react", "npm:18.2.48"],\
           ["@types/react-dom", "npm:18.2.18"],\
           ["@vitest/ui", "virtual:f7b030241781449f9f163484f540f772ec3707fc5214186cd12bce9e472ad0dbf6db26b799fb1d7d9f7a9e4faeedac41da01e533ee775acb5c8a31c546a0661d#npm:0.33.0"],\
