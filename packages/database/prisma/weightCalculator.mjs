@@ -73,28 +73,35 @@ const calculateAdjustedDistance = (nodeA, nodeB) => {
  * Updates the calculateEdgeWeights function to use the new distance calculation, considering node types.
  */
 export const calculateEdgeWeights = (nodes, edges) => {
-  const nodeMap = new Map();
-  nodes.forEach((node) =>
-    nodeMap.set(node.nodeID, {
-      ...node,
-      xcoord: Number(node.xcoord),
-      ycoord: Number(node.ycoord),
-      floor: mapFloorToNumber(node.floor),
-      nodeType: node.nodeType,
-    })
-  );
+    const nodeMap = new Map();
+    nodes.forEach((node) =>
+        nodeMap.set(node.nodeID, {
+            ...node,
+            xcoord: Number(node.xcoord),
+            ycoord: Number(node.ycoord),
+            floor: mapFloorToNumber(node.floor),
+            nodeType: node.nodeType,
+        })
+    );
 
-  const edgeWeights = edges.map((edge) => {
-    const startNode = nodeMap.get(edge.startNode);
-    const endNode = nodeMap.get(edge.endNode);
+    const elevatorEdgePenalty = 100000;
 
-    if (!startNode || !endNode) {
-      throw new Error("Node not found");
-    }
+    const edgeWeights = edges.map((edge) => {
+        const startNode = nodeMap.get(edge.startNode);
+        const endNode = nodeMap.get(edge.endNode);
 
-    const weight = calculateAdjustedDistance(startNode, endNode);
-    return { edgeID: edge.edgeID, weight };
-  });
+        if (!startNode || !endNode) {
+            throw new Error("Node not found");
+        }
 
-  return edgeWeights;
+        
+        let weight = calculateAdjustedDistance(startNode, endNode);
+        if (endNode.nodeType === "ELEV") {
+            weight += elevatorEdgePenalty;
+        }
+
+        return { edgeID: edge.edgeID, weight };
+    });
+
+    return edgeWeights;
 };
