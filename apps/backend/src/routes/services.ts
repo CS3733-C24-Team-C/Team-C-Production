@@ -57,11 +57,14 @@ router.post("/", async (req, res) => {
             nodeID,
           },
         },
-        newRoomID: {
-          connect: {
-            nodeID: roomTo === "" ? undefined : roomTo,
-          },
-        },
+        newRoomID:
+          roomTo === "" || roomTo === undefined
+            ? undefined
+            : {
+                connect: {
+                  nodeID: roomTo,
+                },
+              },
         employee: {
           connect: {
             id: employeeID,
