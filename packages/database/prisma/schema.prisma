@@ -9,7 +9,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL") // url      = "postgresql://teamc:teamc40@database.cs.wpi.edu/teamcdb/public"
+  //url      = "postgresql://teamc:teamc40@database.cs.wpi.edu:/teamcdb/?schema=teamc" //comment that connects to online db, only uncomment out if using online database
+  url      = env("POSTGRES_URL")                                                       //if using online database, comment this line out
 }
 
 model Nodes {
@@ -71,7 +72,7 @@ enum EmployeeJob {
   JANITOR
   DOCTOR
   NURSE
-  OFFICEADMIN
+  OFFICE_ADMIN
 }
 
 enum EmployeeRole {
