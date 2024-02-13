@@ -87,42 +87,6 @@ router.post("/", async (req, res) => {
     res.status(200).send("Service request received");
 });
 
-// router.post("/", async (req, res) => {
-//     const {
-//         maintenanceType, medicineName, medicineDosage, roomTo,
-//         type, urgency, notes, completionStatus, nodeID, employeeID,
-//     } = req.body;
-//
-//     await PrismaClient.requests.create({
-//         data: {
-//             maintenanceType: (maintenanceType !== '' && maintenanceType !== undefined) ? maintenanceType : undefined,
-//             medicineName: (medicineName !== '' && medicineName !== undefined) ? medicineName : undefined,
-//             medicineDosage: (medicineDosage !== '' && medicineDosage !== undefined) ? medicineDosage : undefined,
-//             type,
-//             urgency,
-//             notes,
-//             completionStatus,
-//             room: {
-//                 connect: {
-//                     nodeID,
-//                 },
-//             },
-//             employee: {
-//                 connect: {
-//                     id: employeeID,
-//                 },
-//             },
-//             newRoomID: {
-//                 connect: {
-//                     nodeID: roomTo,
-//                 }
-//             }
-//         },
-//     });
-//
-//     res.status(200).send("Service request received");
-// });
-
 const storage = multer.diskStorage({
     destination: "tmp/",
     filename: (req, file, cb) => {

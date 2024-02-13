@@ -57,18 +57,40 @@ const ServiceRequest = () => {
         fetchEmployees();
     }, []);
 
+    const isEmployeeValid = (employeeName: string): boolean => {
+        return employees.some((emp) => emp.firstName + " " + emp.lastName === employeeName);
+    };
+
+    const isRoomValid = (roomName: string): boolean => {
+        return nodes.some((node) => node.longName === roomName);
+    };
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log("submitting");
 
+        // Check if the entered room is valid
+        if (!isRoomValid(room)) {
+            alert("Invalid room. Please select a room from the autocomplete.");
+            return;
+        }
+
+        // Check if the entered employee is valid
+        if (!isEmployeeValid(employee)) {
+            alert("Invalid employee. Please select an employee from the autocomplete.");
+            return;
+        }
+
         let selectedNodeID = undefined;
 
-        // If type is RELC and roomTo is not empty
+        // If type is RELC and roomTo is valid
         if (type === "RELC" && roomTo) {
             const selectedNode = nodes.find((node) => node.longName === roomTo);
 
             if (selectedNode) {
                 selectedNodeID = selectedNode.nodeID;
+            } else {
+                alert("Invalid room. Please select a room from the autocomplete.");
+                return;
             }
         }
 
