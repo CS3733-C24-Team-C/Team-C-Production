@@ -21,16 +21,16 @@ import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 import { Autocomplete } from "@/components";
-import {
-  HiChevronUp,
-  HiChevronDown,
-  HiLocationMarker,
-  HiArrowCircleUp,
-  HiArrowCircleLeft,
-  HiArrowCircleRight,
-} from "react-icons/hi";
+import { HiChevronUp, HiChevronDown, HiLocationMarker } from "react-icons/hi";
 //import { TbElevator } from "react-icons/tb";
 import { MdElevator } from "react-icons/md";
+import {
+  BsArrowUpLeftCircle,
+  BsArrowUpRightCircle,
+  BsArrowLeftCircle,
+  BsArrowRightCircle,
+  BsArrowUpCircle,
+} from "react-icons/bs";
 /*
 const customStyles = {
     li: {
@@ -190,7 +190,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
       // Assuming the next direction is already present in newDirections
       return (
         <>
-          <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
+          <HiLocationMarker className="mr-2 ml-1 h-5 w-5 inline" />
           {"Arrive at " + currDirection.node.longName}
         </>
       );
@@ -201,14 +201,14 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
         case 0:
           return (
             <>
-              <HiLocationMarker className="mr-2 ml-1 h-4 w-4 inline" />
+              <HiLocationMarker className="mr-2 ml-1 h-5 w-5 inline" />
               {"Start at " + currDirection.node.longName}
             </>
           );
         case 1000:
           return (
             <>
-              <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline " />
+              <BsArrowUpCircle className="mr-2 ml-1 w-4 h-4 inline " />
               {"Head towards " + currDirection.node.longName}
             </>
           );
@@ -227,7 +227,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             if (currDirection.floorID != nextDirection.floorID) {
               return (
                 <>
-                  <MdElevator className="mr-2 ml-1 h-4 w-4 inline" />
+                  <MdElevator className="mr-2 ml-1 h-5 w-5 inline" />
                   {"Take " +
                     currDirection.node.longName +
                     " to Floor " +
@@ -250,26 +250,36 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             if (angle < -30) {
               return (
                 <>
-                  <HiArrowCircleLeft className="mr-2 ml-1 w-4 h-4 inline" />
+                  <BsArrowLeftCircle className="mr-2 ml-1 w-4 h-4 inline" />
                   {"Turn left towards " + currDirection.node.longName}
                 </>
               );
             } else if (angle >= -30 && angle < -15) {
-              return "Bear left towards " + currDirection.node.longName;
+              return (
+                <>
+                  <BsArrowUpLeftCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                  {"Bear left towards " + currDirection.node.longName}
+                </>
+              );
             } else if (angle >= -15 && angle < 15) {
               return (
                 <>
-                  <HiArrowCircleUp className="mr-2 ml-1 w-4 h-4 inline" />
+                  <BsArrowUpCircle className="mr-2 ml-1 w-4 h-4 inline" />
                   {"Continue Straight towards " + currDirection.node.longName}
                 </>
               );
               //return "Head straight towards " + currDirection.longName;
             } else if (angle >= 15 && angle < 30) {
-              return "Bear right towards " + currDirection.node.longName;
+              return (
+                <>
+                  <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                  {"Bear right towards " + currDirection.node.longName}
+                </>
+              );
             } else if (angle >= 30) {
               return (
                 <>
-                  <HiArrowCircleRight className="mr-2 ml-1 w-4 h-4 inline" />
+                  <BsArrowRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
                   {"Turn right towards " + currDirection.node.longName}
                 </>
               );
