@@ -19,6 +19,7 @@ const main = async () => {
   // drop existing data
   await prisma.edges.deleteMany();
   await prisma.requests.deleteMany();
+  await prisma.employeeJobs.deleteMany();
   await prisma.employees.deleteMany();
   await prisma.nodes.deleteMany();
 
@@ -93,7 +94,7 @@ const generateEmployee = (nodeIds) => {
       create: [
         {
           nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
-          urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH"]),
+          urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
           type: faker.helpers.arrayElement([
             "JANI",
             "MECH",
@@ -111,6 +112,14 @@ const generateEmployee = (nodeIds) => {
           ]),
         },
       ],
+    },
+    jobs: {
+      create: faker.helpers.arrayElements([
+        { job: "JANITOR" },
+        { job: "OFFICE_ADMIN" },
+        { job: "DOCTOR" },
+        { job: "NURSE" },
+      ]),
     },
   };
 };
