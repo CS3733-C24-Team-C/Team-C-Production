@@ -83,20 +83,6 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
   const [openFloor, setOpenFloor] = useState<string | null>(null);
 
-  // function handleBlur(type: string) {
-  //     if (type == "start") {
-  //         if (startSuggestions.length != 0) {
-  //             setStartSuggestions([]);
-  //         }
-  //     } else if (type == "end") {
-  //         if (endSuggestions.length != 0) {
-  //             setEndSuggestions([]);
-  //         }
-  //     } else {
-  //         console.log("oh no");
-  //     }
-  // }
-
   const newDirections = directions.map(
     (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
@@ -172,6 +158,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   }
 
   function turnDirection(floor: string, index: number) {
+    console.log(nodes);
     //const floor = floorID.substring(0,floorID.length-1);
     const floorDirections = splitDirections.filter(
       (direction, i, arr) =>
@@ -180,7 +167,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
         (i === arr.length - 1 && arr[i].floorID === floor),
     );
 
-    console.log(floorDirections);
+    //console.log(floorDirections);
 
     const currDirection = floorDirections[index];
     const prevDirection = index > 0 ? floorDirections[index - 1] : null;
@@ -408,7 +395,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     )
                     .filter(
                       (loc) =>
-                        !loc.toLowerCase().includes("hall") ||
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
                           "carrie m. hall conference center floor 2",
                     )
@@ -424,7 +413,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     )
                     .filter(
                       (loc) =>
-                        !loc.toLowerCase().includes("hall") ||
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
                           "carrie m. hall conference center floor 2",
                     )
@@ -446,7 +437,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     )
                     .filter(
                       (loc) =>
-                        !loc.toLowerCase().includes("hall") ||
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
                           "carrie m. hall conference center floor 2",
                     )
@@ -480,7 +473,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     )
                     .filter(
                       (loc) =>
-                        !loc.toLowerCase().includes("hall") ||
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
                           "carrie m. hall conference center floor 2",
                     )
@@ -502,7 +497,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     )
                     .filter(
                       (loc) =>
-                        !loc.toLowerCase().includes("hall") ||
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
                           "carrie m. hall conference center floor 2",
                     )
@@ -518,7 +515,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     )
                     .filter(
                       (loc) =>
-                        !loc.toLowerCase().includes("hall") ||
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
                           "carrie m. hall conference center floor 2",
                     )
