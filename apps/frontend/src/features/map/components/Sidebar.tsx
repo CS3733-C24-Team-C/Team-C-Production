@@ -396,6 +396,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
+                    .filter((loc) => !loc.toLowerCase().includes("hall"))
                     .slice(0, 10),
                 );
               } else {
@@ -405,6 +406,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
+                    .filter((loc) => !loc.toLowerCase().includes("hall"))
                     .sort(),
                 );
               }
@@ -421,6 +423,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
+                    .filter((loc) => !loc.toLowerCase().includes("hall"))
                     .slice(0, 10),
                 );
               } else {
@@ -448,6 +451,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
+                    .filter((loc) => !loc.toLowerCase().includes("hall"))
                     .slice(0, 10),
                 );
               } else {
@@ -463,6 +467,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
+                    .filter((loc) => !loc.toLowerCase().includes("hall"))
                     .slice(0, 10),
                 );
               } else {
@@ -472,6 +477,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
+                    .filter((loc) => !loc.toLowerCase().includes("hall"))
                     .sort(),
                 );
               }
