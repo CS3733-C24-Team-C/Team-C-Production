@@ -83,6 +83,20 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
   const [openFloor, setOpenFloor] = useState<string | null>(null);
 
+  // function handleBlur(type: string) {
+  //     if (type == "start") {
+  //         if (startSuggestions.length != 0) {
+  //             setStartSuggestions([]);
+  //         }
+  //     } else if (type == "end") {
+  //         if (endSuggestions.length != 0) {
+  //             setEndSuggestions([]);
+  //         }
+  //     } else {
+  //         console.log("oh no");
+  //     }
+  // }
+
   const newDirections = directions.map(
     (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
@@ -373,6 +387,19 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             placeholder="Medical Records Conference Room Floor L1"
             required
             rightIcon={CiSearch}
+            onFocus={(e) => {
+              setStartSuggestions(
+                locations
+                  .map((loc) => loc.longName)
+                  .filter((loc) =>
+                    loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                  )
+                  .sort(),
+              );
+            }}
+            onBlur={() => {
+              setStartSuggestions([]);
+            }}
             onChange={(e) => {
               setStartLocation(e.target.value);
               if (e.target.value.length > 0) {
@@ -414,6 +441,19 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
               } else {
                 setEndSuggestions([]);
               }
+            }}
+            onFocus={(e) => {
+              setEndSuggestions(
+                locations
+                  .map((loc) => loc.longName)
+                  .filter((loc) =>
+                    loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                  )
+                  .sort(),
+              );
+            }}
+            onBlur={() => {
+              setEndSuggestions([]);
             }}
           />
           <div className="w-full">
