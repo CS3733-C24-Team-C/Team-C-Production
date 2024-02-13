@@ -1,6 +1,5 @@
 import { useState } from "react";
-//import groundFloor from "../assets/00_thegroundfloor.png";
-import lowerLevel1 from "../assets/00_thelowerlevel1.png";
+import firstFloor from "../assets/01_thefirstfloor.png";
 import {
   Sidebar,
   DirectionsContext,
@@ -12,10 +11,10 @@ import "leaflet/dist/leaflet.css";
 import BeefletMap from "@/features/map/components/BeefletMap.tsx";
 
 const Map = () => {
-  const [selectedFloor, setSelectedFloor] = useState(lowerLevel1);
+  const [selectedFloor, setSelectedFloor] = useState(firstFloor);
   const [path, setPath] = useState<string[]>([]);
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
 
   // const mapStyles = {
   //   width: "100%",
@@ -27,7 +26,7 @@ const Map = () => {
   //     center: [52, 4],
   //     zoom: 4,
   //     layers: [
-  //       L.tileLayer(`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`, {
+  //       L.tileLayer(https://%7Bs%7D.tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png, {
   //         attribution:
   //           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   //       }),
@@ -36,8 +35,8 @@ const Map = () => {
   // }, []);
 
   return (
-    <EndContext.Provider value={{ endLocation: end, setEndLocation: setEnd }}>
-      <StartContext.Provider value={{ startLocation: start, setStartLocation: setStart }}>
+    <EndContext.Provider value={{ endLocation, setEndLocation }}>
+      <StartContext.Provider value={{ startLocation, setStartLocation }}>
         <DirectionsContext.Provider value={{ path, setPath }}>
           <div className="h-screen flex overflow-hidden">
             <Sidebar setSelectedFloor={setSelectedFloor} />

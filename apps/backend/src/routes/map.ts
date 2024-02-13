@@ -300,6 +300,7 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
     // Both nodes exist; proceed with finding the path
     const edges = await PrismaClient.edges.findMany();
     const graph = createGraph(edges);
+
     let pathNodeIds = [];
 
     switch (algorithm) {
