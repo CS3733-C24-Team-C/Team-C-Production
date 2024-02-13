@@ -60,12 +60,26 @@ const ServiceRequest = () => {
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log("submitting");
+
+        let selectedNodeID = undefined;
+
+        // If type is RELC and roomTo is not empty
+        if (type === "RELC" && roomTo) {
+            const selectedNode = nodes.find((node) => node.longName === roomTo);
+
+            if (selectedNode) {
+                selectedNodeID = selectedNode.nodeID;
+            }
+        }
+
         const nodeID = nodes
             .filter((node) => node.longName === room)
             .map((node) => node.nodeID)[0];
+
         const employeeID = employees
             .filter((emp) => emp.firstName + " " + emp.lastName === employee)
             .map((emp) => emp.id)[0];
+
         try {
             const res = await fetch("/api/services", {
                 method: "POST",
@@ -73,7 +87,7 @@ const ServiceRequest = () => {
                     maintenanceType,
                     medicineName,
                     medicineDosage,
-                    roomTo,
+                    roomTo: selectedNodeID,
                     type,
                     urgency,
                     notes,
