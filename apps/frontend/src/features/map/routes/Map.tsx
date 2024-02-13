@@ -36,8 +36,8 @@ const Map = () => {
   // }, []);
 
   return (
-    <EndContext.Provider value={{ end, setEnd }}>
-      <StartContext.Provider value={{ start, setStart }}>
+    <EndContext.Provider value={{ endLocation: end, setEndLocation: setEnd }}>
+      <StartContext.Provider value={{ startLocation: start, setStartLocation: setStart }}>
         <DirectionsContext.Provider value={{ path, setPath }}>
           <div className="h-screen flex overflow-hidden">
             <Sidebar setSelectedFloor={setSelectedFloor} />
