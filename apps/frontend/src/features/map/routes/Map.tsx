@@ -1,5 +1,5 @@
 import { useState } from "react";
-import groundFloor from "../assets/00_thegroundfloor.png";
+import firstFloor from "../assets/01_thefirstfloor.png";
 import {
   Sidebar,
   DirectionsContext,
@@ -11,7 +11,7 @@ import "leaflet/dist/leaflet.css";
 import BeefletMap from "@/features/map/components/BeefletMap.tsx";
 
 const Map = () => {
-  const [selectedFloor, setSelectedFloor] = useState(groundFloor);
+  const [selectedFloor, setSelectedFloor] = useState(firstFloor);
   const [path, setPath] = useState<string[]>([]);
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
