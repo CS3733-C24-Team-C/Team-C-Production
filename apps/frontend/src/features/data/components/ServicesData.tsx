@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "@/components";
-import { FileInput, Label, Button, Select } from "flowbite-react";
+import { DataTable, DataTableColumnHeader } from "@/components";
+import {
+  FileInput,
+  Label,
+  Button,
+  Select,
+  Checkbox,
+  Dropdown,
+} from "flowbite-react";
 import { downloadCSV } from "../utils";
 import { RequestStatus, Requests } from "database";
+import { ColumnDef } from "@tanstack/react-table";
+import { MdMoreHoriz } from "react-icons/md";
+import { FaDownload, FaTrash } from "react-icons/fa";
+// import { RxCaretSort } from "react-icons/rx";
 
 const ServicesData = () => {
   const [services, setServices] = useState<Requests[]>([]);
@@ -93,14 +104,10 @@ const ServicesData = () => {
       </div>
 
       <div className="flex">
-        <Table
-          data={
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            services.map(({ completionStatus, ...rest }) => rest) as Record<
-              string,
-              string | number
-            >[]
-          }
+        <DataTable
+          columns={requestsTableColumns}
+          data={services}
+          searchColumn="id"
         />
         <div>
           <h6 className="font-bold mb-2">Completion Status</h6>
@@ -131,5 +138,102 @@ const ServicesData = () => {
     </>
   );
 };
+
+const requestsTableColumns: ColumnDef<Requests>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && undefined)
+        }
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          table.toggleAllPageRowsSelected(event.target.checked);
+        }}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          row.toggleSelected(event.target.checked);
+        }}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="ID" />
+    ),
+    cell: ({ row }) => row.getValue("id"),
+  },
+  {
+    accessorKey: "nodeID",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Room ID" />
+    ),
+    cell: ({ row }) => row.getValue("nodeID"),
+  },
+  {
+    accessorKey: "employeeID",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Employee ID" />
+    ),
+    cell: ({ row }) => row.getValue("employeeID"),
+  },
+  {
+    accessorKey: "urgency",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Urgency" />
+    ),
+    cell: ({ row }) => row.getValue("urgency"),
+  },
+  {
+    accessorKey: "type",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Type" />
+    ),
+    cell: ({ row }) => row.getValue("type"),
+  },
+  {
+    accessorKey: "notes",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Notes" />
+    ),
+    cell: ({ row }) => row.getValue("notes"),
+  },
+  {
+    accessorKey: "completionStatus",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Completion Status" />
+    ),
+    cell: ({ row }) => row.getValue("completionStatus"),
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: () => {
+      return (
+        <Dropdown
+          label="Actions"
+          renderTrigger={() => (
+            <Button outline pill size="xs">
+              <MdMoreHoriz className="h-4 w-4" />
+            </Button>
+          )}
+        >
+          <Dropdown.Item icon={FaDownload}>Download track</Dropdown.Item>
+          <Dropdown.Item icon={FaTrash}>Delete track</Dropdown.Item>
+        </Dropdown>
+      );
+    },
+  },
+];
 
 export { ServicesData };
