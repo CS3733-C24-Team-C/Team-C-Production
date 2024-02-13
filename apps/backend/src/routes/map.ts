@@ -159,7 +159,7 @@ router.get("/download/edges", async function (req: Request, res: Response) {
 });
 
 router.post("/pathfinding", async function (req: Request, res: Response) {
-  const { startNodeId, endNodeId, algorithm } = req.body;
+    const { startNodeId, endNodeId, algorithm } = req.body;
 
   if (!startNodeId || !endNodeId) {
     return res.status(400).send("Both startNodeId and endNodeId are required");
@@ -214,13 +214,12 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
         break;
       default:
         return res.status(400).send("Unsupported algorithm");
+    }    
+        res.json({ path: pathNodeIds });
+    } catch (error) {
+        console.error("Error processing pathfinding request:", error);
+        res.status(500).send("Internal server error");
     }
-
-    res.json({ path: pathNodeIds });
-  } catch (error) {
-    console.error("Error processing pathfinding request:", error);
-    res.status(500).send("Internal server error");
-  }
 });
 
 export default router;
