@@ -3,6 +3,7 @@ import { LoginButton } from "@/features/auth/components/LoginButton.tsx";
 import { LogoutButton } from "@/features/auth/components/LogoutButton.tsx";
 import { SignupButton } from "@/features/auth/components/SignupButton.tsx";
 import { useAuth0 } from "@auth0/auth0-react";
+/*import { Label } from "flowbite-react";*/
 
 const SignIn = () => {
   const { loginWithRedirect } = useAuth0();
@@ -28,14 +29,11 @@ const SignIn = () => {
   }, [getAccessTokenSilently, isAuthenticated, isLoading, loginWithRedirect]);
 
   return (
-    <div>
-      <h1>Sign In Page:</h1>
-      <br></br>
+    <div className="mx-auto py-8 flex flex-col space-y-4 max-w-md">
+      <h1 className="text-2xl font-bold">Sign In Page</h1>
       <LoginButton />
-      <br></br>
-      <LogoutButton />
-      <br></br>
       <SignupButton />
+      <LogoutButton />
     </div>
   );
 };

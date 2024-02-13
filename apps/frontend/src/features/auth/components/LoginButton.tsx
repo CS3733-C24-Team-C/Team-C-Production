@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
+import { Button } from "flowbite-react";
 
 export const LoginButton: React.FC = () => {
   const { loginWithRedirect } = useAuth0();
@@ -13,8 +14,8 @@ export const LoginButton: React.FC = () => {
   };
 
   return (
-    <button className="login" onClick={handleLogin}>
+    <Button className="login" onClick={handleLogin}>
       Log In
-    </button>
+    </Button>
   );
 };
