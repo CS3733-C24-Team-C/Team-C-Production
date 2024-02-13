@@ -1,12 +1,45 @@
-import React from "react";
+import React /*, { useEffect }*/ from "react";
 import { LoginButton } from "@/features/auth/components/LoginButton.tsx";
 import { LogoutButton } from "@/features/auth/components/LogoutButton.tsx";
 import { SignupButton } from "@/features/auth/components/SignupButton.tsx";
-import { Auth0Provider } from "@auth0/auth0-react";
+import { Auth0Provider /*useAuth0*/ } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   const navigate = useNavigate();
+
+  /*
+  const {
+    isAuthenticated,
+    isLoading,
+    user,
+  } = useAuth0();
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        await getAccessTokenSilently();
+      } catch (error) {
+        await loginWithRedirect({
+          appState: {
+            returnTo: location.pathname,
+          },
+        });
+      }
+    };
+
+    if (!isLoading && isAuthenticated) {
+      checkToken();
+    }
+  }, [
+    getAccessTokenSilently,
+    isAuthenticated,
+    isLoading,
+    location.pathname,
+    loginWithRedirect,
+  ]);
+
+   */
 
   return (
     <Auth0Provider
