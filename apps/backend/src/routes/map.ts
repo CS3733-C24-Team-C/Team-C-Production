@@ -3,13 +3,14 @@ import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
 import { readCSV, objectsToCSV } from "../utils";
 import { Prisma } from "database";
-import { createGraph, shortestPathAStar, bfsShortestPath, dijkstraShortestPath } from "../shortestPath.ts";
+import {
+  shortestPathAStar,
+  bfsShortestPath,
+  dijkstraShortestPath,
+} from "../shortestPath.ts";
 import uniqueGraph from "../uniqueGraph.ts";
 
-
 const router: Router = express.Router();
-
-
 
 router.get("/nodes", async function (req: Request, res: Response) {
   const nodes = await PrismaClient.nodes.findMany();
@@ -157,55 +158,69 @@ router.get("/download/edges", async function (req: Request, res: Response) {
   }
 });
 
-
 router.post("/pathfinding", async function (req: Request, res: Response) {
-    const { startNodeId, endNodeId, algorithm } = req.body;
+  const { startNodeId, endNodeId, algorithm } = req.body;
 
-    if (!startNodeId || !endNodeId) {
-        return res.status(400).send("Both startNodeId and endNodeId are required");
+  if (!startNodeId || !endNodeId) {
+    return res.status(400).send("Both startNodeId and endNodeId are required");
+  }
+
+  if (!["AStar", "BFS", "Dijkstra"].includes(algorithm)) {
+    return res
+      .status(400)
+      .send(
+        "Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'Dijkstra'."
+      );
+  }
+
+  try {
+    const nodes = await PrismaClient.nodes.findMany({
+      where: {
+        nodeID: {
+          in: [startNodeId, endNodeId],
+        },
+      },
+    });
+
+    if (nodes.length < 2) {
+      return res.status(404).send("One or both node IDs not found");
     }
 
-    if (!['AStar', 'BFS', 'Dijkstra'].includes(algorithm)) {
-        return res.status(400).send("Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'Dijkstra'.");
+    const graph = await uniqueGraph.getInstance();
+    // console.log(uniqueGraph.getInitializationCount());
+    let pathNodeIds = [];
+
+    switch (algorithm) {
+      case "AStar":
+        pathNodeIds = shortestPathAStar(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      case "BFS":
+        pathNodeIds = bfsShortestPath(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      case "Dijkstra":
+        pathNodeIds = dijkstraShortestPath(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      default:
+        return res.status(400).send("Unsupported algorithm");
     }
 
-    try {
-        const nodes = await PrismaClient.nodes.findMany({
-            where: {
-                nodeID: {
-                    in: [startNodeId, endNodeId],
-                },
-            },
-        });
-
-        if (nodes.length < 2) {
-            return res.status(404).send("One or both node IDs not found");
-        }
-
-        const graph = await uniqueGraph.getInstance();
-        //console.log(uniqueGraph.getInitializationCount());
-        let pathNodeIds = [];
-
-        switch (algorithm) {
-            case 'AStar':
-                pathNodeIds = shortestPathAStar(startNodeId as string, endNodeId as string, graph);
-                break;
-            case 'BFS':
-                pathNodeIds = bfsShortestPath(startNodeId as string, endNodeId as string, graph);
-                break;
-            case 'Dijkstra':
-                pathNodeIds = dijkstraShortestPath(startNodeId as string, endNodeId as string, graph);
-                break;
-            default:
-                return res.status(400).send("Unsupported algorithm");
-        }
-
-        res.json({ path: pathNodeIds });
-    } catch (error) {
-        console.error("Error processing pathfinding request:", error);
-        res.status(500).send("Internal server error");
-    }
+    res.json({ path: pathNodeIds });
+  } catch (error) {
+    console.error("Error processing pathfinding request:", error);
+    res.status(500).send("Internal server error");
+  }
 });
-
 
 export default router;

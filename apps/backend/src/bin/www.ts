@@ -72,7 +72,7 @@ export default server;
 
 // Initialize graph in memory
 uniqueGraph.getInstance().then(() => {
-    console.log('Graph loaded and ready.');
+  console.log("Graph loaded and ready.");
 });
 
 // Listen on the provided port, on all interfaces
@@ -117,12 +117,12 @@ function onError(error: NodeJS.ErrnoException): void {
  * Event listener for HTTP server "listening" event.
  */
 function onListening(): void {
-    // Get the address we're listening on
-    const addr: string | AddressInfo | null = server.address();
+  // Get the address we're listening on
+  const addr: string | AddressInfo | null = server.address();
 
-    // If it's a string, simply get it (it's a pipe)
-    const bind: string =
-        typeof addr === "string" ? "pipe " + addr : "port " + addr?.port; // Otherwise get the port
-    console.info("Server listening on " + bind); // Debug output that we're listening
-    console.log("Startup complete");
+  // If it's a string, simply get it (it's a pipe)
+  const bind: string =
+    typeof addr === "string" ? "pipe " + addr : "port " + addr?.port; // Otherwise get the port
+  console.info("Server listening on " + bind); // Debug output that we're listening
+  console.log("Startup complete");
 }
