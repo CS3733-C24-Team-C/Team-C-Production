@@ -12,18 +12,13 @@ import {
   SVGOverlay,
 } from "react-leaflet";
 import { LatLngBounds, CRS } from "leaflet";
-import groundFloor from "@/features/map/assets/00_thegroundfloor.png";
-import lowerLevel1 from "../assets/00_thelowerlevel1.png";
-import lowerLevel2 from "@/features/map/assets/00_thelowerlevel2.png";
-import firstFloor from "@/features/map/assets/01_thefirstfloor.png";
-import secondFloor from "@/features/map/assets/02_thesecondfloor.png";
-import thirdFloor from "@/features/map/assets/03_thethirdfloor.png";
 import { MapContext } from "../components";
 import "./forBeef.css";
 import "leaflet/dist/leaflet.css";
 import { Button } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "@/features/map/components/Description.tsx";
+import { assetToFloor } from "../utils";
 
 export default function BeefletMap() {
   // Define the bounds of the image in terms of x and y coordinates
@@ -66,23 +61,6 @@ export default function BeefletMap() {
     // @ts-expect-error type error (any)
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
   }
-
-  const floorID = () => {
-    if (selectedFloor == groundFloor) {
-      return "G";
-    } else if (selectedFloor == lowerLevel1) {
-      return "L1";
-    } else if (selectedFloor == lowerLevel2) {
-      return "L2";
-    } else if (selectedFloor == firstFloor) {
-      return "1";
-    } else if (selectedFloor == secondFloor) {
-      return "2";
-    } else if (selectedFloor == thirdFloor) {
-      return "3";
-    }
-    return "";
-  };
 
   const handleSubmit = async (s: string, e: string) => {
     if (s === "" || e === "") {
@@ -138,7 +116,7 @@ export default function BeefletMap() {
               ])
               .filter(
                 (edge) =>
-                  edge[0][0].floor == floorID() &&
+                  edge[0][0].floor == assetToFloor(selectedFloor) &&
                   edge[0][0].floor == edge[1][0].floor
               )
               .map((edge) => (
@@ -149,27 +127,24 @@ export default function BeefletMap() {
                   ]}
                 ></Polyline>
               ))}
-          {
-            //@ts-expect-error any type error
-            paths[floorID()].map((currentPath, i) => (
-              <Polyline
-                key={i}
-                //@ts-expect-error any type error
-                positions={currentPath.map((node) => [
-                  -node[0].ycoord,
-                  node[0].xcoord,
-                ])}
-                pathOptions={{ color: "black" }}
-                interactive={false}
-                weight={8}
-              />
-            ))
-          }
+          {paths[assetToFloor(selectedFloor)].map((currentPath, i) => (
+            <Polyline
+              key={i}
+              //@ts-expect-error any type error
+              positions={currentPath.map((node) => [
+                -node[0].ycoord,
+                node[0].xcoord,
+              ])}
+              pathOptions={{ color: "black" }}
+              interactive={false}
+              weight={8}
+            />
+          ))}
         </LayerGroup>
         <SVGOverlay bounds={imageBounds}></SVGOverlay>
         <FeatureGroup>
           {nodes
-            .filter((node) => node.floor == floorID())
+            .filter((node) => node.floor == assetToFloor(selectedFloor))
             .map((node, i) => {
               return (
                 <Circle
@@ -282,14 +257,18 @@ export default function BeefletMap() {
         </FeatureGroup>
         {nodes
           .filter(
-            (node) => node.longName == startLocation && node.floor == floorID()
+            (node) =>
+              node.longName == startLocation &&
+              node.floor == assetToFloor(selectedFloor)
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
           ))}
         {nodes
           .filter(
-            (node) => node.longName == endLocation && node.floor == floorID()
+            (node) =>
+              node.longName == endLocation &&
+              node.floor == assetToFloor(selectedFloor)
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />

@@ -29,6 +29,7 @@ import {
   BsArrowRightCircle,
   BsArrowUpCircle,
 } from "react-icons/bs";
+import { floorToAsset } from "../utils";
 
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
@@ -72,14 +73,8 @@ const Sidebar = () => {
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
 
-  const newDirections = path.map(
+  const nodeDirections = path.map(
     (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
-  );
-
-  const locations: { nodeID: string; longName: string }[] = nodes.map(
-    (node) => {
-      return { nodeID: node.nodeID, longName: node.longName };
-    }
   );
 
   // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
@@ -97,42 +92,11 @@ const Sidebar = () => {
     return floors;
   }
 
-  const splitDirections = separateFloors(newDirections);
+  const splitDirections = separateFloors(nodeDirections);
 
   const handleFloorClick = (floorID: string) => {
-    const floor = floorID.substring(0, floorID.length - 1);
-    if (floor == "L1") {
-      setSelectedFloor(lowerLevel1);
-    } else if (floor == "L2") {
-      setSelectedFloor(lowerLevel2);
-    } else if (floor == "1") {
-      setSelectedFloor(firstFloor);
-    } else if (floor == "2") {
-      setSelectedFloor(secondFloor);
-    } else if (floor == "3") {
-      setSelectedFloor(thirdFloor);
-    }
+    setSelectedFloor(adhocConverterChangePlease(floorID));
   };
-
-  function angleBetweenVectors(
-    v1: { x: number; y: number },
-    v2: { x: number; y: number }
-  ): number {
-    // Calculate the angle in radians using the arctangent function
-    const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
-
-    // Convert angle to degrees
-    let angleDegrees = angleRad * (180 / Math.PI);
-
-    // Adjust the angle to be in the range from -180 to 180 degrees
-    if (angleDegrees > 180) {
-      angleDegrees -= 360;
-    } else if (angleDegrees < -180) {
-      angleDegrees += 360;
-    }
-
-    return angleDegrees;
-  }
 
   function turnDirection(floor: string, index: number) {
     //const floor = floorID.substring(0,floorID.length-1);
@@ -174,7 +138,7 @@ const Sidebar = () => {
               {"Head towards " + currDirection.node.longName}
             </>
           );
-        case newDirections.length - 1:
+        case nodeDirections.length - 1:
           return (
             <>
               {"Arrive at " + currDirection.node.longName}
@@ -346,7 +310,7 @@ const Sidebar = () => {
               setStartLocation(e.target.value);
               if (e.target.value.length > 0) {
                 setStartSuggestions(
-                  locations
+                  nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase())
@@ -364,7 +328,7 @@ const Sidebar = () => {
                 );
               } else {
                 setStartSuggestions(
-                  locations
+                  nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase())
@@ -388,7 +352,7 @@ const Sidebar = () => {
               setStartLocation(e.target.value);
               if (e.target.value.length > 0) {
                 setStartSuggestions(
-                  locations
+                  nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase())
@@ -424,7 +388,7 @@ const Sidebar = () => {
               setEndLocation(e.target.value);
               if (e.target.value.length > 0) {
                 setEndSuggestions(
-                  locations
+                  nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase())
@@ -448,7 +412,7 @@ const Sidebar = () => {
               setEndLocation(e.target.value);
               if (e.target.value.length > 0) {
                 setEndSuggestions(
-                  locations
+                  nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase())
@@ -466,7 +430,7 @@ const Sidebar = () => {
                 );
               } else {
                 setEndSuggestions(
-                  locations
+                  nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
                       loc.toLowerCase().includes(e.target.value.toLowerCase())
@@ -546,7 +510,7 @@ const Sidebar = () => {
                           0
                         )} dark:bg-${colorPicker(i, 1)}`}
                       >
-                        {i < newDirections.length && turnDirection(floorID, i)}
+                        {i < nodeDirections.length && turnDirection(floorID, i)}
                       </List>
                     ))}
                 </List>
@@ -561,17 +525,28 @@ const Sidebar = () => {
 
 const adhocConverterChangePlease = (floorID: string) => {
   const floor = floorID.substring(0, floorID.length - 1);
-  if (floor == "L1") {
-    return "/src/features/map/assets/00_thelowerlevel1.png";
-  } else if (floor == "L2") {
-    return "/src/features/map/assets/00_thelowerlevel2.png";
-  } else if (floor == "1") {
-    return "/src/features/map/assets/01_thefirstfloor.png";
-  } else if (floor == "2") {
-    return "/src/features/map/assets/02_thesecondfloor.png";
-  } else if (floor == "3") {
-    return "/src/features/map/assets/03_thethirdfloor.png";
-  }
+  // @ts-expect-error nope
+  return floorToAsset(floor);
 };
+
+function angleBetweenVectors(
+  v1: { x: number; y: number },
+  v2: { x: number; y: number }
+): number {
+  // Calculate the angle in radians using the arctangent function
+  const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
+
+  // Convert angle to degrees
+  let angleDegrees = angleRad * (180 / Math.PI);
+
+  // Adjust the angle to be in the range from -180 to 180 degrees
+  if (angleDegrees > 180) {
+    angleDegrees -= 360;
+  } else if (angleDegrees < -180) {
+    angleDegrees += 360;
+  }
+
+  return angleDegrees;
+}
 
 export { Sidebar };
