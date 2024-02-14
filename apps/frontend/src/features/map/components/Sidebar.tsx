@@ -10,11 +10,10 @@ import {
   Dropdown,
 } from "flowbite-react";
 import { CiMenuBurger, CiSearch } from "react-icons/ci";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Nodes } from "database";
-import { DirectionsContext, StartContext, EndContext } from "../components";
+import { MapContext } from "../components";
 
-//import groundFloor from "../assets/00_thegroundfloor.png";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
 import lowerLevel2 from "../assets/00_thelowerlevel2.png";
 import firstFloor from "../assets/01_thefirstfloor.png";
@@ -22,7 +21,6 @@ import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 import { Autocomplete } from "@/components";
 import { HiChevronUp, HiChevronDown, HiLocationMarker } from "react-icons/hi";
-//import { TbElevator } from "react-icons/tb";
 import { MdElevator } from "react-icons/md";
 import {
   BsArrowUpLeftCircle,
@@ -31,19 +29,7 @@ import {
   BsArrowRightCircle,
   BsArrowUpCircle,
 } from "react-icons/bs";
-/*
-const customStyles = {
-    li: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    '.custom-arrow-icon': {
-        height: '1.5rem',
-        width: '1.5rem',
-        marginRight: '1.0rem !important',
-    },
-};
-*/
+
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
     base: "h-full",
@@ -57,12 +43,8 @@ const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   },
 };
 
-type SidebarProps = {
-  setSelectedFloor: (value: string) => void;
-};
-
 // A class to temporarily hold nodes with an associated floorID, so that nodes on separate areas of the same floor can be differentiated
-class nodeFloorID {
+class NodeFloorID {
   node: Nodes;
   floorID: string;
 
@@ -72,57 +54,52 @@ class nodeFloorID {
   }
 }
 
-const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
-  const [nodes, setNodes] = useState<Nodes[]>([]);
+const Sidebar = () => {
+  const {
+    nodes,
+    selectedFloor,
+    setSelectedFloor,
+    algorithm,
+    setAlgorithm,
+    path,
+    setPath,
+    startLocation,
+    setStartLocation,
+    endLocation,
+    setEndLocation,
+  } = useContext(MapContext);
+
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
-  //const [startLocation, setStartLocation] = useState<string>("");
-  //const [endLocation, setEndLocation] = useState<string>("");
-  const [directions, setDirections] = useState<string[]>([]);
-  const [algorithm, setAlgorithm] = useState<string | null>("AStar");
 
-  const [openFloor, setOpenFloor] = useState<string | null>(null);
-
-  const newDirections = directions.map(
-    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
+  const newDirections = path.map(
+    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
   );
 
-  //assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
+  const locations: { nodeID: string; longName: string }[] = nodes.map(
+    (node) => {
+      return { nodeID: node.nodeID, longName: node.longName };
+    }
+  );
+
+  // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
   function separateFloors(newDirections: Nodes[]) {
     let lastFloor = "";
-    const floors: nodeFloorID[] = [];
+    const floors: NodeFloorID[] = [];
     let floorID = 0;
     for (const node of newDirections) {
       if (lastFloor != node.floor) {
         lastFloor = node.floor;
         floorID = (floorID + 1) % 10;
       }
-      floors.push(new nodeFloorID(node, node.floor + floorID));
+      floors.push(new NodeFloorID(node, node.floor + floorID));
     }
     return floors;
   }
 
   const splitDirections = separateFloors(newDirections);
 
-  console.log(splitDirections);
-
-  const { startLocation, setStartLocation } = useContext(StartContext);
-  const { endLocation, setEndLocation } = useContext(EndContext);
-  const { path, setPath } = useContext(DirectionsContext);
-
-  path;
-  const locations: { nodeID: string; longName: string }[] = nodes.map(
-    (node) => {
-      return { nodeID: node.nodeID, longName: node.longName };
-    },
-  );
-
-  const handleItemClick = (value: string) => {
-    setAlgorithm(value);
-  };
-
   const handleFloorClick = (floorID: string) => {
-    setOpenFloor((prevFloor) => (prevFloor === floorID ? null : floorID));
     const floor = floorID.substring(0, floorID.length - 1);
     if (floor == "L1") {
       setSelectedFloor(lowerLevel1);
@@ -139,7 +116,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
 
   function angleBetweenVectors(
     v1: { x: number; y: number },
-    v2: { x: number; y: number },
+    v2: { x: number; y: number }
   ): number {
     // Calculate the angle in radians using the arctangent function
     const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
@@ -158,16 +135,13 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
   }
 
   function turnDirection(floor: string, index: number) {
-    console.log(nodes);
     //const floor = floorID.substring(0,floorID.length-1);
     const floorDirections = splitDirections.filter(
       (direction, i, arr) =>
         direction?.floorID === floor ||
         (i > 0 && arr[i - 1].floorID === floor) ||
-        (i === arr.length - 1 && arr[i].floorID === floor),
+        (i === arr.length - 1 && arr[i].floorID === floor)
     );
-
-    //console.log(floorDirections);
 
     const currDirection = floorDirections[index];
     const prevDirection = index > 0 ? floorDirections[index - 1] : null;
@@ -281,20 +255,6 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
     }
   }
 
-  useEffect(() => {
-    const fetchNodes = async () => {
-      try {
-        const res = await fetch("/api/map/nodes");
-        if (!res.ok) throw new Error(res.statusText);
-        const data = await res.json();
-        setNodes(data);
-      } catch (error) {
-        console.error("Failed to fetch nodes:", error);
-      }
-    };
-    fetchNodes();
-  }, []);
-
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const startNodeId = nodes
@@ -317,7 +277,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
       });
       if (!res.ok) throw new Error(res.statusText);
       const data = await res.json();
-      setDirections(data.path);
+      // setDirections(data.path);
       setPath(data.path);
     } catch (error) {
       alert("Failed to find path. Please try again.");
@@ -361,11 +321,8 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
             name="mapFloor"
             id="mapFloor"
             onChange={(e) => setSelectedFloor(e.target.value)}
-            defaultValue={firstFloor}
+            value={selectedFloor}
           >
-            {
-              //<option value={groundFloor}>Ground Floor</option>
-            }
             <option value={lowerLevel1}>Lower Level 1</option>
             <option value={lowerLevel2}>Lower Level 2</option>
             <option value={firstFloor}>First Floor</option>
@@ -392,7 +349,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -400,17 +357,17 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions(
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -418,9 +375,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -434,7 +391,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -442,10 +399,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions([]);
@@ -470,7 +427,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -478,10 +435,10 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions([]);
@@ -494,7 +451,7 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -502,17 +459,17 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions(
                   locations
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -520,9 +477,9 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -530,57 +487,66 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
               setTimeout(() => setEndSuggestions([]), 200);
             }}
           />
-          <div className="w-full">
-            <Dropdown
-              label={`Search Method${algorithm ? `: ${algorithm}` : ""}`}
-              dismissOnClick={true}
-            >
-              <Dropdown.Item onClick={() => handleItemClick("AStar")}>
-                AStar
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleItemClick("BFS")}>
-                BFS
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleItemClick("Dijkstra")}>
-                Dijkstra
-              </Dropdown.Item>
-            </Dropdown>
-          </div>
+          <Dropdown
+            label={`Search Method${algorithm ? `: ${algorithm}` : ""}`}
+            size="xs"
+            dismissOnClick={true}
+          >
+            <Dropdown.Item onClick={() => setAlgorithm("AStar")}>
+              AStar
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setAlgorithm("BFS")}>
+              BFS
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setAlgorithm("Dijkstra")}>
+              Dijkstra
+            </Dropdown.Item>
+          </Dropdown>
           <Button type="submit">Submit</Button>
         </form>
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
           {Array.from(
-            new Set(splitDirections.map((direction) => direction?.floorID)),
-          ).map((floor) => (
-            <div key={floor}>
+            new Set(splitDirections.map((direction) => direction?.floorID))
+          ).map((floorID) => (
+            <div key={floorID}>
               <Button
                 className="w-full"
                 outline
-                label={`Floor ${floor}`}
-                onClick={() => handleFloorClick(floor)}
+                label={`Floor ${floorID}`}
+                onClick={() => handleFloorClick(floorID)}
               >
-                {openFloor === floor ? (
+                {selectedFloor === adhocConverterChangePlease(floorID) ? (
                   <>
-                    {`Hide Directions for Floor ${floor.substring(0, floor.length - 1)}`}
+                    {`Hide Directions for Floor ${floorID.substring(
+                      0,
+                      floorID.length - 1
+                    )}`}
                     <HiChevronUp className="ml-4 h-4 w-4" />
                   </>
                 ) : (
                   <>
-                    {`Show Directions for Floor ${floor.substring(0, floor.length - 1)}`}
+                    {`Show Directions for Floor ${floorID.substring(
+                      0,
+                      floorID.length - 1
+                    )}`}
                     <HiChevronDown className="ml-4 h-4 w-4" />
                   </>
                 )}
               </Button>
-              {openFloor === floor && (
-                <List>
+              {selectedFloor === adhocConverterChangePlease(floorID) && (
+                <List key={floorID}>
                   {splitDirections
-                    .filter((direction) => direction?.floorID === floor)
+                    .filter((direction) => direction?.floorID === floorID)
                     .map((row, i: number) => (
                       <List
-                        className={`bg-${colorPicker(i, 0)} dark:bg-${colorPicker(i, 1)}`}
+                        key={i}
+                        className={`bg-${colorPicker(
+                          i,
+                          0
+                        )} dark:bg-${colorPicker(i, 1)}`}
                       >
-                        {i < newDirections.length && turnDirection(floor, i)}
+                        {i < newDirections.length && turnDirection(floorID, i)}
                       </List>
                     ))}
                 </List>
@@ -591,6 +557,21 @@ const Sidebar = ({ setSelectedFloor }: SidebarProps) => {
       </div>
     </FlowbiteSidebar>
   );
+};
+
+const adhocConverterChangePlease = (floorID: string) => {
+  const floor = floorID.substring(0, floorID.length - 1);
+  if (floor == "L1") {
+    return "/src/features/map/assets/00_thelowerlevel1.png";
+  } else if (floor == "L2") {
+    return "/src/features/map/assets/00_thelowerlevel2.png";
+  } else if (floor == "1") {
+    return "/src/features/map/assets/01_thefirstfloor.png";
+  } else if (floor == "2") {
+    return "/src/features/map/assets/02_thesecondfloor.png";
+  } else if (floor == "3") {
+    return "/src/features/map/assets/03_thethirdfloor.png";
+  }
 };
 
 export { Sidebar };
