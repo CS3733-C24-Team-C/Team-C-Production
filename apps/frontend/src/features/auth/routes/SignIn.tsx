@@ -3,7 +3,6 @@ import { LoginButton } from "@/features/auth/components/LoginButton.tsx";
 import { LogoutButton } from "@/features/auth/components/LogoutButton.tsx";
 import { SignupButton } from "@/features/auth/components/SignupButton.tsx";
 import { useAuth0 } from "@auth0/auth0-react";
-/*import { Label } from "flowbite-react";*/
 
 const SignIn = () => {
   const { loginWithRedirect } = useAuth0();
