@@ -246,6 +246,8 @@ export default function BeefletMap() {
                         {"Full name: " + node.longName}
                         <br />
                         {"Short name: " + node.shortName}
+                        <br />
+                          {"Node ID: " + node.nodeID}
                       </div>
                     )}
                   </Popup>
