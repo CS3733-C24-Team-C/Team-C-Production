@@ -156,11 +156,13 @@ router.post("/upload/nodes", upload.single("csv-upload"), async (req, res) => {
       // const existingNodes = await tx.nodes.findMany();
       const existingEdges = await tx.edges.findMany();
       const existingEmployees = await tx.employees.findMany();
+      const existingEmployeeJobs = await tx.employeeJobs.findMany();
       const existingRequests = await tx.requests.findMany();
 
       // 2. Drop all the tables in the order of foreign key dependencies
       await tx.edges.deleteMany();
       await tx.requests.deleteMany();
+      await tx.employeeJobs.deleteMany();
       await tx.employees.deleteMany();
       await tx.nodes.deleteMany();
 
@@ -175,6 +177,10 @@ router.post("/upload/nodes", upload.single("csv-upload"), async (req, res) => {
 
       await tx.employees.createMany({
         data: existingEmployees,
+      });
+
+      await tx.employeeJobs.createMany({
+        data: existingEmployeeJobs,
       });
 
       await tx.requests.createMany({
@@ -207,12 +213,14 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
       // const existingNodes = await tx.nodes.findMany();
       const existingNodes = await tx.nodes.findMany();
       const existingEmployees = await tx.employees.findMany();
+      const existingEmployeeJobs = await tx.employeeJobs.findMany();
       const existingRequests = await tx.requests.findMany();
 
       // 2. Drop all the tables in the order of foreign key dependencies
       await tx.edges.deleteMany();
       await tx.requests.deleteMany();
       await tx.employees.deleteMany();
+      await tx.employeeJobs.deleteMany();
       await tx.nodes.deleteMany();
 
       // 3. Re-seed the database
@@ -226,6 +234,10 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
 
       await tx.employees.createMany({
         data: existingEmployees,
+      });
+
+      await tx.employeeJobs.createMany({
+        data: existingEmployeeJobs,
       });
 
       await tx.requests.createMany({
@@ -303,6 +315,7 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
           endNodeId as string,
           graph
         );
+        break;
       case "AStar":
         pathNodeIds = shortestPathAStar(
           startNodeId as string,
