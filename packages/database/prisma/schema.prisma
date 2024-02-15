@@ -103,7 +103,7 @@ model Requests {
   newRoomID Nodes?  @relation("destination", fields: [roomTo], references: [nodeID])
 
   //Janitorial Request
-  hazardousWaste   Boolean?
+  hazardousWaste   String?
 
   //Patient Consultation
   department       MedicalDepartment?
