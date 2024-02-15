@@ -14,13 +14,11 @@ const SignUp = () => {
       alert("Passwords do not match!");
       return;
     }
-    console.log(username);
-    console.log(password);
     navigate("/");
   };
 
   return (
-    <form onSubmit={handleSubmit} className={"centeredElement"}>
+    <form onSubmit={handleSubmit}>
       <h1>Sign Up</h1>
       <div>
         <input

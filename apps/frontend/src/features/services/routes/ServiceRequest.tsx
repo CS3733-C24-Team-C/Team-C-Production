@@ -10,8 +10,6 @@ import {
   RequestStatus,
 } from "database";
 import { Autocomplete } from "@/components";
-import { useNavigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
 
 const ServiceRequest = () => {
   const [nodes, setNodes] = useState<Nodes[]>([]);
@@ -33,13 +31,6 @@ const ServiceRequest = () => {
 
   const [roomToSuggestions, setRoomToSuggestions] = useState<string[]>([]);
   const [roomTo, setRoomTo] = useState<string>("");
-
-    const navigate = useNavigate();
-    const { isAuthenticated } = useAuth0();
-
-    if (!isAuthenticated) {
-        navigate("/auth/sign-in");
-    }
 
   useEffect(() => {
     const fetchNodes = async () => {

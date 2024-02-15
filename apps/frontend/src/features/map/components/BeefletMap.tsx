@@ -41,12 +41,11 @@ export default function BeefletMap() {
   const [toggledNames, setToggledNames] = useState(false);
   const [clicked, setClicked] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth0();
 
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID)
   );
-
-    const { isAuthenticated } = useAuth0();
 
   let paths = { G: [], L1: [], L2: [], "1": [], "2": [], "3": [] };
 
@@ -222,24 +221,27 @@ export default function BeefletMap() {
                         >
                           Set End
                         </Button>
-                          {isAuthenticated &&
-                        <Button
-                          className={"custom-button"}
-                          onClick={() => navigate("/data/services")}
-                        >
-                          View Requests
-                        </Button>}
-                          {isAuthenticated &&
-                        <Button
-                          className={"custom-button"}
-                          onClick={() => navigate("/services")}
-                        >
-                          Make Request
-                        </Button>}
-                          {isAuthenticated &&
-                        <Button className={"custom-button"}>
-                          Schedule Move
-                        </Button>}
+                        {isAuthenticated && (
+                          <Button
+                            className={"custom-button"}
+                            onClick={() => navigate("/data/services")}
+                          >
+                            View Requests
+                          </Button>
+                        )}
+                        {isAuthenticated && (
+                          <Button
+                            className={"custom-button"}
+                            onClick={() => navigate("/services")}
+                          >
+                            Make Request
+                          </Button>
+                        )}
+                        {isAuthenticated && (
+                          <Button className={"custom-button"}>
+                            Schedule Move
+                          </Button>
+                        )}
                       </div>
                     ) : (
                       <div>
@@ -247,7 +249,7 @@ export default function BeefletMap() {
                         <br />
                         {"Short name: " + node.shortName}
                         <br />
-                          {"Node ID: " + node.nodeID}
+                        {"Node ID: " + node.nodeID}
                       </div>
                     )}
                   </Popup>
@@ -282,20 +284,20 @@ export default function BeefletMap() {
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
           ))}
-          <div>
-        <CustomButton
-          title={"Toggle Edges"}
-          onClick={() => setToggledEdges(!toggledEdges)}
-          className={"custom-toggle-button"}
-          position={"bottomleft"}
-        />
-              <CustomButton
-                  title={"Toggle Names"}
-                  onClick={() => setToggledNames(!toggledNames)}
-                  className={"custom-toggle-button"}
-                  position={"bottomleft"}
-              />
-          </div>
+        <div>
+          <CustomButton
+            title={"Toggle Edges"}
+            onClick={() => setToggledEdges(!toggledEdges)}
+            className={"custom-toggle-button"}
+            position={"bottomleft"}
+          />
+          <CustomButton
+            title={"Toggle Names"}
+            onClick={() => setToggledNames(!toggledNames)}
+            className={"custom-toggle-button"}
+            position={"bottomleft"}
+          />
+        </div>
       </MapContainer>
     </div>
   );

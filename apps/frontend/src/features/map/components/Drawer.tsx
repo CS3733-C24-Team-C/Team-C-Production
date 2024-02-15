@@ -1,6 +1,12 @@
 import logoUrl from "/logo.png";
 import { drawerId } from "../constants";
-import { FaMapMarkedAlt, FaSignInAlt, FaDownload, FaMap, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaMapMarkedAlt,
+  FaSignInAlt,
+  FaDownload,
+  FaMap,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { MdOutlineRoomService } from "react-icons/md";
 import { FaPeopleGroup } from "react-icons/fa6";
 import {
@@ -31,7 +37,6 @@ const drawerTheme: CustomFlowbiteTheme["sidebar"] = {
 };
 
 const Drawer = () => {
-
   const { isAuthenticated } = useAuth0();
 
   return (
@@ -85,12 +90,16 @@ const Drawer = () => {
             <DarkThemeToggle />
             Switch Theme
           </FlowbiteSidebar.Item>
-            {!isAuthenticated && <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignInAlt}>
-            Sign In
-          </FlowbiteSidebar.Item>}
-            {isAuthenticated && <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignOutAlt}>
-                Sign Out
-            </FlowbiteSidebar.Item>}
+          {!isAuthenticated && (
+            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignInAlt}>
+              Sign In
+            </FlowbiteSidebar.Item>
+          )}
+          {isAuthenticated && (
+            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignOutAlt}>
+              Sign Out
+            </FlowbiteSidebar.Item>
+          )}
         </FlowbiteSidebar.ItemGroup>
       </FlowbiteSidebar.Items>
     </FlowbiteSidebar>
