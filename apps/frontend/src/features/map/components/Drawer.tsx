@@ -64,26 +64,36 @@ const Drawer = () => {
           <FlowbiteSidebar.Item href="/" icon={FaMapMarkedAlt}>
             Hospital Map
           </FlowbiteSidebar.Item>
-          <FlowbiteSidebar.Item href="/services" icon={MdOutlineRoomService}>
-            Request Services
-          </FlowbiteSidebar.Item>
-          <FlowbiteSidebar.Collapse
-            icon={FaDownload}
-            label="Import/Export Data"
-          >
-            <FlowbiteSidebar.Item href="/data/map" icon={FaMap}>
-              Map Data
-            </FlowbiteSidebar.Item>
-            <FlowbiteSidebar.Item href="/data/employees" icon={FaPeopleGroup}>
-              Employees Data
-            </FlowbiteSidebar.Item>
-            <FlowbiteSidebar.Item
-              href="/data/services"
-              icon={MdOutlineRoomService}
-            >
-              Service Requests Data
-            </FlowbiteSidebar.Item>
-          </FlowbiteSidebar.Collapse>
+          {isAuthenticated && (
+            <>
+              <FlowbiteSidebar.Item
+                href="/services"
+                icon={MdOutlineRoomService}
+              >
+                Request Services
+              </FlowbiteSidebar.Item>
+              <FlowbiteSidebar.Collapse
+                icon={FaDownload}
+                label="Import/Export Data"
+              >
+                <FlowbiteSidebar.Item href="/data/map" icon={FaMap}>
+                  Map Data
+                </FlowbiteSidebar.Item>
+                <FlowbiteSidebar.Item
+                  href="/data/employees"
+                  icon={FaPeopleGroup}
+                >
+                  Employees Data
+                </FlowbiteSidebar.Item>
+                <FlowbiteSidebar.Item
+                  href="/data/services"
+                  icon={MdOutlineRoomService}
+                >
+                  Service Requests Data
+                </FlowbiteSidebar.Item>
+              </FlowbiteSidebar.Collapse>
+            </>
+          )}
         </FlowbiteSidebar.ItemGroup>
         <FlowbiteSidebar.ItemGroup>
           <FlowbiteSidebar.Item>

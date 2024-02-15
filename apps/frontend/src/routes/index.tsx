@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useNavigate, useRoutes } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthRoutes } from "@/features/auth";
 import { MapRoutes } from "@/features/map";
@@ -8,13 +7,6 @@ import { DataRoutes } from "@/features/data";
 
 export const AppRoutes = () => {
   const { isAuthenticated } = useAuth0();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/auth/sign-in");
-    }
-  }, [isAuthenticated, navigate]);
 
   const publicRoutes = [
     {
