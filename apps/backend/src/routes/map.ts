@@ -7,6 +7,7 @@ import {
   shortestPathAStar,
   bfsShortestPath,
   dijkstraShortestPath,
+  dfsShortestPath,
 } from "../shortestPath.ts";
 import uniqueGraph from "../uniqueGraph.ts";
 
