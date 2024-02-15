@@ -219,8 +219,8 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
       // 2. Drop all the tables in the order of foreign key dependencies
       await tx.edges.deleteMany();
       await tx.requests.deleteMany();
-      await tx.employees.deleteMany();
       await tx.employeeJobs.deleteMany();
+      await tx.employees.deleteMany();
       await tx.nodes.deleteMany();
 
       // 3. Re-seed the database
