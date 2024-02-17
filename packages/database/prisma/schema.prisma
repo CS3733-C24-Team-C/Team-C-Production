@@ -95,7 +95,7 @@ model Requests {
   medicineName   String?
   medicineDosage String?
 
-  // Maintenance Request
+  // Mechanical Request
   maintenanceType MaintenanceType?
 
   // Patient Relocation Request
@@ -134,7 +134,7 @@ enum RequestStatus {
 
 enum MaintenanceType {
   ELEC // electrical
-  PLUM // plumbling
+  PLUM // plumbing
   LOCK // locksmith
   TECH // technology
 }

@@ -56,73 +56,194 @@ const main = async () => {
     },
   });
 
+
+
   // seed employees
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     await prisma.employees.create({
-      data: generateEmployee(nodeIds),
+      data: generateEmployee(),
     });
   }
 
-  await prisma.employees.createMany({
-    data: [
-      {
-        firstName: "admin",
-        lastName: "admin",
-        role: "ADMIN",
-        username: "admin",
-        password: "admin",
-      },
-      {
-        firstName: "Team",
-        lastName: "C",
-        role: "ADMIN",
-        username: "softengc24C@gmail.com",
-        password: "cs3733c24C!",
-      },
-    ],
+  const employeeIds = await prisma.employees.findMany({
+        select: {
+            id: true,
+        },
   });
+
+  // seed service requests
+for (let i = 0; i < 1000; i++) {
+    await prisma.requests.create({
+        data: generateRequest(employeeIds, nodeIds),
+    });
+}
+
+await prisma.employees.createMany({
+    data: [
+        {
+            firstName: "admin",
+            lastName: "admin",
+            role: "ADMIN",
+            username: "admin",
+            password: "admin",
+        },
+        {
+            firstName: "Team",
+            lastName: "C",
+            role: "ADMIN",
+            username: "softengc24C@gmail.com",
+            password: "cs3733c24C!",
+        },
+    ],
+});
+
 };
 
-const generateEmployee = (nodeIds) => {
-  return {
-    firstName: faker.person.firstName(),
-    lastName: faker.person.lastName(),
-    role: faker.helpers.arrayElement(["ADMIN", "REGULAR"]),
-    username: faker.internet.displayName(),
-    password: faker.internet.password(),
-    requests: {
-      create: [
-        {
-          nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
-          urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
-          type: faker.helpers.arrayElement([
-            "JANI",
-            "MECH",
-            "MEDI",
-            "RELC",
-            "CONS",
-            "CUST",
-          ]),
-          notes: faker.hacker.phrase(),
-          completionStatus: faker.helpers.arrayElement([
+
+const generateEmployee = () => {
+    return {
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        role: faker.helpers.arrayElement(["ADMIN", "REGULAR"]),
+        username: faker.internet.displayName(),
+        password: faker.internet.password(),
+        jobs: {
+            create: faker.helpers.arrayElements([
+                { job: "JANITOR" },
+                { job: "OFFICE_ADMIN" },
+                { job: "DOCTOR" },
+                { job: "NURSE" },
+            ]),
+        },
+    };
+};
+
+
+
+
+
+const generateRequest = (employeeIds, nodeIds) => {
+    let reqtype = getRandomNumber(1,5);
+
+    let twoNodes = faker.helpers.arrayElements(nodeIds, 2)
+
+    if(reqtype == 1){
+        return {
+            nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
+            employeeID: faker.helpers.arrayElement(employeeIds).id,
+            urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
+            type: "JANI",
+            notes: faker.hacker.phrase(),
+            completionStatus: faker.helpers.arrayElement([
+                "UNASSIGNED",
+                "ASSIGNED",
+                "IN_PROGRESS",
+                "COMPLETED",
+            ]),
+            hazardousWaste: faker.helpers.arrayElement([
+                "YES",
+                "NO",
+            ])
+        };
+    }
+    if(reqtype == 2){
+        return {
+            nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
+            employeeID: faker.helpers.arrayElement(employeeIds).id,
+            urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
+            type: "MECH",
+            notes: faker.hacker.phrase(),
+            completionStatus: faker.helpers.arrayElement([
+                "UNASSIGNED",
+                "ASSIGNED",
+                "IN_PROGRESS",
+                "COMPLETED",
+            ]),
+            maintenanceType: faker.helpers.arrayElement([
+                "ELEC",
+                "PLUM",
+                "LOCK",
+                "TECH",
+            ])
+        };
+    }
+    if(reqtype == 3){
+        return {
+            nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
+            employeeID: faker.helpers.arrayElement(employeeIds).id,
+            urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
+            type: "MEDI",
+            notes: faker.hacker.phrase(),
+            completionStatus: faker.helpers.arrayElement([
+                "UNASSIGNED",
+                "ASSIGNED",
+                "IN_PROGRESS",
+                "COMPLETED",
+            ]),
+            medicineName: faker.science.chemicalElement().name,
+            medicineDosage: faker.number.int({ min: 10, max: 100 }).toString() + "mg"
+        };
+    }
+    if(reqtype == 4){
+        return {
+            nodeID: twoNodes[0].nodeID,
+            employeeID: faker.helpers.arrayElement(employeeIds).id,
+            urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
+            type: "RELC",
+            notes: faker.hacker.phrase(),
+            completionStatus: faker.helpers.arrayElement([
+                "UNASSIGNED",
+                "ASSIGNED",
+                "IN_PROGRESS",
+                "COMPLETED",
+            ]),
+            roomTo: twoNodes[1].nodeID,
+        };
+    }
+    if(reqtype == 5){
+        return {
+            nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
+            employeeID: faker.helpers.arrayElement(employeeIds).id,
+            urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
+            type: "CONS",
+            notes: faker.hacker.phrase(),
+            completionStatus: faker.helpers.arrayElement([
+                "UNASSIGNED",
+                "ASSIGNED",
+                "IN_PROGRESS",
+                "COMPLETED",
+            ]),
+            department: faker.helpers.arrayElement([
+                "NEURO", // Neurological
+                "ORTHO", // Orthopedics
+                "PEDIA", // Pediatric
+                "CARDI", // Cardiovascular
+                "ONCOL", // Oncology
+                "INTER" // Internal Medicine
+            ])
+        };
+    }
+
+    return {
+        nodeID: faker.helpers.arrayElement(nodeIds).nodeID,
+        employeeID: faker.helpers.arrayElement(employeeIds).id,
+        urgency: faker.helpers.arrayElement(["LOW", "MEDIUM", "HIGH","EMERGENCY"]),
+        type:  "CUST",
+        notes: faker.hacker.phrase(),
+        completionStatus: faker.helpers.arrayElement([
             "UNASSIGNED",
             "ASSIGNED",
             "IN_PROGRESS",
             "COMPLETED",
-          ]),
-        },
-      ],
-    },
-    jobs: {
-      create: faker.helpers.arrayElements([
-        { job: "JANITOR" },
-        { job: "OFFICE_ADMIN" },
-        { job: "DOCTOR" },
-        { job: "NURSE" },
-      ]),
-    },
-  };
+        ]),
+    };
 };
+
+function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
 
 try {
   await main();
