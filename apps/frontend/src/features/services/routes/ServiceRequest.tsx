@@ -157,10 +157,56 @@ const ServiceRequest = () => {
         setDepartment("");
     };
 
-    return (
-        <form
-            className="mx-auto py-8 flex flex-col space-y-4 max-w-md"
-            onSubmit={handleSubmit}
+
+  return (
+    <form
+      className="mx-auto py-8 flex flex-col space-y-4 max-w-md"
+      onSubmit={handleSubmit}
+    >
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        Request Service Form
+      </h1>
+      {type === "JANI" ? (
+        <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+          {" "}
+          Request page created by Phil and Giovanni{" "}
+        </p>
+      ) : type === "MECH" ? (
+        <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+          {" "}
+          Request page created by Abe and Miya{" "}
+        </p>
+      ) : type === "MEDI" ? (
+        <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+          {" "}
+          Request page created by HIEN and Luke{" "}
+        </p>
+      ) : type === "RELC" ? (
+        <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+          {" "}
+          Request page created by Felix and Daniel{" "}
+        </p>
+      ) : type === "CONS" ? (
+        <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+          {" "}
+          Request page created by Oliver and Matt{" "}
+        </p>
+      ) : (
+        <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+          {" "}
+          Request page created by Felix{" "}
+        </p>
+      )}
+      <div className="space-y-2">
+        <Label htmlFor="type">Service type</Label>
+        <Select
+          id="type"
+          required
+          value={type}
+          onChange={(e) => {
+            setType(e.target.value as RequestType);
+            resetFormChangeServiceType();
+          }}
         >
             {type === "JANI" ? (
                 <p> Request page created by Phil </p>

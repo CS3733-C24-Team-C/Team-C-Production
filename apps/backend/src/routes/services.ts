@@ -100,50 +100,58 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 router.post("/upload", upload.single("csv-upload"), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send("No file was selected");
-    }
 
-    if (req.file.mimetype != "text/csv") {
-        return res.status(400).send("Invalid file type");
-    }
+  if (!req.file) {
+    return res.status(400).send("No file was selected");
+  }
 
-    const newRequests = readCSV(req.file.path);
-    newRequests.forEach((request) => {
-        request.id = Number(request.id);
-        request.employeeID = Number(request.employeeID);
-    });
-    try {
-        await PrismaClient.$transaction(async (tx) => {
-            // 1. Get all the existing data and hold them in-memory
-            const existingNodes = await tx.nodes.findMany();
-            const existingEdges = await tx.edges.findMany();
-            const existingEmployees = await tx.employees.findMany();
-            // const existingRequests = await tx.requests.findMany();
+  if (req.file.mimetype != "text/csv") {
+    return res.status(400).send("Invalid file type");
+  }
 
-            // 2. Drop all the tables in the order of foreign key dependencies
-            await tx.edges.deleteMany();
-            await tx.requests.deleteMany();
-            await tx.employees.deleteMany();
-            await tx.nodes.deleteMany();
+  const newRequests = readCSV(req.file.path);
+  newRequests.forEach((request) => {
+    request.id = Number(request.id);
+    request.employeeID = Number(request.employeeID);
+  });
+  try {
+    await PrismaClient.$transaction(async (tx) => {
+      // 1. Get all the existing data and hold them in-memory
+      const existingNodes = await tx.nodes.findMany();
+      const existingEdges = await tx.edges.findMany();
+      const existingEmployees = await tx.employees.findMany();
+      const existingEmployeeJobs = await tx.employeeJobs.findMany();
+      // const existingRequests = await tx.requests.findMany();
 
-            // 3. Re-seed the database
-            await tx.nodes.createMany({
-                data: existingNodes,
-            });
+      // 2. Drop all the tables in the order of foreign key dependencies
+      await tx.edges.deleteMany();
+      await tx.requests.deleteMany();
+      await tx.employeeJobs.deleteMany();
+      await tx.employees.deleteMany();
+      await tx.nodes.deleteMany();
 
-            await tx.edges.createMany({
-                data: existingEdges,
-            });
+      // 3. Re-seed the database
+      await tx.nodes.createMany({
+        data: existingNodes,
+      });
 
-            await tx.employees.createMany({
-                data: existingEmployees,
-            });
+      await tx.edges.createMany({
+        data: existingEdges,
+      });
 
-            await tx.requests.createMany({
-                data: newRequests as unknown as Prisma.RequestsCreateManyInput,
-            });
-        });
+      await tx.employees.createMany({
+        data: existingEmployees,
+      });
+
+      await tx.employeeJobs.createMany({
+        data: existingEmployeeJobs,
+      });
+
+      await tx.requests.createMany({
+        data: newRequests as unknown as Prisma.RequestsCreateManyInput,
+      });
+
+   });
     } catch (error) {
         console.error("Error processing file upload:", error);
         return res.status(400).send("Bad request");

@@ -7,6 +7,7 @@ import {
   shortestPathAStar,
   bfsShortestPath,
   dijkstraShortestPath,
+  dfsShortestPath,
 } from "../shortestPath.ts";
 import uniqueGraph from "../uniqueGraph.ts";
 
@@ -155,11 +156,13 @@ router.post("/upload/nodes", upload.single("csv-upload"), async (req, res) => {
       // const existingNodes = await tx.nodes.findMany();
       const existingEdges = await tx.edges.findMany();
       const existingEmployees = await tx.employees.findMany();
+      const existingEmployeeJobs = await tx.employeeJobs.findMany();
       const existingRequests = await tx.requests.findMany();
 
       // 2. Drop all the tables in the order of foreign key dependencies
       await tx.edges.deleteMany();
       await tx.requests.deleteMany();
+      await tx.employeeJobs.deleteMany();
       await tx.employees.deleteMany();
       await tx.nodes.deleteMany();
 
@@ -174,6 +177,10 @@ router.post("/upload/nodes", upload.single("csv-upload"), async (req, res) => {
 
       await tx.employees.createMany({
         data: existingEmployees,
+      });
+
+      await tx.employeeJobs.createMany({
+        data: existingEmployeeJobs,
       });
 
       await tx.requests.createMany({
@@ -206,11 +213,13 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
       // const existingNodes = await tx.nodes.findMany();
       const existingNodes = await tx.nodes.findMany();
       const existingEmployees = await tx.employees.findMany();
+      const existingEmployeeJobs = await tx.employeeJobs.findMany();
       const existingRequests = await tx.requests.findMany();
 
       // 2. Drop all the tables in the order of foreign key dependencies
       await tx.edges.deleteMany();
       await tx.requests.deleteMany();
+      await tx.employeeJobs.deleteMany();
       await tx.employees.deleteMany();
       await tx.nodes.deleteMany();
 
@@ -225,6 +234,10 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
 
       await tx.employees.createMany({
         data: existingEmployees,
+      });
+
+      await tx.employeeJobs.createMany({
+        data: existingEmployeeJobs,
       });
 
       await tx.requests.createMany({
@@ -264,52 +277,75 @@ router.get("/download/edges", async function (req: Request, res: Response) {
 });
 
 router.post("/pathfinding", async function (req: Request, res: Response) {
-    const { startNodeId, endNodeId, algorithm } = req.body;
+  const { startNodeId, endNodeId, algorithm } = req.body;
 
-    if (!startNodeId || !endNodeId) {
-        return res.status(400).send("Both startNodeId and endNodeId are required");
+  if (!startNodeId || !endNodeId) {
+    return res.status(400).send("Both startNodeId and endNodeId are required");
+  }
+
+  if (!["AStar", "BFS", "Dijkstra", "DFS"].includes(algorithm)) {
+    return res
+      .status(400)
+      .send(
+        "Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'Dijkstra'."
+      );
+  }
+
+  try {
+    const nodes = await PrismaClient.nodes.findMany({
+      where: {
+        nodeID: {
+          in: [startNodeId, endNodeId],
+        },
+      },
+    });
+
+    if (nodes.length < 2) {
+      return res.status(404).send("One or both node IDs not found");
     }
 
-    if (!['AStar', 'BFS', 'Dijkstra'].includes(algorithm)) {
-        return res.status(400).send("Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'Dijkstra'.");
+    const graph = await uniqueGraph.getInstance();
+    //console.log(uniqueGraph.getInitializationCount());
+    let pathNodeIds = [];
+
+    switch (algorithm) {
+      case "DFS":
+        pathNodeIds = dfsShortestPath(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      case "AStar":
+        pathNodeIds = shortestPathAStar(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      case "BFS":
+        pathNodeIds = bfsShortestPath(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      case "Dijkstra":
+        pathNodeIds = dijkstraShortestPath(
+          startNodeId as string,
+          endNodeId as string,
+          graph
+        );
+        break;
+      default:
+        return res.status(400).send("Unsupported algorithm");
     }
 
-    try {
-        const nodes = await PrismaClient.nodes.findMany({
-            where: {
-                nodeID: {
-                    in: [startNodeId, endNodeId],
-                },
-            },
-        });
-
-        if (nodes.length < 2) {
-            return res.status(404).send("One or both node IDs not found");
-        }
-
-        const graph = await uniqueGraph.getInstance();
-        //console.log(uniqueGraph.getInitializationCount());
-        let pathNodeIds = [];
-
-        switch (algorithm) {
-            case 'AStar':
-                pathNodeIds = shortestPathAStar(startNodeId as string, endNodeId as string, graph);
-                break;
-            case 'BFS':
-                pathNodeIds = bfsShortestPath(startNodeId as string, endNodeId as string, graph);
-                break;
-            case 'Dijkstra':
-                pathNodeIds = dijkstraShortestPath(startNodeId as string, endNodeId as string, graph);
-                break;
-            default:
-                return res.status(400).send("Unsupported algorithm");
-        }
-
-        res.json({ path: pathNodeIds });
-    } catch (error) {
-        console.error("Error processing pathfinding request:", error);
-        res.status(500).send("Internal server error");
-    }
+    res.json({ path: pathNodeIds });
+  } catch (error) {
+    console.error("Error processing pathfinding request:", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
 export default router;
