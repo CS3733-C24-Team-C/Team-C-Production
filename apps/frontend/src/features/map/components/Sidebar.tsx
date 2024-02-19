@@ -76,7 +76,7 @@ const Sidebar = () => {
   let bgAlt = 0;
 
   const nodeDirections = path.map(
-    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
+    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
   );
 
   // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
@@ -107,7 +107,7 @@ const Sidebar = () => {
       (direction, i, arr) =>
         direction?.floorID === floor ||
         (i > 0 && arr[i - 1].floorID === floor) ||
-        (i === arr.length - 1 && arr[i].floorID === floor),
+        (i === arr.length - 1 && arr[i].floorID === floor)
     );
 
     const currDirection = floorDirections[index];
@@ -416,7 +416,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -424,17 +424,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -442,9 +442,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -458,7 +458,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -466,10 +466,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions([]);
@@ -494,7 +494,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -502,10 +502,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions([]);
@@ -518,7 +518,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -526,17 +526,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -544,9 +544,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -577,7 +577,7 @@ const Sidebar = () => {
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
           {Array.from(
-            new Set(splitDirections.map((direction) => direction?.floorID)),
+            new Set(splitDirections.map((direction) => direction?.floorID))
           ).map((floorID) => (
             <div key={floorID}>
               <Button
@@ -590,7 +590,7 @@ const Sidebar = () => {
                   <>
                     {`Hide Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1,
+                      floorID.length - 1
                     )}`}
                     <HiChevronUp className="ml-4 h-4 w-4" />
                   </>
@@ -598,7 +598,7 @@ const Sidebar = () => {
                   <>
                     {`Show Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1,
+                      floorID.length - 1
                     )}`}
                     <HiChevronDown className="ml-4 h-4 w-4" />
                   </>
@@ -613,7 +613,7 @@ const Sidebar = () => {
                         key={i}
                         className={`bg-${colorPicker(
                           bgAlt,
-                          0,
+                          0
                         )} dark:bg-${colorPicker(bgAlt, 1)}`}
                       >
                         {i < nodeDirections.length && turnDirection(floorID, i)}
@@ -637,7 +637,7 @@ const adhocConverterChangePlease = (floorID: string) => {
 
 function angleBetweenVectors(
   v1: { x: number; y: number },
-  v2: { x: number; y: number },
+  v2: { x: number; y: number }
 ): number {
   // Calculate the angle in radians using the arctangent function
   const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
