@@ -5,6 +5,7 @@ import { downloadCSV } from "../utils";
 import { RequestStatus, Requests } from "database";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
+import PieChart from "../../../components/Elements/StatsnGraphs/PieChart.tsx";
 
 const ServicesContext = createContext<{
   services: Requests[];
@@ -12,7 +13,7 @@ const ServicesContext = createContext<{
 }>({
   services: [],
   // eslint-disable-next-line no-empty-function
-  setServices: () => {},
+  setServices: () => { },
 });
 
 const ServicesData = () => {
@@ -89,6 +90,10 @@ const ServicesData = () => {
             onAddRow={() => navigate("/services")}
           />
         </ServicesContext.Provider>
+      </div>
+      <br />
+      <div>
+        <PieChart></PieChart>
       </div>
     </>
   );
