@@ -5,6 +5,7 @@ import {
   FaSignInAlt,
   FaDownload,
   FaMap,
+  FaUserAlt,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { MdOutlineRoomService } from "react-icons/md";
@@ -103,6 +104,11 @@ const Drawer = () => {
           {!isAuthenticated && (
             <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignInAlt}>
               Sign In
+            </FlowbiteSidebar.Item>
+          )}
+          {isAuthenticated && (
+            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaUserAlt}>
+              Profile
             </FlowbiteSidebar.Item>
           )}
           {isAuthenticated && (

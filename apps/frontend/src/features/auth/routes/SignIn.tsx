@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { LoginButton, LogoutButton, SignupButton } from "../components";
-import { ProfileIn } from "../components/ProfileIn";
-import { ProfileOut } from "../components/ProfileOut";
+import { ProfileContext } from "../components/ProfileContext";
 
 const SignIn = () => {
   const {
@@ -40,7 +39,7 @@ const SignIn = () => {
           >
             Sign In Page
           </h1>
-          <ProfileOut />
+          <ProfileContext />
           <LoginButton />
           <SignupButton />
         </div>
@@ -53,7 +52,7 @@ const SignIn = () => {
           >
             Profile
           </h1>
-          <ProfileIn />
+          <ProfileContext />
           <LogoutButton />
         </div>
       )}
