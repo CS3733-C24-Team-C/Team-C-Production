@@ -20,7 +20,7 @@ import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 import { Autocomplete } from "@/components";
-import { HiChevronUp, HiChevronDown, HiLocationMarker } from "react-icons/hi";
+import { HiChevronDown, HiLocationMarker } from "react-icons/hi";
 import { MdElevator } from "react-icons/md";
 import {
   BsArrowUpLeftCircle,
@@ -74,8 +74,6 @@ const Sidebar = () => {
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
   const [selectedFloorID, setSelectedFloorID] = useState("");
 
-  let bgAlt = 0;
-
   const nodeDirections = path.map(
     (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
@@ -103,7 +101,6 @@ const Sidebar = () => {
   };
 
   function turnDirection(floor: string, index: number) {
-    bgAlt++;
     //const floor = floorID.substring(0,floorID.length-1);
     const floorDirections = splitDirections.filter(
       (direction, i, arr) =>
@@ -248,7 +245,6 @@ const Sidebar = () => {
 
                 const angle2 = angleBetweenVectors(vector3, vector4);
                 if (angle2 >= -15 && angle2 < 15) {
-                  bgAlt--;
                   return;
                 }
               }
@@ -325,7 +321,6 @@ const Sidebar = () => {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    bgAlt = 0;
     const startNodeId = nodes
       .filter((node) => node["longName"] === startLocation)
       .map((node) => node.nodeID)[0];
@@ -590,11 +585,10 @@ const Sidebar = () => {
               >
                 {selectedFloorID === floorID ? (
                   <>
-                    {`Hide Directions for Floor ${floorID.substring(
+                    {`Directions for Floor ${floorID.substring(
                       0,
                       floorID.length - 1,
-                    )}`}
-                    <HiChevronUp className="ml-4 h-4 w-4" />
+                    )}:`}
                   </>
                 ) : (
                   <>
