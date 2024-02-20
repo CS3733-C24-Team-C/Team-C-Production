@@ -2,7 +2,7 @@ import { Table as FlowbiteTable } from "flowbite-react";
 
 const About = () => {
   return (
-    <div className="py-4 flex flex-col items-center h-screen ">
+    <div className="text-center p-16 flex flex-col items-center h-screen container">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
         WPI Computer Science Department, CS3733-C24 Software Engineering
       </h1>
@@ -84,11 +84,16 @@ const About = () => {
         </div>
       </div>
 
-      <p className="py-8 text-md italic font-semibold text-gray-500 dark:text-gray-400">
+      <p className="py-4 text-md italic font-semibold text-gray-500 dark:text-gray-400">
         Thanks to Brigham and Women's Hospital and their representative, Andrew
         Shinn.
       </p>
-      <p className="text-md italic font-semibold text-gray-500 dark:text-gray-400">
+      <p
+        className="text-center text-md italic font-semibold text-gray-500 dark:text-gray-400"
+        style={{
+          textWrap: "balance",
+        }}
+      >
         The Brigham & Women's Hospital maps and data used in this application
         are copyrighted and provided for the sole use of educational purposes.
       </p>

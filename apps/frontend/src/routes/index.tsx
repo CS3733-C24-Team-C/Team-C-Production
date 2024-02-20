@@ -19,7 +19,7 @@ export const AppRoutes = () => {
       element: <AuthRoutes />,
     },
     {
-      path: "/about",
+      path: "/about/*",
       element: <AboutRoutes />,
     },
   ];
