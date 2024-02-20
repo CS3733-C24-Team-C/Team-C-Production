@@ -85,7 +85,7 @@ model Requests {
   nodeID           String
   employeeID       Int?          
   room             Nodes         @relation("origin", fields: [nodeID], references: [nodeID])
-  employee         Employees?    @relation(fields: [employeeID], references: [id], onDelete: SetNull, onUpdate: SetNull) 
+  employee         Employees?    @relation(fields: [employeeID], references: [id], onDelete: SetNull) 
   urgency          Urgency
   type             RequestType
   notes            String?
