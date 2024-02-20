@@ -256,7 +256,6 @@ export default function BeefletMap() {
           <FeatureGroup>
               {nodes
                   .filter((node) => node.floor == assetToFloor(selectedFloor))
-                  .filter((node) => node.nodeType != "HALL")
                   .map((node, i) => {
                       return (
                           <Circle
