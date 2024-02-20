@@ -1,25 +1,50 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-const PieChart: React.FC = () => {
-    const chartData = {
-        series: [5, 10, 10, 20, 25, 30],
-        options: {
-            chart: {
-                type: 'pie',
-            },
-            labels: ['Other', 'Maintenance', 'Patient relocation', 'Janitorial', 'Patient consultation', 'Medicine'],
-        },
+interface PieChartProps {
+    series: number[];
+    labels: string[];
+    onChangeEmployeeType: (employeeType: string | null) => void;
+}
+
+const PieChart: React.FC<PieChartProps> = ({series, labels, onChangeEmployeeType}) => {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const handleEmployeeTypeChange = (employeeType: string) => {
+        onChangeEmployeeType(employeeType);
+        setIsDropdownOpen(false);
     };
+    const renderDropdown = () => (
+        <div id="empTypeDropdown"
+             className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+            <ul className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby="dropdownDefaultButton">
+                <li>
+                    <a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                       onClick={() => handleEmployeeTypeChange('')}
+                    >All</a>
+                </li>
+                <li>
+                    <a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                       onClick={() => handleEmployeeTypeChange('ADMIN')}
+                    >Admin</a>
+                </li>
+                <li>
+                    <a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                       onClick={() => handleEmployeeTypeChange('REGULAR')}
+                    >Regular</a>
+                </li>
+            </ul>
+        </div>
+    );
 
     return (
-        <div className="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
             <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Requests statistics</h5>
 
             <div className="py-6" id="pie-chart">
                 <ReactApexChart
-                    options={chartData.options}
-                    series={chartData.series}
+                    options={{labels}}
+                    series={series}
                     type="pie"
                     height={400}
                 />
@@ -31,8 +56,8 @@ const PieChart: React.FC = () => {
 
                     <button
                         id="dropdownDefaultButton"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         data-dropdown-toggle="empTypeDropdown"
-                        data-dropdown-placement="bottom"
                         className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
                         type="button">
                         Employee role assigned
@@ -43,18 +68,7 @@ const PieChart: React.FC = () => {
                         </svg>
                     </button>
 
-                    <div id="empTypeDropdown"
-                         className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="dropdownDefaultButton">
-                            <li>
-                                <a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Admin</a>
-                            </li>
-                            <li>
-                                <a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Employee</a>
-                            </li>
-                        </ul>
-                    </div>
+                    {renderDropdown()}
                 </div>
             </div>
         </div>
