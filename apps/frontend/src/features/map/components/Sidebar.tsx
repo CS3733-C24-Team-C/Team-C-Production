@@ -68,6 +68,8 @@ const Sidebar = () => {
     setStartLocation,
     endLocation,
     setEndLocation,
+    setStartID,
+    setEndID,
   } = useContext(MapContext);
 
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
@@ -366,6 +368,17 @@ const Sidebar = () => {
     return "gray-200";
   }
 
+  setStartID(
+    nodes
+      .filter((node) => node["longName"] === startLocation)
+      .map((node) => node.nodeID)[0],
+  );
+  setEndID(
+    nodes
+      .filter((node) => node["longName"] === endLocation)
+      .map((node) => node.nodeID)[0],
+  );
+
   return (
     <FlowbiteSidebar aria-label="Map sidebar" theme={sidebarTheme}>
       <div className="flex space-x-4 items-center">
@@ -413,6 +426,11 @@ const Sidebar = () => {
             rightIcon={CiSearch}
             onFocus={(e) => {
               setStartLocation(e.target.value);
+              setStartID(
+                nodes
+                  .filter((node) => node["longName"] === startLocation)
+                  .map((node) => node.nodeID)[0],
+              );
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   nodes
@@ -451,10 +469,20 @@ const Sidebar = () => {
               }
             }}
             onBlur={() => {
+              setStartID(
+                nodes
+                  .filter((node) => node["longName"] === startLocation)
+                  .map((node) => node.nodeID)[0],
+              );
               setTimeout(() => setStartSuggestions([]), 200);
             }}
             onChange={(e) => {
               setStartLocation(e.target.value);
+              setStartID(
+                nodes
+                  .filter((node) => node["longName"] === startLocation)
+                  .map((node) => node.nodeID)[0],
+              );
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   nodes
@@ -491,6 +519,11 @@ const Sidebar = () => {
             rightIcon={CiSearch}
             onChange={(e) => {
               setEndLocation(e.target.value);
+              setEndID(
+                nodes
+                  .filter((node) => node["longName"] === endLocation)
+                  .map((node) => node.nodeID)[0],
+              );
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   nodes
@@ -515,6 +548,11 @@ const Sidebar = () => {
             }}
             onFocus={(e) => {
               setEndLocation(e.target.value);
+              setEndID(
+                nodes
+                  .filter((node) => node["longName"] === endLocation)
+                  .map((node) => node.nodeID)[0],
+              );
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   nodes

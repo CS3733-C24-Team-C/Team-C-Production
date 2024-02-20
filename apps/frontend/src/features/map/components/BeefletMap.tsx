@@ -50,14 +50,16 @@ export default function BeefletMap() {
     setStartLocation,
     //endLocation,
     setEndLocation,
+    startID,
+    setStartID,
+    endID,
+    setEndID,
   } = useContext(MapContext);
 
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
   const [toggledHallways, setToggledHallways] = useState(false);
   const [clicked, setClicked] = useState(false);
-  const [startID, setStartID] = useState("");
-  const [endID, setEndID] = useState("");
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth0();
 
