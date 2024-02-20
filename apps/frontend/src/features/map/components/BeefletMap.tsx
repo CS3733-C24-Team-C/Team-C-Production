@@ -39,6 +39,7 @@ export default function BeefletMap() {
 
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
+  const [toggledHallways, setToggledHallways] = useState(false);
   const [clicked, setClicked] = useState(false);
   const [startID, setStartID] = useState("");
   const [endID, setEndID] = useState("");
@@ -150,6 +151,12 @@ export default function BeefletMap() {
         <FeatureGroup>
           {nodes
             .filter((node) => node.floor == assetToFloor(selectedFloor))
+            .filter((node) => {
+              if (toggledHallways) {
+                return true;
+              }
+              return node.nodeType != "HALL";
+            })
             .map((node, i) => {
               return (
                 <Circle
@@ -284,7 +291,8 @@ export default function BeefletMap() {
         {nodes
           .filter(
             (node) =>
-              node.nodeID == endID && node.floor == assetToFloor(selectedFloor),
+              node.nodeID == endID && 
+              node.floor == assetToFloor(selectedFloor),
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
@@ -299,6 +307,12 @@ export default function BeefletMap() {
           <CustomButton
             title={"Toggle Names"}
             onClick={() => setToggledNames(!toggledNames)}
+            className={"custom-toggle-button"}
+            position={"bottomleft"}
+          />
+          <CustomButton
+            title={"Toggle Hallways"}
+            onClick={() => setToggledHallways(!toggledHallways)}
             className={"custom-toggle-button"}
             position={"bottomleft"}
           />
