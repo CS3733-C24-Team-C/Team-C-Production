@@ -64,16 +64,52 @@ async function dfsShortestPath(startNodeId: string, endNodeId: string, graph: Gr
 }
 interface AStarNode {
     nodeId: string;
-    gCost: number; 
-    hCost: number; 
-    fCost: number; 
-    parent?: AStarNode; 
+    gCost: number;
+    hCost: number;
+    fCost: number;
+    parent?: AStarNode;
 }
+
+const mapFloorToNumber = (floorLabel: string | number): number => {
+    const mappings: { [key: string]: number } = {
+        L1: -1,
+        L2: -2,
+        '1': 1,
+        '2': 2,
+        '3': 3,
+    };
+    return mappings[floorLabel.toString()] || 0;
+};
 
 
 function heuristic(nodeIdA: string, nodeIdB: string, graph: Graph): number {
-    return Math.abs(parseInt(nodeIdA) - parseInt(nodeIdB));
+    const nodeA = graph.getNode(nodeIdA);
+    const nodeB = graph.getNode(nodeIdB);
+
+    if (!nodeA || !nodeB) {
+        return 0;
+    }
+
+    const floorA = mapFloorToNumber(nodeA.floor);
+    const floorB = mapFloorToNumber(nodeB.floor);
+    const sameFloor = floorA === floorB;
+    let distance;
+
+    if (sameFloor) {
+        const dx = nodeA.xcoord - nodeB.xcoord;
+        const dy = nodeA.ycoord - nodeB.ycoord;
+        distance = Math.sqrt(dx * dx + dy * dy);
+
+        if ((nodeA.nodeType === 'ELEV' || nodeB.nodeType === 'ELEV')) {
+            distance += 10000; // Arbitrary large penalty
+        }
+    } else {
+        distance = Math.abs(floorA - floorB);
+    }
+
+    return distance;
 }
+
 
 function shortestPathAStar(startNodeId: string, endNodeId: string, graph: Graph): string[] {
     let openSet: AStarNode[] = [];
