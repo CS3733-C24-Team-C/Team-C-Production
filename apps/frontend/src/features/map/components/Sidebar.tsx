@@ -74,6 +74,8 @@ const Sidebar = () => {
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
   const [selectedFloorID, setSelectedFloorID] = useState("");
 
+  let bgAlt = 0;
+
   const nodeDirections = path.map(
     (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
@@ -101,6 +103,7 @@ const Sidebar = () => {
   };
 
   function turnDirection(floor: string, index: number) {
+    bgAlt++;
     //const floor = floorID.substring(0,floorID.length-1);
     const floorDirections = splitDirections.filter(
       (direction, i, arr) =>
@@ -245,6 +248,7 @@ const Sidebar = () => {
 
                 const angle2 = angleBetweenVectors(vector3, vector4);
                 if (angle2 >= -15 && angle2 < 15) {
+                  bgAlt--;
                   return;
                 }
               }
@@ -321,6 +325,7 @@ const Sidebar = () => {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    bgAlt = 0;
     const startNodeId = nodes
       .filter((node) => node["longName"] === startLocation)
       .map((node) => node.nodeID)[0];
@@ -608,9 +613,9 @@ const Sidebar = () => {
                       <List
                         key={i}
                         className={`bg-${colorPicker(
-                          i,
+                          bgAlt,
                           0,
-                        )} dark:bg-${colorPicker(i, 1)}`}
+                        )} dark:bg-${colorPicker(bgAlt, 1)}`}
                       >
                         {i < nodeDirections.length && turnDirection(floorID, i)}
                       </List>
