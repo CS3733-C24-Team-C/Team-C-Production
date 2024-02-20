@@ -16,10 +16,6 @@ const MapContext = createContext<{
   setStartLocation: Dispatch<SetStateAction<string>>;
   endLocation: string;
   setEndLocation: Dispatch<SetStateAction<string>>;
-  startID: string;
-  setStartID: Dispatch<SetStateAction<string>>;
-  endID: string;
-  setEndID: Dispatch<SetStateAction<string>>;
 }>({
   nodes: [],
   // eslint-disable-next-line no-empty-function
@@ -42,12 +38,6 @@ const MapContext = createContext<{
   endLocation: "",
   // eslint-disable-next-line no-empty-function
   setEndLocation: () => {},
-  startID: "",
-  // eslint-disable-next-line no-empty-function
-  setStartID: () => {},
-  endID: "",
-  // eslint-disable-next-line no-empty-function
-  setEndID: () => {},
 });
 
 export { MapContext };
