@@ -50,6 +50,27 @@ const ServicesData = () => {
       alert("Failed to upload file. Please try again.");
     }
   };
+  // Map service requests type labels to more user-friendly text
+  const typeLabelsMap: Record<string, string> = {
+    JANI: 'Janitorial',
+    MECH: 'Mechanical Maintenance',
+    MEDI: 'Medicine Delivery',
+    RELC: 'Patient Relocation',
+    CONS: 'Patient Consultation',
+    CUST: 'Customer Service',
+  };
+
+  // Calculate series and labels
+  const totalRequests = services.length;
+  const requestTypesMap = services.reduce((map, service) => {
+    const type = service.type;
+    const userFriendlyLabel = typeLabelsMap[type];
+    map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
+    return map;
+  }, {} as Record<string, number>);
+
+  const series = Object.values(requestTypesMap).map(count => (count / totalRequests) * 100);
+  const labels = Object.keys(requestTypesMap);
 
   return (
     <>
@@ -93,7 +114,10 @@ const ServicesData = () => {
       </div>
       <br />
       <div>
-        <PieChart></PieChart>
+        <PieChart
+          series={series}
+          labels={labels}
+        />
       </div>
     </>
   );
@@ -206,8 +230,8 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
       row.getValue("hazardousWaste") === null
         ? row.getValue("hazardousWaste")
         : row.getValue("hazardousWaste")
-        ? "Yes"
-        : "No",
+          ? "Yes"
+          : "No",
   },
   {
     accessorKey: "department",
