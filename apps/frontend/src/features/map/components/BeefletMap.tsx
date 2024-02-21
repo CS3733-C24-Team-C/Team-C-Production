@@ -61,6 +61,7 @@ export default function BeefletMap() {
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
   const [toggledHallways, setToggledHallways] = useState(false);
+  const [toggledNodes, setToggledNodes] = useState(true);
   const [colorBlind, setColorBlind] = useState(false);
   const [clicked, setClicked] = useState(false);
   const [zoom, setZoom] = useState(0);
@@ -301,7 +302,7 @@ export default function BeefletMap() {
           ))}
         </LayerGroup>
         <FeatureGroup>
-          {nodes
+          {toggledNodes && nodes
             .filter((node) => node.floor == assetToFloor(selectedFloor))
             .filter((node) => {
               if (toggledHallways) {
@@ -542,6 +543,19 @@ export default function BeefletMap() {
             onClick={() => setColorBlind(!colorBlind)}
             className={"custom-toggle-button"}
             position={"bottomleft"}
+          />
+          <CustomButton
+            title={"Toggle Nodes"}
+            onClick={() => setToggledNodes(!toggledNodes)}
+            className={"custom-toggle-button"}
+            position={"bottomleft"}
+          />
+          <CustomButton
+            title={
+                    "How To Use Map <br> Double click node to set as start location <br> Control click node to set as start location <br> Right click node to set as end location"
+                }
+            className={"instructions"}
+            position={"bottomright"}
           />
         </div>
       </MapContainer>
