@@ -2,7 +2,7 @@ import app from "../app.ts";
 import http from "http";
 import { AddressInfo } from "net";
 import { createHttpTerminator } from "http-terminator";
-import {GraphSingleton} from "../GraphSingleton.ts";
+import {GraphSingleton} from "../pathfinding/GraphSingleton.ts";
 
 console.info("Connecting to database...");
 try {
