@@ -19,6 +19,7 @@ export const ProfileContext: React.FC = () => {
           >
             <Avatar
               bordered
+              color="gray"
               status="online"
               statusPosition="bottom-right"
               size="xl"
@@ -41,6 +42,7 @@ export const ProfileContext: React.FC = () => {
           >
             <Avatar
               bordered
+              color="gray"
               size="xl"
               status="offline"
               statusPosition="bottom-right"

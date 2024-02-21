@@ -38,7 +38,15 @@ const drawerTheme: CustomFlowbiteTheme["sidebar"] = {
 };
 
 const Drawer = () => {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, logout } = useAuth0();
+
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
+  };
 
   return (
     <FlowbiteSidebar
@@ -107,12 +115,16 @@ const Drawer = () => {
             </FlowbiteSidebar.Item>
           )}
           {isAuthenticated && (
-            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaUserAlt}>
+            <FlowbiteSidebar.Item href="/auth/profile" icon={FaUserAlt}>
               Profile
             </FlowbiteSidebar.Item>
           )}
           {isAuthenticated && (
-            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignOutAlt}>
+            <FlowbiteSidebar.Item
+              href="/"
+              onClick={handleLogout}
+              icon={FaSignOutAlt}
+            >
               Sign Out
             </FlowbiteSidebar.Item>
           )}
