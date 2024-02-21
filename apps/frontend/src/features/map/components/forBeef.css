@@ -99,6 +99,20 @@
   background-color: #ddd;
 }
 
+.custom-path {
+  fill: none;
+  stroke-dasharray: 16px;
+  animation: stroke 0.8s linear infinite;
+  shape-rendering: geometricPrecision;
+  stroke-dashoffset: 32px;
+}
+
+@keyframes stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .instructions {
   width: 300px; /* Adjust width to fit the word 'toggle' */
   height: 125px; /* Adjust height as needed */

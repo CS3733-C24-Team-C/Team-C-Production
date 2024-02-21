@@ -28,7 +28,6 @@ import {
   BsArrowUpCircle,
 } from "react-icons/bs";
 import { floorToAsset } from "../utils";
-//import {downloadCSV} from "@/features/data/utils";
 
 const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
   root: {
@@ -96,15 +95,6 @@ const Sidebar = () => {
     return floors;
   }
 
-  // const getButtonClass = (match:boolean) => {
-  //     if (!match) {
-  //         return "text-cyan-900 bg-red-500 border border-cyan-300 enabled:hover:bg-red-300 focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:text-white dark:border-cyan-600 dark:enabled:hover:bg-cyan-700 dark:enabled:hover:border-cyan-700 dark:focus:ring-cyan-700";
-  //     } else {
-  //         return "text-cyan-900 bg-white border border-cyan-300 enabled:hover:bg-cyan-100 focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:text-white dark:border-cyan-600 dark:enabled:hover:bg-cyan-700 dark:enabled:hover:border-cyan-700 dark:focus:ring-cyan-700";
-  //         //return "text-blue-900 bg-green-500 border border-blue-300 enabled:hover:bg-green-300 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:text-white dark:border-blue-600 dark:enabled:hover:bg-blue-700 dark:enabled:hover:border-blue-700 dark:focus:ring-blue-700";
-  //     }
-  // };
-
   const splitDirections = separateFloors(nodeDirections);
   const [openFloors, setOpenFloors] = useState<string[]>([]);
 
@@ -119,7 +109,6 @@ const Sidebar = () => {
       // If not open, add it to the open floors
       setOpenFloors((prevOpenFloors) => [...prevOpenFloors, floorID]);
       setSelectedFloor(adhocConverterChangePlease(floorID));
-      console.log("setfloorcalled");
     }
   };
 
@@ -394,12 +383,12 @@ const Sidebar = () => {
   setStartID(
     nodes
       .filter((node) => node["longName"] === startLocation)
-      .map((node) => node.nodeID)[0],
+      .map((node) => node.nodeID)[0]
   );
   setEndID(
     nodes
       .filter((node) => node["longName"] === endLocation)
-      .map((node) => node.nodeID)[0],
+      .map((node) => node.nodeID)[0]
   );
 
   return (
@@ -427,6 +416,7 @@ const Sidebar = () => {
                 onClick={() => setSelectedFloor(lowerLevel2)}
                 color={selectedFloor === lowerLevel2 ? undefined : "gray"}
                 className={"w-1/5"}
+                style={"focus:ring-0"}
               >
                 L2
               </Button>
@@ -479,14 +469,14 @@ const Sidebar = () => {
               setStartID(
                 nodes
                   .filter((node) => node["longName"] === startLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -494,17 +484,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -512,9 +502,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -522,7 +512,7 @@ const Sidebar = () => {
               setStartID(
                 nodes
                   .filter((node) => node["longName"] === startLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               setTimeout(() => setStartSuggestions([]), 200);
             }}
@@ -531,14 +521,14 @@ const Sidebar = () => {
               setStartID(
                 nodes
                   .filter((node) => node["longName"] === startLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -546,10 +536,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions([]);
@@ -572,14 +562,14 @@ const Sidebar = () => {
               setEndID(
                 nodes
                   .filter((node) => node["longName"] === endLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -587,10 +577,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions([]);
@@ -601,14 +591,14 @@ const Sidebar = () => {
               setEndID(
                 nodes
                   .filter((node) => node["longName"] === endLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -616,17 +606,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -634,9 +624,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -664,7 +654,7 @@ const Sidebar = () => {
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
           {Array.from(
-            new Set(splitDirections.map((direction) => direction?.floorID)),
+            new Set(splitDirections.map((direction) => direction?.floorID))
           ).map((floorID) => (
             <div key={floorID}>
               <Button
@@ -677,7 +667,7 @@ const Sidebar = () => {
                   <>
                     {`Hide Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1,
+                      floorID.length - 1
                     )}`}
                     <HiChevronUp className="ml-4 h-4 w-4" />
                   </>
@@ -685,7 +675,7 @@ const Sidebar = () => {
                   <>
                     {`Show Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1,
+                      floorID.length - 1
                     )}`}
                     <HiChevronDown className="ml-4 h-4 w-4" />
                   </>
@@ -700,7 +690,7 @@ const Sidebar = () => {
                         key={i}
                         className={`bg-${colorPicker(
                           bgAlt,
-                          0,
+                          0
                         )} dark:bg-${colorPicker(bgAlt, 1)}`}
                       >
                         {i < nodeDirections.length && turnDirection(floorID, i)}
@@ -727,7 +717,7 @@ const adhocConverterChangePlease = (floorID: string) => {
 
 function angleBetweenVectors(
   v1: { x: number; y: number },
-  v2: { x: number; y: number },
+  v2: { x: number; y: number }
 ): number {
   // Calculate the angle in radians using the arctangent function
   const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
