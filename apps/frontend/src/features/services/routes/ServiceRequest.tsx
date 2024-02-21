@@ -44,7 +44,7 @@ const ServiceRequest = () => {
   const [roomTo, setRoomTo] = useState<string>("");
 
   const [hazardousWaste, setHazardousWaste] = useState<boolean | undefined>(
-    undefined,
+    undefined
   );
   const [department, setDepartment] = useState<string>("");
 
@@ -95,7 +95,7 @@ const ServiceRequest = () => {
       !employees.some((emp) => emp.firstName + " " + emp.lastName === employee)
     ) {
       alert(
-        "Invalid employee. Please select an employee from the autocomplete.",
+        "Invalid employee. Please select an employee from the autocomplete."
       );
       return;
     }
@@ -158,7 +158,6 @@ const ServiceRequest = () => {
   const resetFormChangeServiceType = () => {
     setRoom("");
     setEmployee("");
-    setType("JANI");
     setUrgency("LOW");
     setStatus("UNASSIGNED");
     setNotes("");
@@ -176,9 +175,9 @@ const ServiceRequest = () => {
   };
 
   return (
-    <div className="py-8">
+    <div className="h-full p-16">
       <form
-        className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)] mx-auto py-4 px-4 flex flex-col space-y-4 max-w-md rounded-lg bg-gray-50 dark:bg-neutral-800"
+        className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)] mx-auto p-8 flex flex-col space-y-4 max-w-md rounded-lg bg-gray-50 dark:bg-neutral-800"
         onSubmit={handleSubmit}
       >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -234,7 +233,6 @@ const ServiceRequest = () => {
             <option value="CUST">Other</option>
           </Select>
         </div>
-
         <Autocomplete
           suggestions={roomSuggestions}
           setSuggestions={setRoomSuggestions}
@@ -255,16 +253,15 @@ const ServiceRequest = () => {
                     return loc.longName;
                   })
                   .filter((loc) =>
-                    loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                    loc.toLowerCase().includes(e.target.value.toLowerCase())
                   )
-                  .slice(0, 10),
+                  .slice(0, 10)
               );
             } else {
               setRoomSuggestions([]);
             }
           }}
         />
-
         {type === "RELC" && (
           <Autocomplete
             suggestions={roomToSuggestions}
@@ -286,9 +283,9 @@ const ServiceRequest = () => {
                       return loc.longName;
                     })
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setRoomToSuggestions([]);
@@ -296,46 +293,46 @@ const ServiceRequest = () => {
             }}
           />
         )}
-
         {type === "MEDI" && (
-          <Label
-            className="text-sm font-medium dark:text-white"
-            htmlFor="medicineName"
-          >
-            Medicine to be delivered
-            <TextInput
-              className="pt-2"
-              type="text"
-              name="medicineName"
-              id="medicineName"
-              placeholder="Ibuprofen"
-              value={medicineName}
-              onChange={(event) => {
-                setMedicineName(event.target.value);
-              }}
-            />
-          </Label>
+          <div className="space-y-2">
+            <Label
+              className="text-sm font-medium dark:text-white"
+              htmlFor="medicineName"
+            >
+              Medicine to be delivered
+              <TextInput
+                type="text"
+                name="medicineName"
+                id="medicineName"
+                placeholder="Ibuprofen"
+                value={medicineName}
+                onChange={(event) => {
+                  setMedicineName(event.target.value);
+                }}
+              />
+            </Label>
+          </div>
         )}
         {type === "MEDI" && (
-          <Label
-            className="text-sm font-medium dark:text-white"
-            htmlFor="medicineDosage"
-          >
-            Dosage
-            <TextInput
-              className="pt-2"
-              type="text"
-              name="medicineDosage"
-              id="medicineDosage"
-              placeholder="0"
-              value={medicineDosage}
-              onChange={(event) => {
-                setMedicineDosage(event.target.value);
-              }}
-            />
-          </Label>
+          <div className="space-y-2">
+            <Label
+              className="text-sm font-medium dark:text-white"
+              htmlFor="medicineDosage"
+            >
+              Dosage
+              <TextInput
+                type="text"
+                name="medicineDosage"
+                id="medicineDosage"
+                placeholder="0"
+                value={medicineDosage}
+                onChange={(event) => {
+                  setMedicineDosage(event.target.value);
+                }}
+              />
+            </Label>
+          </div>
         )}
-
         <Autocomplete
           suggestions={employeeSuggestions}
           setSuggestions={setEmployeeSuggestions}
@@ -354,16 +351,15 @@ const ServiceRequest = () => {
                 employees
                   .map((emp) => emp.firstName + " " + emp.lastName)
                   .filter((emp) =>
-                    emp.toLowerCase().includes(e.target.value.toLowerCase()),
+                    emp.toLowerCase().includes(e.target.value.toLowerCase())
                   )
-                  .slice(0, 10),
+                  .slice(0, 10)
               );
             } else {
               setEmployeeSuggestions([]);
             }
           }}
         />
-
         {type === "CONS" && (
           <div className="space-y-2">
             <Label htmlFor="department">Medical Department</Label>
@@ -384,7 +380,6 @@ const ServiceRequest = () => {
             </Select>
           </div>
         )}
-
         {type === "MECH" && (
           <div className="space-y-2">
             <Label htmlFor="maintenanceType">Maintenence Type</Label>
@@ -401,7 +396,6 @@ const ServiceRequest = () => {
             </Select>
           </div>
         )}
-
         <div className="space-y-2">
           <Label htmlFor="urgency">Urgency</Label>
           <Select
@@ -430,7 +424,6 @@ const ServiceRequest = () => {
             <option value="COMPLETED">Completed</option>
           </Select>
         </div>
-
         {type === "JANI" && (
           <div className="space-y-2">
             <Checkbox
@@ -442,7 +435,6 @@ const ServiceRequest = () => {
             <Label htmlFor="hazardousWaste">Includes hazardous waste?</Label>
           </div>
         )}
-
         <div className="space-y-2">
           <Label htmlFor="notes">Additional notes</Label>
           <Textarea
