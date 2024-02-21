@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { DataTable, DataTableColumnHeader } from "@/components";
-import { FileInput, Label, Button, Select, Checkbox } from "flowbite-react";
+import {
+  FileInput,
+  Label,
+  Button,
+  Select,
+  Checkbox,
+  Card,
+} from "flowbite-react";
 import { downloadCSV } from "../utils";
 import { RequestStatus, Requests } from "database";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -52,35 +59,39 @@ const ServicesData = () => {
 
   return (
     <>
-      <form
-        action="/api/services/upload"
-        method="post"
-        encType="multipart/form-data"
-        onSubmit={handleSubmit}
-      >
-        <div className="mb-2 block">
-          <Label htmlFor="csv-upload" value="Upload new CSV Data:" />
-        </div>
-        <FileInput
-          className="w-96"
-          id="csv-upload"
-          name="csv-upload"
-          accept="text/csv"
-          value={file}
-          helperText="CSV files only."
-          onChange={(e) => setFile(e.target.value)}
-        />
-        <br />
-        <Button type="submit">Upload File</Button>
-      </form>
+      <div className="px-16 py-8">
+        <Card className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)]">
+          <form
+            action="/api/services/upload"
+            method="post"
+            encType="multipart/form-data"
+            onSubmit={handleSubmit}
+          >
+            <div className="mb-2 block">
+              <Label htmlFor="csv-upload" value="Upload new CSV Data:" />
+            </div>
+            <FileInput
+              className="w-96"
+              id="csv-upload"
+              name="csv-upload"
+              accept="text/csv"
+              value={file}
+              helperText="CSV files only."
+              onChange={(e) => setFile(e.target.value)}
+            />
+            <br />
+            <Button type="submit">Upload File</Button>
+          </form>
 
-      <div className="mt-4 flex space-x-4 w-96">
-        <Button onClick={() => downloadCSV("/api/services/download")}>
-          Download Service Requests CSV
-        </Button>
+          <div className="mt-4 flex space-x-4 w-96">
+            <Button onClick={() => downloadCSV("/api/services/download")}>
+              Download Service Requests CSV
+            </Button>
+          </div>
+        </Card>
       </div>
 
-      <div className="flex">
+      <div className="flex flex-col px-16 py-8">
         <ServicesContext.Provider value={{ services, setServices }}>
           <DataTable
             columns={requestsTableColumns}
@@ -202,8 +213,8 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
       row.getValue("hazardousWaste") === null
         ? row.getValue("hazardousWaste")
         : row.getValue("hazardousWaste")
-        ? "Yes"
-        : "No",
+          ? "Yes"
+          : "No",
   },
   {
     accessorKey: "department",
@@ -237,7 +248,7 @@ const ServicesActions = ({ row }: ServicesActionsProps) => {
 
   const changeCompletionStatus = async (
     id: number,
-    newStatus: RequestStatus
+    newStatus: RequestStatus,
   ) => {
     try {
       const res = await fetch(`/api/services/${id}`, {
@@ -251,7 +262,7 @@ const ServicesActions = ({ row }: ServicesActionsProps) => {
       const updatedServices = services.map((service) =>
         service.id === id
           ? { ...service, completionStatus: newStatus }
-          : service
+          : service,
       );
       setServices(updatedServices);
     } catch (error) {
