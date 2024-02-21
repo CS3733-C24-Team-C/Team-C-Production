@@ -32,7 +32,7 @@ const SignIn = () => {
   return (
     <div>
       {!isAuthenticated && (
-        <div className="mx-auto py-8 flex flex-col space-y-4 max-w-md">
+        <div className="mx-auto py-8 flex flex-col space-y-4 max-w-md dark:text-white">
           <h1
             className="text-2xl font-bold"
             style={{ display: "flex", justifyContent: "center" }}
