@@ -1,10 +1,10 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
-import {DataTable, DataTableColumnHeader} from "@/components";
-import {FileInput, Label, Button, Select, Checkbox} from "flowbite-react";
-import {downloadCSV} from "../utils";
-import {RequestStatus, Requests} from "database";
-import {ColumnDef, Row} from "@tanstack/react-table";
-import {useNavigate} from "react-router-dom";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { DataTable, DataTableColumnHeader } from "@/components";
+import { FileInput, Label, Button, Select, Checkbox } from "flowbite-react";
+import { downloadCSV } from "../utils";
+import { RequestStatus, Requests } from "database";
+import { ColumnDef, Row } from "@tanstack/react-table";
+import { useNavigate } from "react-router-dom";
 import PieChart from "../../../components/Elements/StatsnGraphs/PieChart.tsx";
 
 const ServicesContext = createContext<{
@@ -93,51 +93,39 @@ const ServicesData = () => {
 
     return (
         <>
-            <form
-                action="/api/services/upload"
-                method="post"
-                encType="multipart/form-data"
-                onSubmit={handleSubmit}
-            >
-                <div className="mb-2 block">
-                    <Label htmlFor="csv-upload" value="Upload new CSV Data:"/>
+            <div className="flex space-x-4 my-4">
+                <div>
+                    <form action="/api/services/upload" method="post" encType="multipart/form-data"
+                        onSubmit={handleSubmit}>
+                        <div className="mb-2 block">
+                            <Label htmlFor="csv-upload" value="Upload new CSV Data:" />
+                        </div>
+                        <FileInput
+                            className="w-96"
+                            id="csv-upload"
+                            name="csv-upload"
+                            accept="text/csv"
+                            value={file}
+                            helperText="CSV files only."
+                            onChange={(e) => setFile(e.target.value)}
+                        />
+                        <br />
+                        <Button type="submit">Upload File</Button>
+                    </form>
+                    <div className="mt-4 flex space-x-4 w-96">
+                        <Button onClick={() => downloadCSV("/api/services/download")}>Download Service Requests
+                            CSV</Button>
+                    </div>
                 </div>
-                <FileInput
-                    className="w-96"
-                    id="csv-upload"
-                    name="csv-upload"
-                    accept="text/csv"
-                    value={file}
-                    helperText="CSV files only."
-                    onChange={(e) => setFile(e.target.value)}
-                />
-                <br/>
-                <Button type="submit">Upload File</Button>
-            </form>
-
-            <div className="mt-4 flex space-x-4 w-96">
-                <Button onClick={() => downloadCSV("/api/services/download")}>
-                    Download Service Requests CSV
-                </Button>
+                <div className="flex-1">
+                    <PieChart series={series} labels={labels} onChangeEmployeeType={setSelectedEmployeeType} />
+                </div>
             </div>
-
             <div className="flex">
-                <ServicesContext.Provider value={{services, setServices}}>
-                    <DataTable
-                        columns={requestsTableColumns}
-                        data={services}
-                        searchColumn="id"
-                        onAddRow={() => navigate("/services")}
-                    />
+                <ServicesContext.Provider value={{ services, setServices }}>
+                    <DataTable columns={requestsTableColumns} data={services} searchColumn="id"
+                        onAddRow={() => navigate("/services")} />
                 </ServicesContext.Provider>
-            </div>
-            <br/>
-            <div>
-                <PieChart
-                    series={series}
-                    labels={labels}
-                    onChangeEmployeeType={setSelectedEmployeeType}
-                />
             </div>
         </>
     );
@@ -146,7 +134,7 @@ const ServicesData = () => {
 const requestsTableColumns: ColumnDef<Requests>[] = [
     {
         id: "select",
-        header: ({table}) => (
+        header: ({ table }) => (
             <Checkbox
                 checked={
                     table.getIsAllPageRowsSelected() ||
@@ -158,7 +146,7 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
                 aria-label="Select all"
             />
         ),
-        cell: ({row}) => (
+        cell: ({ row }) => (
             <Checkbox
                 checked={row.getIsSelected()}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,86 +160,86 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
     },
     {
         accessorKey: "id",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="ID"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="ID" />
         ),
-        cell: ({row}) => row.getValue("id"),
+        cell: ({ row }) => row.getValue("id"),
     },
     {
         accessorKey: "nodeID",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Room ID"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Room ID" />
         ),
-        cell: ({row}) => row.getValue("nodeID"),
+        cell: ({ row }) => row.getValue("nodeID"),
     },
     {
         accessorKey: "employeeID",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Employee ID"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Employee ID" />
         ),
-        cell: ({row}) => row.getValue("employeeID"),
+        cell: ({ row }) => row.getValue("employeeID"),
     },
     {
         accessorKey: "urgency",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Urgency"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Urgency" />
         ),
-        cell: ({row}) => row.getValue("urgency"),
+        cell: ({ row }) => row.getValue("urgency"),
     },
     {
         accessorKey: "type",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Type"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Type" />
         ),
-        cell: ({row}) => row.getValue("type"),
+        cell: ({ row }) => row.getValue("type"),
     },
     {
         accessorKey: "notes",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Notes"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Notes" />
         ),
-        cell: ({row}) => row.getValue("notes"),
+        cell: ({ row }) => row.getValue("notes"),
     },
     {
         accessorKey: "medicineName",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Medicine Name"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Medicine Name" />
         ),
-        cell: ({row}) => row.getValue("medicineName"),
+        cell: ({ row }) => row.getValue("medicineName"),
     },
     {
         accessorKey: "medicineDosage",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Medicine Dosage"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Medicine Dosage" />
         ),
-        cell: ({row}) => row.getValue("medicineDosage"),
+        cell: ({ row }) => row.getValue("medicineDosage"),
     },
     {
         accessorKey: "maintenanceType",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Maintenance Type"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Maintenance Type" />
         ),
-        cell: ({row}) => row.getValue("maintenanceType"),
+        cell: ({ row }) => row.getValue("maintenanceType"),
     },
     {
         accessorKey: "roomTo",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Room To"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Room To" />
         ),
-        cell: ({row}) => row.getValue("roomTo"),
+        cell: ({ row }) => row.getValue("roomTo"),
     },
     {
         accessorKey: "completionStatus",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Completion Status"/>
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Completion Status" />
         ),
-        cell: ({row}) => row.getValue("completionStatus"),
+        cell: ({ row }) => row.getValue("completionStatus"),
     },
     {
         id: "actions",
         enableHiding: false,
-        cell: ({row}) => {
-            return <ServicesActions row={row}/>;
+        cell: ({ row }) => {
+            return <ServicesActions row={row} />;
         },
     },
 ];
@@ -260,8 +248,8 @@ type ServicesActionsProps = {
     row: Row<Requests>;
 };
 
-const ServicesActions = ({row}: ServicesActionsProps) => {
-    const {services, setServices} = useContext(ServicesContext);
+const ServicesActions = ({ row }: ServicesActionsProps) => {
+    const { services, setServices } = useContext(ServicesContext);
 
     const changeCompletionStatus = async (
         id: number,
@@ -273,12 +261,12 @@ const ServicesActions = ({row}: ServicesActionsProps) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({completionStatus: newStatus}),
+                body: JSON.stringify({ completionStatus: newStatus }),
             });
             if (!res.ok) throw new Error(res.statusText);
             const updatedServices = services.map((service) =>
                 service.id === id
-                    ? {...service, completionStatus: newStatus}
+                    ? { ...service, completionStatus: newStatus }
                     : service
             );
             setServices(updatedServices);
@@ -307,4 +295,4 @@ const ServicesActions = ({row}: ServicesActionsProps) => {
     );
 };
 
-export {ServicesData};
+export { ServicesData };
