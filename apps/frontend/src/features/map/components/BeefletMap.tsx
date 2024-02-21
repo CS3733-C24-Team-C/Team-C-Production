@@ -17,9 +17,10 @@ import L, { LatLngBounds, CRS, LatLng } from "leaflet";
 import { MapContext } from "../components";
 import "./forBeef.css";
 import "leaflet/dist/leaflet.css";
-import { Button } from "flowbite-react";
+import { Button, Alert, Card, ToggleSwitch } from "flowbite-react";
+import { HiInformationCircle } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import CustomButton from "@/features/map/components/Description.tsx";
+//import CustomButton from "@/features/map/components/Description.tsx";
 import { assetToFloor, floorToAsset } from "../utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Nodes } from "database";
@@ -75,7 +76,7 @@ export default function BeefletMap() {
   const [lastFloor, setLastFloor] = useState<any>();
 
   const nodePath = path.map((nodeID) =>
-    nodes.filter((node) => node.nodeID == nodeID)
+    nodes.filter((node) => node.nodeID == nodeID),
   );
 
   class newNodeFloorID {
@@ -105,7 +106,7 @@ export default function BeefletMap() {
         lastCut = i;
         floorChanges.push(new newNodeFloorID(nodePath[i - 1][0], currentFloor));
         prevFloors.push(
-          new newNodeFloorID(nodePath[i][0], nodePath[i - 1][0].floor)
+          new newNodeFloorID(nodePath[i][0], nodePath[i - 1][0].floor),
         );
       }
     }
@@ -155,7 +156,7 @@ export default function BeefletMap() {
 
     const pathElement = document.createElementNS(
       "http://www.w3.org/2000/svg",
-      "path"
+      "path",
     );
     pathElement.setAttribute("d", pathData);
 
@@ -219,7 +220,7 @@ export default function BeefletMap() {
               .filter(
                 (edge) =>
                   edge[0][0].floor == assetToFloor(selectedFloor) &&
-                  edge[0][0].floor == edge[1][0].floor
+                  edge[0][0].floor == edge[1][0].floor,
               )
               .map((edge) => (
                 <Polyline
@@ -233,7 +234,7 @@ export default function BeefletMap() {
                 ></Polyline>
               ))}
           <SVGOverlay bounds={new LatLngBounds([0, 0], [-3400, 5000])}>
-              <svg viewBox="0 0 5000 3400">
+            <svg viewBox="0 0 5000 3400">
               {paths[assetToFloor(selectedFloor)].map((currentPath, i) => (
                 <>
                   <path
@@ -248,7 +249,7 @@ export default function BeefletMap() {
                       }
                     })()}
                     fill="none"
-                    strokeWidth={12 * (Math.max(1 - zoom, 1/2) * 1.5)}
+                    strokeWidth={12 * (Math.max(1 - zoom, 1 / 2) * 1.5)}
                     strokeLinecap={"round"}
                   />
                   <path
@@ -263,10 +264,10 @@ export default function BeefletMap() {
                       }
                     })()}
                     fill="none"
-                    strokeWidth={6 * (Math.max(1 - zoom, 1/2) * 1.5)}
-                    strokeLinecap ={"round"}
+                    strokeWidth={6 * (Math.max(1 - zoom, 1 / 2) * 1.5)}
+                    strokeLinecap={"round"}
                   />
-                  <path 
+                  <path
                     key={i}
                     id={"movePath" + i.toString()}
                     d={pathToPoints(currentPath).pathData}
@@ -277,12 +278,13 @@ export default function BeefletMap() {
                         return "yellow";
                       }
                     })()}
-                    strokeWidth={3 * (Math.max(1 - zoom, 1/2) * 1.5)}
-                    className="custom-path"/>
-                  </>
+                    strokeWidth={3 * (Math.max(1 - zoom, 1 / 2) * 1.5)}
+                    className="custom-path"
+                  />
+                </>
               ))}
-                </svg>
-              </SVGOverlay>
+            </svg>
+          </SVGOverlay>
         </LayerGroup>
         <FeatureGroup>
           {toggledNodes &&
@@ -366,7 +368,7 @@ export default function BeefletMap() {
                               <tbody>
                                 {requests
                                   .filter(
-                                    (request) => request.nodeID === node.nodeID
+                                    (request) => request.nodeID === node.nodeID,
                                   )
                                   .map((item, index) => (
                                     <tr key={index}>
@@ -458,7 +460,7 @@ export default function BeefletMap() {
           .filter(
             (node) =>
               node.nodeID == startID &&
-              node.floor == assetToFloor(selectedFloor)
+              node.floor == assetToFloor(selectedFloor),
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
@@ -466,14 +468,14 @@ export default function BeefletMap() {
         {nodes
           .filter(
             (node) =>
-              node.nodeID == endID && node.floor == assetToFloor(selectedFloor)
+              node.nodeID == endID && node.floor == assetToFloor(selectedFloor),
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
           ))}
         {floorChanges
           .filter(
-            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor)
+            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor),
           )
           .map((newFloor) => (
             <Marker
@@ -489,7 +491,7 @@ export default function BeefletMap() {
               eventHandlers={{
                 click: async () =>
                   setSelectedFloor(
-                    adhocConverterChangePlease(newFloor.floorID)
+                    adhocConverterChangePlease(newFloor.floorID),
                   ),
               }}
             >
@@ -504,7 +506,7 @@ export default function BeefletMap() {
           ))}
         {prevFloors
           .filter(
-            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor)
+            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor),
           )
           .map((newFloor) => (
             <Marker
@@ -520,7 +522,7 @@ export default function BeefletMap() {
               eventHandlers={{
                 click: async () =>
                   setSelectedFloor(
-                    adhocConverterChangePlease(newFloor.floorID)
+                    adhocConverterChangePlease(newFloor.floorID),
                   ),
               }}
             >
@@ -533,45 +535,53 @@ export default function BeefletMap() {
               </Tooltip>
             </Marker>
           ))}
-        <div>
-          <CustomButton
-            title={"Toggle Edges"}
-            onClick={() => setToggledEdges(!toggledEdges)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Names"}
-            onClick={() => setToggledNames(!toggledNames)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Hallways"}
-            onClick={() => setToggledHallways(!toggledHallways)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Colorblind"}
-            onClick={() => setColorBlind(!colorBlind)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Nodes"}
-            onClick={() => setToggledNodes(!toggledNodes)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={
-              "How To Use Map <br> Control click node to set as start location <br> Right click node to set as end location"
-            }
-            className={"instructions"}
-            position={"bottomright"}
-          />
-        </div>
+        <Card className="leaflet-left leaflet-bottom bg-gray-50 dark:bg-gray-800">
+          <ToggleSwitch
+            onChange={() => setToggledEdges(!toggledEdges)}
+            checked={toggledEdges}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Edges"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setToggledNames(!toggledNames)}
+            checked={toggledNames}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Names"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setToggledHallways(!toggledHallways)}
+            checked={toggledHallways}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Hallways"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setColorBlind(!colorBlind)}
+            checked={colorBlind}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Colorblind"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setToggledNodes(!toggledNodes)}
+            checked={toggledNodes}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Nodes"}
+          ></ToggleSwitch>
+        </Card>
+        <Alert
+          color="cyan"
+          className={"leaflet-bottom leaflet-right pointer-events-auto"}
+          //position={"bottomright"}
+          icon={HiInformationCircle}
+          rounded
+        >
+          How To Use Map: <br /> Control click node to set as start location{" "}
+          <br /> Right click node to set as end location
+        </Alert>
       </MapContainer>
     </div>
   );
