@@ -5,6 +5,7 @@ import {
   FaDownload,
   FaMap,
   FaSignOutAlt,
+  FaInfoCircle,
 } from "react-icons/fa";
 import { MdOutlineRoomService } from "react-icons/md";
 import { FaPeopleGroup } from "react-icons/fa6";
@@ -40,7 +41,11 @@ const SidebarNavigation = () => {
       <FlowbiteSidebar.Logo href="/" img={logoUrl} imgAlt="Hospital logo" />
       <FlowbiteSidebar.Items>
         <FlowbiteSidebar.ItemGroup>
-          <FlowbiteSidebar.Item href="/" icon={FaMapMarkedAlt}>
+          <FlowbiteSidebar.Item
+            href="/"
+            icon={FaMapMarkedAlt}
+            className={"mt-2"}
+          >
             Hospital Map
           </FlowbiteSidebar.Item>
           {isAuthenticated && (
@@ -73,6 +78,9 @@ const SidebarNavigation = () => {
               </FlowbiteSidebar.Collapse>
             </>
           )}
+          <FlowbiteSidebar.Item href="/about" icon={FaInfoCircle}>
+            About
+          </FlowbiteSidebar.Item>
         </FlowbiteSidebar.ItemGroup>
         <FlowbiteSidebar.ItemGroup>
           <FlowbiteSidebar.Item>
