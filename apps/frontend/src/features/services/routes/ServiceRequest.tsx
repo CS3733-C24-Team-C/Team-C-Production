@@ -166,7 +166,7 @@ const ServiceRequest = () => {
   return (
     <div className="py-8">
       <form
-        className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)] mx-auto py-4 px-4 flex flex-col space-y-4 max-w-md rounded-lg"
+        className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)] mx-auto py-4 px-4 flex flex-col space-y-4 max-w-md rounded-lg bg-gray-50 dark:bg-neutral-800"
         onSubmit={handleSubmit}
       >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -286,35 +286,42 @@ const ServiceRequest = () => {
         )}
 
         {type === "MEDI" && (
-          <div>
-            <label htmlFor="medicineName">
-              Medicine to be delivered
-              <TextInput
-                type="text"
-                name="medicineName"
-                id="medicineName"
-                placeholder="Ibuprofen"
-                value={medicineName}
-                onChange={(event) => {
-                  setMedicineName(event.target.value);
-                }}
-              />
-            </label>
-            <br />
-            <label htmlFor="medicineDosage">
-              Dosage
-              <TextInput
-                type="text"
-                name="medicineDosage"
-                id="medicineDosage"
-                placeholder="0"
-                value={medicineDosage}
-                onChange={(event) => {
-                  setMedicineDosage(event.target.value);
-                }}
-              />
-            </label>
-          </div>
+          <label
+            className="text-sm font-medium dark:text-white"
+            htmlFor="medicineName"
+          >
+            Medicine to be delivered
+            <TextInput
+              className="pt-2"
+              type="text"
+              name="medicineName"
+              id="medicineName"
+              placeholder="Ibuprofen"
+              value={medicineName}
+              onChange={(event) => {
+                setMedicineName(event.target.value);
+              }}
+            />
+          </label>
+        )}
+        {type === "MEDI" && (
+          <label
+            className="text-sm font-medium dark:text-white"
+            htmlFor="medicineDosage"
+          >
+            Dosage
+            <TextInput
+              className="pt-2"
+              type="text"
+              name="medicineDosage"
+              id="medicineDosage"
+              placeholder="0"
+              value={medicineDosage}
+              onChange={(event) => {
+                setMedicineDosage(event.target.value);
+              }}
+            />
+          </label>
         )}
 
         <Autocomplete
