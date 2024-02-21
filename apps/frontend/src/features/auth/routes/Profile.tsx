@@ -17,8 +17,8 @@ const Profile = () => {
             Profile
           </h1>
           <ProfileContext />
-          <LogoutButton />
           <ProfileTable />
+          <LogoutButton />
         </div>
       )}
     </div>

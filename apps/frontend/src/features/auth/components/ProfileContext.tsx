@@ -25,7 +25,7 @@ export const ProfileContext: React.FC = () => {
               size="xl"
             ></Avatar>
             {user !== undefined && isAuthenticated && (
-              <h2 className="text-xl">Hello, {user.nickname}!</h2>
+              <h2 className="text-xl">Hello, {user.name}!</h2>
             )}
           </div>
         </div>
