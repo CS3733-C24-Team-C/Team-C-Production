@@ -33,11 +33,10 @@ const ServicesData = () => {
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
 
-        const employeesRes = await fetch("/api/employees"); // Adjust the endpoint based on your API
+        const employeesRes = await fetch("/api/employees");
         if (!employeesRes.ok) throw new Error(employeesRes.statusText);
         const employeesData = await employeesRes.json();
 
-        // Filter services based on the selected employee type
         const filteredDataForPieChart = selectedEmployeeType
           ? data.filter((service: { employeeID: string }) => {
               const employee = employeesData.find(
@@ -72,7 +71,6 @@ const ServicesData = () => {
     }
   };
 
-  // Map service requests type labels to more user-friendly text
   const typeLabelsMap: Record<string, string> = {
     JANI: "Janitorial",
     MECH: "Mechanical Maintenance",
@@ -82,7 +80,6 @@ const ServicesData = () => {
     CUST: "Customer Service",
   };
 
-  // Calculate series and labels
   const totalRequests = pieChartServices.length;
   const requestTypesMap = pieChartServices.reduce((map, service) => {
     const type = service.type;
@@ -91,8 +88,8 @@ const ServicesData = () => {
     return map;
   }, {} as Record<string, number>);
 
-  const series = Object.values(requestTypesMap).map(
-    (count) => (count / totalRequests) * 100
+  const series = Object.values(requestTypesMap).map((count) =>
+    Number(((count / totalRequests) * 100).toFixed(2))
   );
   const labels = Object.keys(requestTypesMap);
 
