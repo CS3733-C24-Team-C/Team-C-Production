@@ -1,5 +1,5 @@
 import { Nodes, Edges } from "database";
-import PrismaClient from './bin/database-connection.ts';
+import PrismaClient from '../bin/database-connection.ts';
 
 class Graph {
     private nodes: Map<string, Nodes>;
