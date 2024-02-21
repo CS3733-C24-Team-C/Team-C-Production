@@ -58,8 +58,6 @@ export default function BeefletMap() {
     setEndID,
   } = useContext(MapContext);
 
-  //const [nodeParam, setNodeParam] = useSearchParams();
-
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
   const [toggledHallways, setToggledHallways] = useState(false);
@@ -70,7 +68,7 @@ export default function BeefletMap() {
   const { isAuthenticated } = useAuth0();
 
   const nodePath = path.map((nodeID) =>
-    nodes.filter((node) => node.nodeID == nodeID),
+    nodes.filter((node) => node.nodeID == nodeID)
   );
 
   class newNodeFloorID {
@@ -100,13 +98,12 @@ export default function BeefletMap() {
         lastCut = i;
         floorChanges.push(new newNodeFloorID(nodePath[i - 1][0], currentFloor));
         prevFloors.push(
-          new newNodeFloorID(nodePath[i][0], nodePath[i - 1][0].floor),
+          new newNodeFloorID(nodePath[i][0], nodePath[i - 1][0].floor)
         );
       }
     }
     // @ts-expect-error type error (any)
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
-    //console.log(paths);
   }
 
   const handleSubmit = async (s: string, e: string) => {
@@ -144,7 +141,6 @@ export default function BeefletMap() {
     pathData: string;
     pathLength: number;
   } {
-    //console.log(pathT);
     let pathData = "M" + pathT[0][0].xcoord + "," + pathT[0][0].ycoord + " ";
     pathT.slice(1, pathT.length).forEach((node) => {
       pathData += "L" + (node[0].xcoord + "," + node[0].ycoord + " ");
@@ -152,21 +148,18 @@ export default function BeefletMap() {
 
     const pathElement = document.createElementNS(
       "http://www.w3.org/2000/svg",
-      "path",
+      "path"
     );
     pathElement.setAttribute("d", pathData);
 
     const pathLength = pathElement.getTotalLength();
 
-    //console.log(pathLength);
     return { pathData, pathLength };
   }
 
   const ZoomGetter = () => {
     const map = useMapEvent("zoom", (event) => {
       const zoomLevel = event.target.getZoom();
-      // Do something with the zoomLevel
-      //console.log('Current zoom level:', zoomLevel);
       setZoom(zoomLevel);
     });
     map;
@@ -185,14 +178,12 @@ export default function BeefletMap() {
       new LatLng(0, 0);
       map;
     }
-    console.log("test");
   };
 
   const floor = useMemo(() => {
     if (map != null) {
       ResetZoom(map);
     }
-    return console.log("ran");
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFloor]);
   floor;
@@ -216,8 +207,8 @@ export default function BeefletMap() {
         bounceAtZoomLimits={true}
         doubleClickZoom={false}
       >
-        <ZoomGetter></ZoomGetter>
-        <MapGetter></MapGetter>
+        <ZoomGetter />
+        <MapGetter />
         <LayerGroup>
           <ImageOverlay url={selectedFloor} bounds={imageBounds} />
           {toggledEdges &&
@@ -229,7 +220,7 @@ export default function BeefletMap() {
               .filter(
                 (edge) =>
                   edge[0][0].floor == assetToFloor(selectedFloor) &&
-                  edge[0][0].floor == edge[1][0].floor,
+                  edge[0][0].floor == edge[1][0].floor
               )
               .map((edge) => (
                 <Polyline
@@ -452,7 +443,7 @@ export default function BeefletMap() {
           .filter(
             (node) =>
               node.nodeID == startID &&
-              node.floor == assetToFloor(selectedFloor),
+              node.floor == assetToFloor(selectedFloor)
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
@@ -460,14 +451,14 @@ export default function BeefletMap() {
         {nodes
           .filter(
             (node) =>
-              node.nodeID == endID && node.floor == assetToFloor(selectedFloor),
+              node.nodeID == endID && node.floor == assetToFloor(selectedFloor)
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
           ))}
         {floorChanges
           .filter(
-            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor),
+            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor)
           )
           .map((newFloor) => (
             <Marker
@@ -483,7 +474,7 @@ export default function BeefletMap() {
               eventHandlers={{
                 click: async () =>
                   setSelectedFloor(
-                    adhocConverterChangePlease(newFloor.floorID),
+                    adhocConverterChangePlease(newFloor.floorID)
                   ),
               }}
             >
@@ -498,7 +489,7 @@ export default function BeefletMap() {
           ))}
         {prevFloors
           .filter(
-            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor),
+            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor)
           )
           .map((newFloor) => (
             <Marker
@@ -514,7 +505,7 @@ export default function BeefletMap() {
               eventHandlers={{
                 click: async () =>
                   setSelectedFloor(
-                    adhocConverterChangePlease(newFloor.floorID),
+                    adhocConverterChangePlease(newFloor.floorID)
                   ),
               }}
             >
