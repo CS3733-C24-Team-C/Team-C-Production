@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { LoginButton, SignupButton } from "../components";
-import { ProfileContext } from "../components/ProfileContext";
+import { LoginButton, SignUpButton, ProfileContext } from "../components";
 
 const SignIn = () => {
   const {
@@ -29,21 +28,21 @@ const SignIn = () => {
     }
   }, [getAccessTokenSilently, isAuthenticated, isLoading, loginWithRedirect]);
 
+  if (!isAuthenticated && isLoading) {
+    return;
+  }
+
   return (
-    <div>
-      {!isAuthenticated && (
-        <div className="mx-auto py-8 flex flex-col space-y-4 max-w-md dark:text-white">
-          <h1
-            className="text-2xl font-bold"
-            style={{ display: "flex", justifyContent: "center" }}
-          >
-            Sign In Page
-          </h1>
-          <ProfileContext />
-          <LoginButton />
-          <SignupButton />
-        </div>
-      )}
+    <div className="mx-auto py-8 flex flex-col space-y-4 max-w-md dark:text-white">
+      <h1
+        className="text-2xl font-bold"
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        Sign In Page
+      </h1>
+      <ProfileContext />
+      <LoginButton />
+      <SignUpButton />
     </div>
   );
 };

@@ -88,14 +88,14 @@ const SidebarNavigation = () => {
             <DarkThemeToggle />
             Switch Theme
           </FlowbiteSidebar.Item>
-          {!isAuthenticated && (
-            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignInAlt}>
-              Sign In
-            </FlowbiteSidebar.Item>
-          )}
           {isAuthenticated && (
             <FlowbiteSidebar.Item href="/auth/profile" icon={FaUserAlt}>
               Profile
+            </FlowbiteSidebar.Item>
+          )}
+          {!isAuthenticated && (
+            <FlowbiteSidebar.Item href="/auth/sign-in" icon={FaSignInAlt}>
+              Sign In
             </FlowbiteSidebar.Item>
           )}
           {isAuthenticated && (
