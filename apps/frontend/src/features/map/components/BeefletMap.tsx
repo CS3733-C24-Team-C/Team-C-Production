@@ -56,12 +56,13 @@ export default function BeefletMap() {
     setStartID,
     endID,
     setEndID,
+    requests,
   } = useContext(MapContext);
 
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
   const [toggledHallways, setToggledHallways] = useState(false);
-  const [toggledNodes, setToggledNodes] = useState(true);
+  const [viewRequests, setViewRequests] = useState(false);
   const [colorBlind, setColorBlind] = useState(false);
   const [clicked, setClicked] = useState(false);
   const [zoom, setZoom] = useState(0);
@@ -108,7 +109,7 @@ export default function BeefletMap() {
   }
 
   const handleSubmit = async (s: string, e: string) => {
-    if (s === "" || e === "") {
+    if (s == undefined || e == undefined || s == "" || e == "") {
       return;
     }
     const startNodeId = nodes
@@ -194,11 +195,12 @@ export default function BeefletMap() {
     setLastFloor(selectedFloor);
     return null;
   }
-
+  requests;
+  viewRequests;
   return (
     <div className="w-full h-full">
       <MapContainer
-        style={{ width: "100%", height: "100vh", background: "#B1C8DE" }}
+        style={{ width: "100%", height: "100vh" }}
         center={[-1700, 2500]} // Center of the image in x and y coordinates
         zoom={-2}
         crs={CRS.Simple} // Use the simple CRS for x and y coordinates
@@ -302,144 +304,161 @@ export default function BeefletMap() {
           ))}
         </LayerGroup>
         <FeatureGroup>
-          {toggledNodes &&
-            nodes
-              .filter((node) => node.floor == assetToFloor(selectedFloor))
-              .filter((node) => {
-                if (toggledHallways) {
-                  return true;
-                }
-                return node.nodeType != "HALL";
-              })
-              .map((node, i) => {
-                return (
-                  <Circle
-                    key={i}
-                    center={[-node.ycoord, node.xcoord]}
-                    fillOpacity={1}
-                    radius={(() => {
+          {nodes
+            .filter((node) => node.floor == assetToFloor(selectedFloor))
+            .filter((node) => {
+              if (toggledHallways) {
+                return true;
+              }
+              return node.nodeType != "HALL";
+            })
+            .map((node, i) => {
+              return (
+                <Circle
+                  key={i}
+                  center={[-node.ycoord, node.xcoord]}
+                  fillOpacity={1}
+                  radius={(() => {
+                    if (node.nodeID == startID) {
+                      return 10;
+                    } else if (node.nodeID == endID) {
+                      return 10;
+                    }
+                    return 7;
+                  })()}
+                  pathOptions={{
+                    color: "#0E7490",
+                    weight: 2,
+                    fillColor: (() => {
                       if (node.nodeID == startID) {
-                        return 10;
+                        return "blue";
                       } else if (node.nodeID == endID) {
-                        return 10;
+                        return "yellow";
                       }
-                      return 7;
-                    })()}
-                    pathOptions={{
-                      color: "#0E7490",
-                      weight: 2,
-                      fillColor: (() => {
-                        if (node.nodeID == startID) {
-                          return "blue";
-                        } else if (node.nodeID == endID) {
-                          return "yellow";
-                        }
-                        return "#52BAC2";
-                      })(),
-                    }}
-                    eventHandlers={{
-                      mouseover: (e) => {
-                        e.target.openPopup();
-                        setClicked(false);
-                      },
-                      mouseout: (e) => {
-                        if (clicked) {
-                          return;
-                        }
+                      return "#52BAC2";
+                    })(),
+                  }}
+                  eventHandlers={{
+                    mouseover: (e) => {
+                      e.target.openPopup();
+                      setClicked(false);
+                      setViewRequests(false);
+                    },
+                    mouseout: (e) => {
+                      if (clicked) {
+                        return;
+                      }
+                      e.target.closePopup();
+                    },
+                    click: async (e) => {
+                      if (e.originalEvent.ctrlKey) {
                         e.target.closePopup();
-                      },
-                      click: async (e) => {
-                        if (clicked || e.originalEvent.ctrlKey) {
-                          e.target.closePopup();
-                          setStartLocation(node.longName);
-                          setStartID(node.nodeID);
-                          await handleSubmit(node.nodeID, endID);
-                          return;
-                        }
-                        setClicked(true);
-                      },
-                      contextmenu: async (e) => {
-                        //e.target.preventDefault();
-                        e.target.closePopup();
-                        setEndLocation(node.longName);
-                        setEndID(node.nodeID);
-                        await handleSubmit(startID, node.nodeID);
-                      },
-                    }}
-                  >
-                    <Popup className="leaflet-popup-content-wrapper">
-                      {clicked ? (
-                        <div className={"flex flex-col space-y-2"}>
+                        setStartLocation(node.longName);
+                        setStartID(node.nodeID);
+                        await handleSubmit(node.nodeID, endID);
+                        return;
+                      }
+                      setClicked(true);
+                    },
+                    contextmenu: async (e) => {
+                      //e.target.preventDefault();
+                      e.target.closePopup();
+                      setEndLocation(node.longName);
+                      setEndID(node.nodeID);
+                      await handleSubmit(startID, node.nodeID);
+                    },
+                  }}
+                >
+                  <Popup className="leaflet-popup-content-wrapper">
+                    {(() => {
+                      if (viewRequests) { return (
+                        <table className="table">
+                          <thead>
+                            <tr>
+                              <th>Employee</th>
+                              <th>Urgency</th>
+                              <th>Type</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {requests.filter((request) => request.nodeID === node.nodeID).map((item, index) => (
+                              <tr key={index}>
+                                <td>{item.employeeID}</td>
+                                <td>{item.urgency}</td>
+                                <td>{item.type}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        );
+                      }
+                      else if (clicked) { return (
+                      <div className={"flex flex-col space-y-2"}>
+                        <Button
+                          onClick={async () => {
+                            setStartLocation(node.longName);
+                            setStartID(node.nodeID);
+                            await handleSubmit(node.nodeID, endID);
+                          }}
+                          className={"custom-button"}
+                        >
+                          Set Start
+                        </Button>
+                        <Button
+                          onClick={async () => {
+                            setEndLocation(node.longName);
+                            setEndID(node.nodeID);
+                            await handleSubmit(startID, node.nodeID);
+                          }}
+                          className={"custom-button"}
+                        >
+                          Set End
+                        </Button>
+                        {isAuthenticated && (
                           <Button
-                            onClick={async () => {
-                              setStartLocation(node.longName);
-                              setStartID(node.nodeID);
-                              await handleSubmit(node.nodeID, endID);
-                            }}
                             className={"custom-button"}
+                            onClick={(e) => {e.stopPropagation(); setViewRequests(true);}}
                           >
-                            Set Start
+                            View Requests
                           </Button>
+                        )}
+                        {isAuthenticated && (
                           <Button
-                            onClick={async () => {
-                              setEndLocation(node.longName);
-                              setEndID(node.nodeID);
-                              await handleSubmit(startID, node.nodeID);
-                            }}
                             className={"custom-button"}
+                            onClick={() =>
+                              navigate("/services", {
+                                state: { roomID: node.nodeID },
+                              })
+                            }
                           >
-                            Set End
+                            Make Request
                           </Button>
-                          {isAuthenticated && (
-                            <Button
-                              className={"custom-button"}
-                              onClick={() => navigate("/data/services")}
-                            >
-                              View Requests
-                            </Button>
-                          )}
-                          {isAuthenticated && (
-                            <Button
-                              className={"custom-button"}
-                              onClick={() =>
-                                navigate("/services", {
-                                  state: { roomID: node.nodeID },
-                                })
-                              }
-                            >
-                              Make Request
-                            </Button>
-                          )}
-                          {isAuthenticated && (
-                            <Button className={"custom-button"}>
-                              Schedule Move
-                            </Button>
-                          )}
-                        </div>
-                      ) : (
-                        <div>
-                          {"Full name: " + node.longName}
-                          <br />
-                          {"Short name: " + node.shortName}
-                          <br />
-                          {"Node ID: " + node.nodeID}
-                          <br />
-                          {"Node type: " + node.nodeType}
-                        </div>
-                      )}
-                    </Popup>
-                    {toggledNames && (
-                      <Tooltip
-                        permanent={true}
-                        className={"customTooltip"}
-                        direction={"top"}
-                      >
-                        {node.longName}
-                      </Tooltip>
-                    )}
-                  </Circle>
-                );
-              })}
+                        )}
+                      </div>
+                    );} else { return (
+                      <div>
+                        {"Full name: " + node.longName}
+                        <br />
+                        {"Short name: " + node.shortName}
+                        <br />
+                        {"Node ID: " + node.nodeID}
+                        <br />
+                        {"Node type: " + node.nodeType}
+                      </div>
+                    );}})()}
+                  </Popup>
+                  {toggledNames && (
+                    <Tooltip
+                      permanent={true}
+                      className={"customTooltip"}
+                      direction={"top"}
+                    >
+                      {node.longName}
+                    </Tooltip>
+                  )}
+                </Circle>
+              );
+            })}
         </FeatureGroup>
         {nodes
           .filter(
@@ -522,12 +541,6 @@ export default function BeefletMap() {
           ))}
         <div>
           <CustomButton
-            title={"Toggle Nodes"}
-            onClick={() => setToggledNodes(!toggledNodes)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
             title={"Toggle Edges"}
             onClick={() => setToggledEdges(!toggledEdges)}
             className={"custom-toggle-button"}
@@ -550,13 +563,6 @@ export default function BeefletMap() {
             onClick={() => setColorBlind(!colorBlind)}
             className={"custom-toggle-button"}
             position={"bottomleft"}
-          />
-          <CustomButton
-            title={
-              "How To Use Map <br> Control click node to set as start location <br> Right click node to set as end location"
-            }
-            className={"instructions"}
-            position={"bottomright"}
           />
         </div>
       </MapContainer>
