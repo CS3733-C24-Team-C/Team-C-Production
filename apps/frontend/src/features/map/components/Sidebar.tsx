@@ -20,7 +20,7 @@ import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
 import { Autocomplete } from "@/components";
-import { HiChevronUp, HiChevronDown, HiLocationMarker } from "react-icons/hi";
+import { HiChevronDown, HiLocationMarker } from "react-icons/hi";
 import { MdElevator } from "react-icons/md";
 import {
   BsArrowUpLeftCircle,
@@ -72,9 +72,12 @@ const Sidebar = () => {
 
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
+  const [selectedFloorID, setSelectedFloorID] = useState("");
+
+  let bgAlt = 0;
 
   const nodeDirections = path.map(
-    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
+    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
   );
 
   // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
@@ -96,21 +99,26 @@ const Sidebar = () => {
 
   const handleFloorClick = (floorID: string) => {
     setSelectedFloor(adhocConverterChangePlease(floorID));
+    setSelectedFloorID(floorID);
   };
 
   function turnDirection(floor: string, index: number) {
+    bgAlt++;
     //const floor = floorID.substring(0,floorID.length-1);
     const floorDirections = splitDirections.filter(
       (direction, i, arr) =>
         direction?.floorID === floor ||
         (i > 0 && arr[i - 1].floorID === floor) ||
-        (i === arr.length - 1 && arr[i].floorID === floor)
+        (i === arr.length - 1 && arr[i].floorID === floor),
     );
 
     const currDirection = floorDirections[index];
     const prevDirection = index > 0 ? floorDirections[index - 1] : null;
+    //const prevPrevDirection = index > 0 ? floorDirections[index - 2] : null;
     const nextDirection =
       index < floorDirections.length - 1 ? floorDirections[index + 1] : null;
+    const nextNextDirection =
+      index < floorDirections.length - 2 ? floorDirections[index + 2] : null;
 
     if (nextDirection === null && index === floorDirections.length - 1) {
       // Assuming the next direction is already present in newDirections
@@ -174,39 +182,135 @@ const Sidebar = () => {
             const angle = angleBetweenVectors(vector1, vector2);
             // Use crossProductValue to determine left or right turn
             if (angle < -30) {
+              if (nextNextDirection) {
+                const vector3 = {
+                  x: nextDirection.node.xcoord - currDirection.node.xcoord,
+                  y: nextDirection.node.ycoord - currDirection.node.ycoord,
+                };
+                const vector4 = {
+                  x: nextNextDirection.node.xcoord - nextDirection.node.xcoord,
+                  y: nextNextDirection.node.ycoord - nextDirection.node.ycoord,
+                };
+
+                const angle2 = angleBetweenVectors(vector3, vector4);
+                if (angle2 >= -15 && angle2 < 15) {
+                  return (
+                    <>
+                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Turn left towards " + nextNextDirection.node.longName}
+                    </>
+                  );
+                }
+              }
               return (
                 <>
                   <BsArrowLeftCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                  {"Turn left towards " + currDirection.node.longName}
+                  {"Turn left towards " + nextDirection.node.longName}
                 </>
               );
             } else if (angle >= -30 && angle < -15) {
+              if (nextNextDirection) {
+                const vector3 = {
+                  x: nextDirection.node.xcoord - currDirection.node.xcoord,
+                  y: nextDirection.node.ycoord - currDirection.node.ycoord,
+                };
+                const vector4 = {
+                  x: nextNextDirection.node.xcoord - nextDirection.node.xcoord,
+                  y: nextNextDirection.node.ycoord - nextDirection.node.ycoord,
+                };
+
+                const angle2 = angleBetweenVectors(vector3, vector4);
+                if (angle2 >= -15 && angle2 < 15) {
+                  return (
+                    <>
+                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Bear left towards " + nextNextDirection.node.longName}
+                    </>
+                  );
+                }
+              }
               return (
                 <>
                   <BsArrowUpLeftCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                  {"Bear left towards " + currDirection.node.longName}
+                  {"Bear left towards " + nextDirection.node.longName}
                 </>
               );
             } else if (angle >= -15 && angle < 15) {
+              if (nextNextDirection) {
+                const vector3 = {
+                  x: nextDirection.node.xcoord - currDirection.node.xcoord,
+                  y: nextDirection.node.ycoord - currDirection.node.ycoord,
+                };
+                const vector4 = {
+                  x: nextNextDirection.node.xcoord - nextDirection.node.xcoord,
+                  y: nextNextDirection.node.ycoord - nextDirection.node.ycoord,
+                };
+
+                const angle2 = angleBetweenVectors(vector3, vector4);
+                if (angle2 >= -15 && angle2 < 15) {
+                  bgAlt--;
+                  return;
+                }
+              }
               return (
                 <>
                   <BsArrowUpCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                  {"Continue Straight towards " + currDirection.node.longName}
+                  {"Continue Straight towards " + nextDirection.node.longName}
                 </>
               );
               //return "Head straight towards " + currDirection.longName;
             } else if (angle >= 15 && angle < 30) {
+              if (nextNextDirection) {
+                const vector3 = {
+                  x: nextDirection.node.xcoord - currDirection.node.xcoord,
+                  y: nextDirection.node.ycoord - currDirection.node.ycoord,
+                };
+                const vector4 = {
+                  x: nextNextDirection.node.xcoord - nextDirection.node.xcoord,
+                  y: nextNextDirection.node.ycoord - nextDirection.node.ycoord,
+                };
+
+                const angle2 = angleBetweenVectors(vector3, vector4);
+                if (angle2 >= -15 && angle2 < 15) {
+                  return (
+                    <>
+                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Bear right towards " + nextNextDirection.node.longName}
+                    </>
+                  );
+                }
+              }
               return (
                 <>
                   <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                  {"Bear right towards " + currDirection.node.longName}
+                  {"Bear right towards " + nextDirection.node.longName}
                 </>
               );
             } else if (angle >= 30) {
+              if (nextNextDirection) {
+                const vector3 = {
+                  x: nextDirection.node.xcoord - currDirection.node.xcoord,
+                  y: nextDirection.node.ycoord - currDirection.node.ycoord,
+                };
+                const vector4 = {
+                  x: nextNextDirection.node.xcoord - nextDirection.node.xcoord,
+                  y: nextNextDirection.node.ycoord - nextDirection.node.ycoord,
+                };
+
+                const angle2 = angleBetweenVectors(vector3, vector4);
+                if (angle2 >= -15 && angle2 < 15) {
+                  return (
+                    <>
+                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Turn right towards " + nextNextDirection.node.longName}
+                    </>
+                  );
+                }
+              }
               return (
                 <>
                   <BsArrowRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                  {"Turn right towards " + currDirection.node.longName}
+                  {"Turn right towards " + nextDirection.node.longName}
                 </>
               );
             } else {
@@ -221,6 +325,7 @@ const Sidebar = () => {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    bgAlt = 0;
     const startNodeId = nodes
       .filter((node) => node["longName"] === startLocation)
       .map((node) => node.nodeID)[0];
@@ -313,7 +418,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
                     .filter(
                       (loc) =>
@@ -321,17 +426,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2"
+                          "carrie m. hall conference center floor 2",
                     )
                     .sort()
-                    .slice(0, 10)
+                    .slice(0, 10),
                 );
               } else {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
                     .filter(
                       (loc) =>
@@ -339,9 +444,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2"
+                          "carrie m. hall conference center floor 2",
                     )
-                    .sort()
+                    .sort(),
                 );
               }
             }}
@@ -355,7 +460,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
                     .filter(
                       (loc) =>
@@ -363,10 +468,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2"
+                          "carrie m. hall conference center floor 2",
                     )
                     .sort()
-                    .slice(0, 10)
+                    .slice(0, 10),
                 );
               } else {
                 setStartSuggestions([]);
@@ -391,7 +496,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
                     .filter(
                       (loc) =>
@@ -399,10 +504,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2"
+                          "carrie m. hall conference center floor 2",
                     )
                     .sort()
-                    .slice(0, 10)
+                    .slice(0, 10),
                 );
               } else {
                 setEndSuggestions([]);
@@ -415,7 +520,7 @@ const Sidebar = () => {
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
                     .filter(
                       (loc) =>
@@ -423,17 +528,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2"
+                          "carrie m. hall conference center floor 2",
                     )
                     .sort()
-                    .slice(0, 10)
+                    .slice(0, 10),
                 );
               } else {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
                     )
                     .filter(
                       (loc) =>
@@ -441,9 +546,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2"
+                          "carrie m. hall conference center floor 2",
                     )
-                    .sort()
+                    .sort(),
                 );
               }
             }}
@@ -474,7 +579,7 @@ const Sidebar = () => {
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
           {Array.from(
-            new Set(splitDirections.map((direction) => direction?.floorID))
+            new Set(splitDirections.map((direction) => direction?.floorID)),
           ).map((floorID) => (
             <div key={floorID}>
               <Button
@@ -483,25 +588,24 @@ const Sidebar = () => {
                 label={`Floor ${floorID}`}
                 onClick={() => handleFloorClick(floorID)}
               >
-                {selectedFloor === adhocConverterChangePlease(floorID) ? (
+                {selectedFloorID === floorID ? (
                   <>
-                    {`Hide Directions for Floor ${floorID.substring(
+                    {`Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1
-                    )}`}
-                    <HiChevronUp className="ml-4 h-4 w-4" />
+                      floorID.length - 1,
+                    )}:`}
                   </>
                 ) : (
                   <>
                     {`Show Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1
+                      floorID.length - 1,
                     )}`}
                     <HiChevronDown className="ml-4 h-4 w-4" />
                   </>
                 )}
               </Button>
-              {selectedFloor === adhocConverterChangePlease(floorID) && (
+              {selectedFloorID === floorID && (
                 <List key={floorID}>
                   {splitDirections
                     .filter((direction) => direction?.floorID === floorID)
@@ -509,9 +613,9 @@ const Sidebar = () => {
                       <List
                         key={i}
                         className={`bg-${colorPicker(
-                          i,
-                          0
-                        )} dark:bg-${colorPicker(i, 1)}`}
+                          bgAlt,
+                          0,
+                        )} dark:bg-${colorPicker(bgAlt, 1)}`}
                       >
                         {i < nodeDirections.length && turnDirection(floorID, i)}
                       </List>
@@ -534,7 +638,7 @@ const adhocConverterChangePlease = (floorID: string) => {
 
 function angleBetweenVectors(
   v1: { x: number; y: number },
-  v2: { x: number; y: number }
+  v2: { x: number; y: number },
 ): number {
   // Calculate the angle in radians using the arctangent function
   const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
