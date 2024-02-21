@@ -3,11 +3,13 @@ import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
 import { readCSV, objectsToCSV } from "../utils";
 import { Prisma } from "database";
-import {BFSPathfindingStrategy} from "../pathfinding/strategies/BFSPathFindingStrategy.ts";
-import { DFSPathfindingStrategy} from "../pathfinding/strategies/DFSPathFindingStrategy.ts";
-import { AStarPathfindingStrategy} from "../pathfinding/strategies/ASTARPathFindingStrategy.ts";
-import {GraphSingleton} from "../pathfinding/GraphSingleton.ts";
-import {PathfindingContext} from "../pathfinding/PathfindingContext.ts";
+import {
+  AStarPathfindingStrategy,
+  BFSPathfindingStrategy,
+  DFSPathfindingStrategy,
+  GraphSingleton,
+  PathfindingContext,
+} from "../pathfinding";
 
 const router: Router = express.Router();
 
@@ -274,49 +276,52 @@ router.get("/download/edges", async function (req: Request, res: Response) {
   }
 });
 
-
 router.post("/pathfinding", async function (req: Request, res: Response) {
-    const { startNodeId, endNodeId, algorithm } = req.body;
+  const { startNodeId, endNodeId, algorithm } = req.body;
 
-    if (!startNodeId || !endNodeId) {
-        return res.status(400).send("Both startNodeId and endNodeId are required");
+  if (!startNodeId || !endNodeId) {
+    return res.status(400).send("Both startNodeId and endNodeId are required");
+  }
+
+  if (!["AStar", "BFS", "DFS"].includes(algorithm)) {
+    return res
+      .status(400)
+      .send(
+        "Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'DFS'."
+      );
+  }
+
+  try {
+    const nodes = await PrismaClient.nodes.findMany({
+      where: { nodeID: { in: [startNodeId, endNodeId] } },
+    });
+
+    if (nodes.length < 2) {
+      return res.status(404).send("One or both node IDs not found");
     }
 
-    if (!["AStar", "BFS", "DFS"].includes(algorithm)) {
-        return res.status(400).send("Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'DFS'.");
+    const graph = await GraphSingleton.getInstance();
+    const context = new PathfindingContext(new BFSPathfindingStrategy());
+
+    switch (algorithm) {
+      case "DFS":
+        context.setStrategy(new DFSPathfindingStrategy());
+        break;
+      case "AStar":
+        context.setStrategy(new AStarPathfindingStrategy());
+        break;
+      case "BFS":
+        break;
+      default:
+        return res.status(400).send("Unsupported algorithm");
     }
 
-    try {
-        const nodes = await PrismaClient.nodes.findMany({
-            where: { nodeID: { in: [startNodeId, endNodeId] } },
-        });
-
-        if (nodes.length < 2) {
-            return res.status(404).send("One or both node IDs not found");
-        }
-
-        const graph = await GraphSingleton.getInstance();
-        let context = new PathfindingContext(new BFSPathfindingStrategy());
-
-        switch (algorithm) {
-            case "DFS":
-                context.setStrategy(new DFSPathfindingStrategy());
-                break;
-            case "AStar":
-                context.setStrategy(new AStarPathfindingStrategy());
-                break;
-            case "BFS":
-                break;
-            default:
-                return res.status(400).send("Unsupported algorithm");
-        }
-
-        const pathNodeIds = await context.findPath(startNodeId, endNodeId, graph);
-        res.json({ path: pathNodeIds });
-    } catch (error) {
-        console.error("Error processing pathfinding request:", error);
-        res.status(500).send("Internal server error");
-    }
+    const pathNodeIds = await context.findPath(startNodeId, endNodeId, graph);
+    res.json({ path: pathNodeIds });
+  } catch (error) {
+    console.error("Error processing pathfinding request:", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
 export default router;
