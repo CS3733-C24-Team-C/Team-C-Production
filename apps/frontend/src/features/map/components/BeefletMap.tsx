@@ -18,7 +18,10 @@ import { MapContext } from "../components";
 import "./forBeef.css";
 import "leaflet/dist/leaflet.css";
 import { Button } from "flowbite-react";
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  // useSearchParams 
+} from "react-router-dom";
 import CustomButton from "@/features/map/components/Description.tsx";
 import { assetToFloor } from "../utils";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -40,6 +43,8 @@ export default function BeefletMap() {
     setEndLocation,
   } = useContext(MapContext);
 
+  //const [nodeParam, setNodeParam] = useSearchParams();
+
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
   const [colorBlind, setColorBlind] = useState(false);
@@ -47,7 +52,7 @@ export default function BeefletMap() {
   const [zoom, setZoom] = useState(0);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth0();
-  
+
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID)
   );
@@ -59,12 +64,12 @@ export default function BeefletMap() {
     let currentFloor = nodePath[0][0].floor;
     let lastCut = 0;
     for (let i = 1; i < nodePath.length; i++) {
-        if (nodePath[i][0].floor != currentFloor) {
-            // @ts-expect-error type error (any)
-            paths[currentFloor].push(nodePath.slice(lastCut, i));
-            currentFloor = nodePath[i][0].floor;
-            lastCut = i;
-        }
+      if (nodePath[i][0].floor != currentFloor) {
+        // @ts-expect-error type error (any)
+        paths[currentFloor].push(nodePath.slice(lastCut, i));
+        currentFloor = nodePath[i][0].floor;
+        lastCut = i;
+      }
     }
     // @ts-expect-error type error (any)
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
@@ -102,63 +107,63 @@ export default function BeefletMap() {
     }
   };
 
-    function pathToPoints(pathT: Nodes[][]): {
-        pathData: string;
-        pathLength: number;
-    } {
-        //console.log(pathT);
-        let pathData =
-            "M" +
-            pathT[0][0].xcoord +
-            "," +
-            pathT[0][0].ycoord +
-            " ";
-        pathT.slice(1, pathT.length).forEach((node) => {
-            pathData +=
-                "L" +
-                (node[0].xcoord +
-                    "," +
-                    node[0].ycoord +
-                    " ");
-        });
+  function pathToPoints(pathT: Nodes[][]): {
+    pathData: string;
+    pathLength: number;
+  } {
+    //console.log(pathT);
+    let pathData =
+      "M" +
+      pathT[0][0].xcoord +
+      "," +
+      pathT[0][0].ycoord +
+      " ";
+    pathT.slice(1, pathT.length).forEach((node) => {
+      pathData +=
+        "L" +
+        (node[0].xcoord +
+          "," +
+          node[0].ycoord +
+          " ");
+    });
 
-        const pathElement = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path"
-        );
-        pathElement.setAttribute("d", pathData);
+    const pathElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
+    pathElement.setAttribute("d", pathData);
 
-        const pathLength = pathElement.getTotalLength();
+    const pathLength = pathElement.getTotalLength();
 
-        //console.log(pathLength);
-        return { pathData, pathLength };
-    };
+    //console.log(pathLength);
+    return { pathData, pathLength };
+  };
 
-    const ZoomGetter = () => {
-      const map = useMapEvent('zoom', (event) => {
-        const zoomLevel = event.target.getZoom();
-        // Do something with the zoomLevel
-        //console.log('Current zoom level:', zoomLevel);
-        setZoom(zoomLevel);
-      });
-      map;
-      // Your component code...
-    
-      return null; // or your JSX
-    };
+  const ZoomGetter = () => {
+    const map = useMapEvent('zoom', (event) => {
+      const zoomLevel = event.target.getZoom();
+      // Do something with the zoomLevel
+      //console.log('Current zoom level:', zoomLevel);
+      setZoom(zoomLevel);
+    });
+    map;
+    // Your component code...
+
+    return null; // or your JSX
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [map, setMap] = useState<any>(); const [lastFloor, setLastFloor] = useState<any>();
   const ResetZoom = (map: { flyTo: (arg0: LatLng, arg1: number) => void; }) => {
     if (lastFloor != selectedFloor) {
-      map.flyTo(new LatLng(-1700,2500), -2);
-      new LatLng(0,0);
+      map.flyTo(new LatLng(-1700, 2500), -2);
+      new LatLng(0, 0);
       map;
     }
     console.log("test");
   };
   //eslint-disable-next-line react-hooks/exhaustive-deps
-  const floor = useMemo(() => {if (map != null) {ResetZoom(map);} return console.log("ran");}, [selectedFloor]);
+  const floor = useMemo(() => { if (map != null) { ResetZoom(map); } return console.log("ran"); }, [selectedFloor]);
   floor;
 
   function MapGetter() {
@@ -179,13 +184,13 @@ export default function BeefletMap() {
         maxBoundsViscosity={1.0}
         bounceAtZoomLimits={true}
         doubleClickZoom={false}
-        
+
       >
         <ZoomGetter></ZoomGetter>
         <MapGetter></MapGetter>
         <LayerGroup>
-        <ImageOverlay url={selectedFloor} bounds={imageBounds}/>
-          {toggledEdges && 
+          <ImageOverlay url={selectedFloor} bounds={imageBounds} />
+          {toggledEdges &&
             edges
               .map((edge) => [
                 nodes.filter((node) => node.nodeID == edge.startNode),
@@ -208,60 +213,60 @@ export default function BeefletMap() {
                 ></Polyline>
               ))}
           {paths[assetToFloor(selectedFloor)].map((currentPath, i) => (
-              <>
-                <SVGOverlay bounds={new LatLngBounds([0, 0], [-3400, 5000])}>
-                    <svg viewBox="0 0 5000 3400" key={i}>
-                        <path
-                            key = {i}
-                            id={"movePath" + i.toString()}
-                            d={pathToPoints(currentPath).pathData}
-                            stroke={(() => {if (colorBlind) {return "purple";} else {return "#0d6102";}})()}
-                            fill="none"
-                            strokeWidth={12 * Math.max(1-zoom, 1)}
-                            strokeLinecap={"round"}
-                        />
-                        <path
-                            key = {i}
-                            id={"movePath" + i.toString()}
-                            d={pathToPoints(currentPath).pathData}
-                            stroke={(() => {if (colorBlind) {return "#5D3A9B";} else {return "green";}})()}
-                            fill="none"
-                            strokeWidth={6 * Math.max(1-zoom, 1)}
-                            strokeLinecap={"round"}
-                        />
-                        {(() => {
-                            const path = pathToPoints(currentPath);
-                            const pathLength = path.pathLength;
-                            const pathData = path.pathData;
-                            const numDots = Math.floor(pathLength / 10);
-                            return [...Array(numDots)].map((_, index) => (
-                                <>
-                                    <circle key={index} r={3 * Math.max(1-zoom, 1)}
-                                    fill={(() => {if (colorBlind) {return "#E66100";} else {return "yellow";}})()}>
-                                        <animateMotion
-                                            dur={Math.floor(numDots / 4).toString() + "s"}
-                                            repeatCount="indefinite"
-                                            begin={index}
-                                            path={pathData}
-                                        ></animateMotion>
-                                    </circle>
-                                </>
-                            ));
-                        })()}
-                    </svg>
-                </SVGOverlay>
-              </>
+            <>
+              <SVGOverlay bounds={new LatLngBounds([0, 0], [-3400, 5000])}>
+                <svg viewBox="0 0 5000 3400" key={i}>
+                  <path
+                    key={i}
+                    id={"movePath" + i.toString()}
+                    d={pathToPoints(currentPath).pathData}
+                    stroke={(() => { if (colorBlind) { return "purple"; } else { return "#0d6102"; } })()}
+                    fill="none"
+                    strokeWidth={12 * Math.max(1 - zoom, 1)}
+                    strokeLinecap={"round"}
+                  />
+                  <path
+                    key={i}
+                    id={"movePath" + i.toString()}
+                    d={pathToPoints(currentPath).pathData}
+                    stroke={(() => { if (colorBlind) { return "#5D3A9B"; } else { return "green"; } })()}
+                    fill="none"
+                    strokeWidth={6 * Math.max(1 - zoom, 1)}
+                    strokeLinecap={"round"}
+                  />
+                  {(() => {
+                    const path = pathToPoints(currentPath);
+                    const pathLength = path.pathLength;
+                    const pathData = path.pathData;
+                    const numDots = Math.floor(pathLength / 10);
+                    return [...Array(numDots)].map((_, index) => (
+                      <>
+                        <circle key={index} r={3 * Math.max(1 - zoom, 1)}
+                          fill={(() => { if (colorBlind) { return "#E66100"; } else { return "yellow"; } })()}>
+                          <animateMotion
+                            dur={Math.floor(numDots / 4).toString() + "s"}
+                            repeatCount="indefinite"
+                            begin={index}
+                            path={pathData}
+                          ></animateMotion>
+                        </circle>
+                      </>
+                    ));
+                  })()}
+                </svg>
+              </SVGOverlay>
+            </>
           ))}
         </LayerGroup>
-          <FeatureGroup>
-              {nodes
-                  .filter((node) => node.floor == assetToFloor(selectedFloor))
-                  .map((node, i) => {
-                      return (
-                          <Circle
-                              key={i}
-                              center={[-node.ycoord, node.xcoord]}
-                              fillOpacity={1}
+        <FeatureGroup>
+          {nodes
+            .filter((node) => node.floor == assetToFloor(selectedFloor))
+            .map((node, i) => {
+              return (
+                <Circle
+                  key={i}
+                  center={[-node.ycoord, node.xcoord]}
+                  fillOpacity={1}
                   radius={(() => {
                     if (node.longName == startLocation) {
                       return 10;
@@ -342,7 +347,7 @@ export default function BeefletMap() {
                         {isAuthenticated && (
                           <Button
                             className={"custom-button"}
-                            onClick={() => navigate("/services")}
+                            onClick={() => navigate("/services", { state: { roomID: node.nodeID } })}
                           >
                             Make Request
                           </Button>
