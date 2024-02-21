@@ -3,12 +3,11 @@ import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
 import { readCSV, objectsToCSV } from "../utils";
 import { Prisma } from "database";
-import {
-  shortestPathAStar,
-  bfsShortestPath,
-  dfsShortestPath,
-} from "../shortestPath.ts";
-import {GraphSingleton} from "../GraphSingleton.ts";
+import {BFSPathfindingStrategy} from "../pathfinding/strategies/BFSPathFindingStrategy.ts";
+import { DFSPathfindingStrategy} from "../pathfinding/strategies/DFSPathFindingStrategy.ts";
+import { AStarPathfindingStrategy} from "../pathfinding/strategies/ASTARPathFindingStrategy.ts";
+import {GraphSingleton} from "../pathfinding/GraphSingleton.ts";
+import {PathfindingContext} from "../pathfinding/PathfindingContext.ts";
 
 const router: Router = express.Router();
 
@@ -296,24 +295,23 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
             return res.status(404).send("One or both node IDs not found");
         }
 
-        let pathNodeIds: string[] | null = [];
         const graph = await GraphSingleton.getInstance();
+        let context = new PathfindingContext(new BFSPathfindingStrategy());
 
         switch (algorithm) {
             case "DFS":
-                pathNodeIds = await dfsShortestPath(startNodeId, endNodeId, graph);
+                context.setStrategy(new DFSPathfindingStrategy());
                 break;
             case "AStar":
-                pathNodeIds = shortestPathAStar(startNodeId, endNodeId, graph);
-                console.log(pathNodeIds);
+                context.setStrategy(new AStarPathfindingStrategy());
                 break;
             case "BFS":
-                pathNodeIds = await bfsShortestPath(startNodeId, endNodeId, graph);
                 break;
             default:
                 return res.status(400).send("Unsupported algorithm");
         }
 
+        const pathNodeIds = await context.findPath(startNodeId, endNodeId, graph);
         res.json({ path: pathNodeIds });
     } catch (error) {
         console.error("Error processing pathfinding request:", error);
