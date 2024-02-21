@@ -59,6 +59,8 @@ export default function BeefletMap() {
     requests,
   } = useContext(MapContext);
 
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth0();
   const [toggledEdges, setToggledEdges] = useState(false);
   const [toggledNames, setToggledNames] = useState(false);
   const [toggledHallways, setToggledHallways] = useState(false);
@@ -66,8 +68,10 @@ export default function BeefletMap() {
   const [colorBlind, setColorBlind] = useState(false);
   const [clicked, setClicked] = useState(false);
   const [zoom, setZoom] = useState(0);
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth0();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [map, setMap] = useState<any>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [lastFloor, setLastFloor] = useState<any>();
 
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID)
@@ -160,20 +164,13 @@ export default function BeefletMap() {
   }
 
   const ZoomGetter = () => {
-    const map = useMapEvent("zoom", (event) => {
+    useMapEvent("zoom", (event) => {
       const zoomLevel = event.target.getZoom();
       setZoom(zoomLevel);
     });
-    map;
-    // Your component code...
-
-    return null; // or your JSX
+    return null;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [map, setMap] = useState<any>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [lastFloor, setLastFloor] = useState<any>();
   const ResetZoom = (map: { flyTo: (arg0: LatLng, arg1: number) => void }) => {
     if (lastFloor != selectedFloor) {
       map.flyTo(new LatLng(-1700, 2500), -2);
@@ -182,21 +179,19 @@ export default function BeefletMap() {
     }
   };
 
-  const floor = useMemo(() => {
+  useMemo(() => {
     if (map != null) {
       ResetZoom(map);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFloor]);
-  floor;
 
   function MapGetter() {
     setMap(useMap());
     setLastFloor(selectedFloor);
     return null;
   }
-  requests;
-  viewRequests;
+
   return (
     <div className="w-full h-full">
       <MapContainer
@@ -371,81 +366,93 @@ export default function BeefletMap() {
                 >
                   <Popup className="leaflet-popup-content-wrapper">
                     {(() => {
-                      if (viewRequests) { return (
-                        <table className="table">
-                          <thead>
-                            <tr>
-                              <th>Employee</th>
-                              <th>Urgency</th>
-                              <th>Type</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {requests.filter((request) => request.nodeID === node.nodeID).map((item, index) => (
-                              <tr key={index}>
-                                <td>{item.employeeID}</td>
-                                <td>{item.urgency}</td>
-                                <td>{item.type}</td>
+                      if (viewRequests) {
+                        return (
+                          <table className="table">
+                            <thead>
+                              <tr>
+                                <th>Employee</th>
+                                <th>Urgency</th>
+                                <th>Type</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {requests
+                                .filter(
+                                  (request) => request.nodeID === node.nodeID
+                                )
+                                .map((item, index) => (
+                                  <tr key={index}>
+                                    <td>{item.employeeID}</td>
+                                    <td>{item.urgency}</td>
+                                    <td>{item.type}</td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        );
+                      } else if (clicked) {
+                        return (
+                          <div className={"flex flex-col space-y-2"}>
+                            <Button
+                              onClick={async () => {
+                                setStartLocation(node.longName);
+                                setStartID(node.nodeID);
+                                await handleSubmit(node.nodeID, endID);
+                              }}
+                              className={"custom-button"}
+                            >
+                              Set Start
+                            </Button>
+                            <Button
+                              onClick={async () => {
+                                setEndLocation(node.longName);
+                                setEndID(node.nodeID);
+                                await handleSubmit(startID, node.nodeID);
+                              }}
+                              className={"custom-button"}
+                            >
+                              Set End
+                            </Button>
+                            {isAuthenticated && (
+                              <Button
+                                className={"custom-button"}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setViewRequests(true);
+                                }}
+                              >
+                                View Requests
+                              </Button>
+                            )}
+                            {isAuthenticated && (
+                              <Button
+                                className={"custom-button"}
+                                onClick={() =>
+                                  navigate("/services", {
+                                    state: { roomID: node.nodeID },
+                                  })
+                                }
+                              >
+                                Make Request
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div>
+                            {"Full name: " + node.longName}
+                            <br />
+                            {"Short name: " + node.shortName}
+                            <br />
+                            {"Node ID: " + node.nodeID}
+                            <br />
+                            {"Node type: " + node.nodeType}
+                          </div>
                         );
                       }
-                      else if (clicked) { return (
-                      <div className={"flex flex-col space-y-2"}>
-                        <Button
-                          onClick={async () => {
-                            setStartLocation(node.longName);
-                            setStartID(node.nodeID);
-                            await handleSubmit(node.nodeID, endID);
-                          }}
-                          className={"custom-button"}
-                        >
-                          Set Start
-                        </Button>
-                        <Button
-                          onClick={async () => {
-                            setEndLocation(node.longName);
-                            setEndID(node.nodeID);
-                            await handleSubmit(startID, node.nodeID);
-                          }}
-                          className={"custom-button"}
-                        >
-                          Set End
-                        </Button>
-                        {isAuthenticated && (
-                          <Button
-                            className={"custom-button"}
-                            onClick={(e) => {e.stopPropagation(); setViewRequests(true);}}
-                          >
-                            View Requests
-                          </Button>
-                        )}
-                        {isAuthenticated && (
-                          <Button
-                            className={"custom-button"}
-                            onClick={() =>
-                              navigate("/services", {
-                                state: { roomID: node.nodeID },
-                              })
-                            }
-                          >
-                            Make Request
-                          </Button>
-                        )}
-                      </div>
-                    );} else { return (
-                      <div>
-                        {"Full name: " + node.longName}
-                        <br />
-                        {"Short name: " + node.shortName}
-                        <br />
-                        {"Node ID: " + node.nodeID}
-                        <br />
-                        {"Node type: " + node.nodeType}
-                      </div>
-                    );}})()}
+                    })()}
                   </Popup>
                   {toggledNames && (
                     <Tooltip
@@ -571,7 +578,6 @@ export default function BeefletMap() {
 }
 
 const adhocConverterChangePlease = (floorID: string) => {
-  //const floor = floorID.substring(0, floorID.length - 1);
   // @ts-expect-error nope
   return floorToAsset(floorID);
 };
