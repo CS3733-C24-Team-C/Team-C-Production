@@ -136,7 +136,7 @@ export default function BeefletMap() {
   return (
     <div className="w-full h-full">
       <MapContainer
-        style={{ width: "100%", height: "100vh" }}
+        style={{ width: "100%", height: "100vh", background: "#B1C8DE" }}
         center={[-1700, 2500]} // Center of the image in x and y coordinates
         zoom={-2}
         crs={CRS.Simple} // Use the simple CRS for x and y coordinates
