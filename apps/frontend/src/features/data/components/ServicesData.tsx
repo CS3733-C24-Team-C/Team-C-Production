@@ -200,8 +200,7 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
   },
   {
     accessorKey: "employeeID",
-    // @ts-expect-error ahhh
-    accessorFn: (row) => row.employeeID.toString(),
+    accessorFn: (row) => row.employeeID?.toString(),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Employee ID" />
     ),

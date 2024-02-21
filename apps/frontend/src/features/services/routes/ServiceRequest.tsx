@@ -18,8 +18,11 @@ import {
   MedicalDepartment,
 } from "database";
 import { Autocomplete } from "@/components";
+import { useLocation } from "react-router-dom";
 
 const ServiceRequest = () => {
+  const location = useLocation();
+
   const [nodes, setNodes] = useState<Nodes[]>([]);
   const [roomSuggestions, setRoomSuggestions] = useState<string[]>([]);
   const [room, setRoom] = useState<string>("");
@@ -66,9 +69,19 @@ const ServiceRequest = () => {
         console.error("Failed to fetch employees:", error);
       }
     };
+    const initializeRoom = () => {
+      const initialRoomID = new URLSearchParams(location.state).get("roomID");
+      if (initialRoomID && nodes.length > 0) {
+        const initialRoom = nodes.find((node) => node.nodeID === initialRoomID);
+        if (initialRoom) {
+          setRoom(initialRoom.longName);
+        }
+      }
+    };
     fetchNodes();
     fetchEmployees();
-  }, []);
+    initializeRoom();
+  }, [location.state, nodes]);
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -145,6 +158,7 @@ const ServiceRequest = () => {
   const resetFormChangeServiceType = () => {
     setRoom("");
     setEmployee("");
+    setType("JANI");
     setUrgency("LOW");
     setStatus("UNASSIGNED");
     setNotes("");
@@ -160,8 +174,6 @@ const ServiceRequest = () => {
     resetFormChangeServiceType();
     setType("JANI");
   };
-
-  //
 
   return (
     <div className="py-8">
@@ -286,7 +298,7 @@ const ServiceRequest = () => {
         )}
 
         {type === "MEDI" && (
-          <label
+          <Label
             className="text-sm font-medium dark:text-white"
             htmlFor="medicineName"
           >
@@ -302,10 +314,10 @@ const ServiceRequest = () => {
                 setMedicineName(event.target.value);
               }}
             />
-          </label>
+          </Label>
         )}
         {type === "MEDI" && (
-          <label
+          <Label
             className="text-sm font-medium dark:text-white"
             htmlFor="medicineDosage"
           >
@@ -321,7 +333,7 @@ const ServiceRequest = () => {
                 setMedicineDosage(event.target.value);
               }}
             />
-          </label>
+          </Label>
         )}
 
         <Autocomplete

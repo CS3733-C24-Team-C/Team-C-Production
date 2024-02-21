@@ -395,7 +395,7 @@ const Sidebar = () => {
         <FlowbiteSidebar.Logo href="/" img={logoUrl} imgAlt="Hospital logo" />
       </div>
 
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 my-4">
         <div className="flex flex-col space-y-2">
           <Label htmlFor="mapFloor" value="Select a floor" />
           <Select
