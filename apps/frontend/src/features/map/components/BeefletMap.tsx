@@ -354,6 +354,7 @@ export default function BeefletMap() {
                   >
                     <Popup className="leaflet-popup-content-wrapper">
                       {(() => {
+                        const reqNum = requests.filter((req) => req.nodeID === node.nodeID).length;
                         if (viewRequests) {
                           return (
                             <table className="table">
@@ -409,8 +410,9 @@ export default function BeefletMap() {
                                     e.stopPropagation();
                                     setViewRequests(true);
                                   }}
+                                  disabled = {(() => {if (reqNum <= 0) {return true;} else {return false;}})()}
                                 >
-                                  View Requests
+                                  {(() => {if (reqNum > 0) {return ("View Requests (" + reqNum + ")");} else {return "No Requests";}})()}
                                 </Button>
                               )}
                               {isAuthenticated && (
