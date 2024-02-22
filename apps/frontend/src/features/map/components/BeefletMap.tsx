@@ -456,15 +456,19 @@ export default function BeefletMap() {
                 );
               })}
         </FeatureGroup>
-        {nodes
-          .filter(
-            (node) =>
-              node.nodeID == startID &&
-              node.floor == assetToFloor(selectedFloor),
-          )
-          .map((node) => (
-            <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
-          ))}
+        {toggledNodes &&
+          nodes
+            .filter(
+              (node) =>
+                node.nodeID == startID &&
+                node.floor == assetToFloor(selectedFloor),
+            )
+            .map((node) => (
+              <Marker
+                position={[-node.ycoord, node.xcoord]}
+                key={node.nodeID}
+              />
+            ))}
         {nodes
           .filter(
             (node) =>
