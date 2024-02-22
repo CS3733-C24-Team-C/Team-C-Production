@@ -96,6 +96,23 @@ const Sidebar = () => {
   }
 
   const splitDirections = separateFloors(nodeDirections);
+
+  // Set to store unique floorID values
+  const uniqueFloorIDSet = new Set<string>();
+
+  const splitFloors = splitDirections.filter((item) => {
+    // Check if the 'type' is not in the Set
+    if (!uniqueFloorIDSet.has(item.floorID)) {
+      // Add the 'type' to the Set and return the item
+      uniqueFloorIDSet.add(item.floorID);
+      return true;
+    }
+    // If the 'type' is already in the Set, return undefined (filtered out)
+    return false;
+  });
+
+  console.log(splitFloors);
+
   const [openFloors, setOpenFloors] = useState<string[]>([]);
 
   const handleFloorClick = (floorID: string) => {
@@ -210,8 +227,9 @@ const Sidebar = () => {
                 if (angle2 >= -15 && angle2 < 15) {
                   return (
                     <div className="ml-3 mr-3">
-                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                      {"Turn left towards " + nextNextDirection.node.longName}
+                      <BsArrowUpCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Head straight towards " +
+                        nextNextDirection.node.longName}
                     </div>
                   );
                 }
