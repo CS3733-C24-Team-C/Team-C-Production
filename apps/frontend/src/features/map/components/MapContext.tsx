@@ -22,6 +22,8 @@ const MapContext = createContext<{
   setEndID: Dispatch<SetStateAction<string>>;
   requests: Requests[];
   setRequests: Dispatch<SetStateAction<Requests[]>>;
+  center: number[];
+  setCenter: Dispatch<number[]>;
 }>({
   nodes: [],
   // eslint-disable-next-line no-empty-function
@@ -53,6 +55,9 @@ const MapContext = createContext<{
   requests: [],
   // eslint-disable-next-line no-empty-function
   setRequests: () => {},
+  center: [],
+  // eslint-disable-next-line no-empty-function
+  setCenter: () => {},
 });
 
 export { MapContext };

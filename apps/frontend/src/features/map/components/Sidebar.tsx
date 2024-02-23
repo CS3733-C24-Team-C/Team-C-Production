@@ -68,6 +68,7 @@ const Sidebar = () => {
     setEndLocation,
     setStartID,
     setEndID,
+    setCenter,
   } = useContext(MapContext);
 
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
@@ -684,17 +685,30 @@ const Sidebar = () => {
                 <List key={floorID}>
                   {splitDirections
                     .filter((direction) => direction?.floorID === floorID)
-                    .map((row, i: number) => (
-                      <List
-                        key={i}
-                        className={`bg-${colorPicker(
-                          bgAlt,
-                          0,
-                        )} dark:bg-${colorPicker(bgAlt, 1)}`}
-                      >
-                        {i < nodeDirections.length && turnDirection(floorID, i)}
-                      </List>
-                    ))}
+                    .map((row, i: number) => {
+                    return (<List
+                      key={0}
+                      className={`bg-${colorPicker(
+                        bgAlt,
+                        0,
+                      )} dark:bg-${colorPicker(bgAlt, 1)}`}
+                    >
+                      <div style={{cursor: "pointer"}} onClick={() => {
+                        const floorDirections = splitDirections.filter(
+                          (direction, i, arr) =>
+                            direction?.floorID === floorID ||
+                            (i > 0 && arr[i - 1].floorID === floorID) ||
+                            (i === arr.length - 1 && arr[i].floorID === floorID),
+                        );
+                    
+                        const currDirection = floorDirections[i];
+                        setCenter([currDirection.node.xcoord, currDirection.node.ycoord]);
+                        setSelectedFloor(adhocConverterChangePlease(floorID));
+                      }}>
+                        {turnDirection(floorID, i)}
+                      </div>
+                    </List>);
+                  })}
                 </List>
               )}
             </div>

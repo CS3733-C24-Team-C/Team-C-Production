@@ -15,6 +15,7 @@ const Map = () => {
   const [startID, setStartID] = useState("");
   const [endID, setEndID] = useState("");
   const [requests, setRequests] = useState<Requests[]>([]);
+  const [center, setCenter] = useState<number[]>([0, 0]);
 
   useEffect(() => {
     const fetchNodes = async () => {
@@ -75,6 +76,8 @@ const Map = () => {
         setEndID,
         requests,
         setRequests,
+        center,
+        setCenter,
       }}
     >
       <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-neutral-900">

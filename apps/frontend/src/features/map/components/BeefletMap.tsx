@@ -57,6 +57,7 @@ export default function BeefletMap() {
     endID,
     setEndID,
     requests,
+    center,
   } = useContext(MapContext);
 
   const navigate = useNavigate();
@@ -186,6 +187,13 @@ export default function BeefletMap() {
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFloor]);
+
+  useMemo(() => {
+    if (map != null) {
+      map.flyTo(new LatLng(-center[1], center[0]), 1);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center]);
 
   function MapGetter() {
     setMap(useMap());
