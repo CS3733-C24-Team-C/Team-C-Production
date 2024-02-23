@@ -68,6 +68,13 @@ const MapData = () => {
     }
   };
 
+  const handleDownloadAll = () => {
+    downloadCSV("/api/map/download/edges");
+    downloadCSV("/api/map/download/ndoes");
+    downloadCSV("/api/map/services/download");
+    downloadCSV("/api/map/employees/download");
+  };
+
   return (
     <>
       <div className="px-16 py-8">
@@ -123,6 +130,32 @@ const MapData = () => {
               </form>
               <Button onClick={() => downloadCSV("/api/map/download/edges")}>
                 Download Edges CSV
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <form
+                action="/api/map/upload/edges"
+                method="post"
+                encType="multipart/form-data"
+                onSubmit={handleSubmitEdges}
+              >
+                <div className="mb-2 block">
+                  <Label htmlFor="csv-upload" value="Upload new Edges Data:" />
+                </div>
+                <FileInput
+                  className="w-50%"
+                  id="csv-upload"
+                  name="csv-upload"
+                  accept="text/csv"
+                  value={edgesFile}
+                  helperText="CSV files only."
+                  onChange={(e) => setEdgesFile(e.target.value)}
+                />
+                <br />
+                <Button type="submit">Upload File</Button>
+              </form>
+              <Button onClick={handleDownloadAll}>
+                Download All
               </Button>
             </div>
           </div>
@@ -281,7 +314,7 @@ const edgesTableColumns: ColumnDef<Edges>[] = [
   {
     accessorKey: "weight",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Weight" />
+      <DataTableColumnHeader column={column} title="Weight " />
     ),
     cell: ({ row }) => row.getValue("weight"),
   },
