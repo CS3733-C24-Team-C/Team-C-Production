@@ -113,6 +113,11 @@ export default function BeefletMap() {
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
   }
 
+  console.log(floorChanges);
+  console.log(prevFloors);
+
+  const floors = [prevFloors[0]].concat(floorChanges);
+
   const handleSubmit = async (s: string, e: string) => {
     if (s === undefined || e === undefined || s === "" || e === "") {
       return;
@@ -576,6 +581,22 @@ export default function BeefletMap() {
             className={"instructions"}
             position={"bottomright"}
           />
+        </div>
+        <div className={"flex leaflet-top"}>
+          {floors.length > 1
+            ? floors.map((floor) => (
+                <Button
+                  className={"pointer-events-auto"}
+                  onClick={() =>
+                    setSelectedFloor(
+                      adhocConverterChangePlease(floor.node.floor),
+                    )
+                  }
+                >
+                  {floor.node.floor}
+                </Button>
+              ))
+            : null}
         </div>
       </MapContainer>
     </div>
