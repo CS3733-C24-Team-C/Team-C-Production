@@ -20,7 +20,7 @@ const ServicesContext = createContext<{
 }>({
   services: [],
   // eslint-disable-next-line no-empty-function
-  setServices: () => {},
+  setServices: () => { },
 });
 
 const ServicesData = () => {
@@ -46,11 +46,11 @@ const ServicesData = () => {
 
         const filteredDataForPieChart = selectedEmployeeType
           ? data.filter((service: { employeeID: string }) => {
-              const employee = employeesData.find(
-                (emp: { id: string }) => emp.id === service.employeeID,
-              );
-              return employee?.role === selectedEmployeeType;
-            })
+            const employee = employeesData.find(
+              (emp: { id: string }) => emp.id === service.employeeID,
+            );
+            return employee?.role === selectedEmployeeType;
+          })
           : data;
 
         setServices(data);
@@ -137,6 +137,11 @@ const ServicesData = () => {
               </div>
             </div>
             <PieChart
+              series={series}
+              labels={labels}
+              onChangeEmployeeType={setSelectedEmployeeType}
+            />
+            <DonutChart
               series={series}
               labels={labels}
               onChangeEmployeeType={setSelectedEmployeeType}
