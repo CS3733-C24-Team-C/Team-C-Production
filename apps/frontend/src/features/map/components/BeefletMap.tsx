@@ -114,10 +114,12 @@ export default function BeefletMap() {
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
   }
 
-  console.log(floorChanges);
-  console.log(prevFloors);
-
   const floors = [prevFloors[0]].concat(floorChanges);
+
+  const [currPath, setCurrPath] = useState<string>("");
+
+  console.log(prevFloors[0]);
+  console.log(floors);
 
   const handleSubmit = async (s: string, e: string) => {
     if (s === undefined || e === undefined || s === "" || e === "") {
@@ -145,6 +147,7 @@ export default function BeefletMap() {
       const data = await res.json();
       //setDirections(data.path);
       setPath(data.path);
+      setCurrPath(floors[0].floorID);
     } catch (error) {
       alert("Failed to find path. Please try again.");
     }
@@ -591,21 +594,34 @@ export default function BeefletMap() {
           How To Use Map: <br /> Control click node to set as start location{" "}
           <br /> Right click node to set as end location
         </Alert>
-        <div className={"flex leaflet-top"}>
-          {floors.length > 1
-            ? floors.map((floor) => (
+        <div
+          className={"flex leaflet-top leaflet-center"}
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          {floors.length > 1 && (
+            <Button.Group>
+              {floors.map((floor, i) => (
                 <Button
-                  className={"pointer-events-auto"}
-                  onClick={() =>
-                    setSelectedFloor(
-                      adhocConverterChangePlease(floor.node.floor),
-                    )
-                  }
+                  outline
+                  key={floor.floorID} // Make sure to provide a unique key
+                  className={"pointer-events-auto focus:ring-2"}
+                  style={{ width: "50px" }}
+                  color={floors[i].floorID === currPath ? undefined : "gray"}
+                  onClick={() => {
+                    setSelectedFloor(adhocConverterChangePlease(floor.floorID));
+                    setCurrPath(floors[i].floorID);
+                  }}
                 >
-                  {floor.node.floor}
+                  {floor.floorID}
                 </Button>
-              ))
-            : null}
+              ))}
+            </Button.Group>
+          )}
         </div>
       </MapContainer>
     </div>
