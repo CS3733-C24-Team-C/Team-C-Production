@@ -70,9 +70,9 @@ const MapData = () => {
 
   const handleDownloadAll = () => {
     downloadCSV("/api/map/download/edges");
-    downloadCSV("/api/map/download/ndoes");
-    downloadCSV("/api/map/services/download");
-    downloadCSV("/api/map/employees/download");
+    downloadCSV("/api/map/download/nodes");
+    downloadCSV("/api/services/download");
+    downloadCSV("/api/employees/download");
   };
 
   return (
