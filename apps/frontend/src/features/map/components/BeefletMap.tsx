@@ -81,7 +81,7 @@ export default function BeefletMap() {
   const [floors, setFloors] = useState<newNodeFloorID[]>([]);
 
   const nodePath = path.map((nodeID) =>
-    nodes.filter((node) => node.nodeID == nodeID),
+    nodes.filter((node) => node.nodeID == nodeID)
   );
 
   class newNodeFloorID {
@@ -111,7 +111,7 @@ export default function BeefletMap() {
         lastCut = i;
         floorChanges.push(new newNodeFloorID(nodePath[i - 1][0], currentFloor));
         prevFloors.push(
-          new newNodeFloorID(nodePath[i][0], nodePath[i - 1][0].floor),
+          new newNodeFloorID(nodePath[i][0], nodePath[i - 1][0].floor)
         );
       }
     }
@@ -166,7 +166,7 @@ export default function BeefletMap() {
 
     const pathElement = document.createElementNS(
       "http://www.w3.org/2000/svg",
-      "path",
+      "path"
     );
     pathElement.setAttribute("d", pathData);
 
@@ -230,7 +230,7 @@ export default function BeefletMap() {
               .filter(
                 (edge) =>
                   edge[0][0].floor == assetToFloor(selectedFloor) &&
-                  edge[0][0].floor == edge[1][0].floor,
+                  edge[0][0].floor == edge[1][0].floor
               )
               .map((edge) => (
                 <Polyline
@@ -378,7 +378,7 @@ export default function BeefletMap() {
                               <tbody>
                                 {requests
                                   .filter(
-                                    (request) => request.nodeID === node.nodeID,
+                                    (request) => request.nodeID === node.nodeID
                                   )
                                   .map((item, index) => (
                                     <tr key={index}>
@@ -471,7 +471,7 @@ export default function BeefletMap() {
             .filter(
               (node) =>
                 node.nodeID == startID &&
-                node.floor == assetToFloor(selectedFloor),
+                node.floor == assetToFloor(selectedFloor)
             )
             .map((node) => (
               <Marker
@@ -482,14 +482,14 @@ export default function BeefletMap() {
         {nodes
           .filter(
             (node) =>
-              node.nodeID == endID && node.floor == assetToFloor(selectedFloor),
+              node.nodeID == endID && node.floor == assetToFloor(selectedFloor)
           )
           .map((node) => (
             <Marker position={[-node.ycoord, node.xcoord]} key={node.nodeID} />
           ))}
         {floorChanges
           .filter(
-            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor),
+            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor)
           )
           .map((newFloor) => (
             <Marker
@@ -505,7 +505,7 @@ export default function BeefletMap() {
               eventHandlers={{
                 click: async () =>
                   setSelectedFloor(
-                    adhocConverterChangePlease(newFloor.floorID),
+                    adhocConverterChangePlease(newFloor.floorID)
                   ),
               }}
             >
@@ -520,7 +520,7 @@ export default function BeefletMap() {
           ))}
         {prevFloors
           .filter(
-            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor),
+            (newFloor) => newFloor.node.floor == assetToFloor(selectedFloor)
           )
           .map((newFloor) => (
             <Marker
@@ -536,7 +536,7 @@ export default function BeefletMap() {
               eventHandlers={{
                 click: async () =>
                   setSelectedFloor(
-                    adhocConverterChangePlease(newFloor.floorID),
+                    adhocConverterChangePlease(newFloor.floorID)
                   ),
               }}
             >
@@ -623,7 +623,7 @@ export default function BeefletMap() {
                   color={floor.floorID === selectedFID ? undefined : "gray"}
                   onClick={() => {
                     setSelectedFloor(
-                      adhocConverterChangePlease(floor.node.floor),
+                      adhocConverterChangePlease(floor.node.floor)
                     );
                     setSelectedFID(floor.floorID);
                   }}
