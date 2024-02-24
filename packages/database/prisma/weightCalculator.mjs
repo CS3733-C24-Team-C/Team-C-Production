@@ -57,7 +57,7 @@ export const calculateEdgeWeights = (nodes, edges) => {
       throw new Error("Node not found");
     }
 
-    let weight = calculateAdjustedDistance(startNode, endNode);
+    const weight = calculateAdjustedDistance(startNode, endNode);
 
     return { edgeID: edge.edgeID, weight };
   });

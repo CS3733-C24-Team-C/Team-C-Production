@@ -69,6 +69,7 @@ class AStarPathfindingStrategy implements IPathfindingStrategy {
         const path = [];
         while (current) {
           path.unshift(current.nodeId);
+          if (!current.parent) break;
           current = current.parent;
         }
         return path;
