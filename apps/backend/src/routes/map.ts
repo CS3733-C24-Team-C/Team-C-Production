@@ -1,6 +1,8 @@
 import express, { Router, Request, Response } from "express";
 import PrismaClient from "../bin/database-connection.ts";
 import multer from "multer";
+import JSZip from "jszip";
+import fs from "fs";
 import { readCSV, objectsToCSV } from "../utils";
 import { Prisma } from "database";
 import {
@@ -252,6 +254,86 @@ router.post("/upload/edges", upload.single("csv-upload"), async (req, res) => {
   res.status(200).send("File uploaded successfully");
 });
 
+function determineFileType(file: Express.Multer.File, callback: (type: string) => void) {
+  const fileName = file.originalname.toLowerCase();
+
+  if (fileName.includes('node')) {
+    callback('node');
+  } else if (fileName.includes('edge')) {
+    callback('edge');
+  } else if (fileName.includes('employee')) {
+    callback('employee');
+  } else {
+    callback('unknown');
+  }
+}
+
+interface FileType {
+  name: string;
+  type: string;
+}
+
+router.post("/upload/all", upload.any(), async (req, res) => {
+
+  if (!req.files) {
+    res.status(400).send('No files uploaded');
+    return;
+  }
+
+  // Ensure that req.files exists and is an array
+  if (!Array.isArray(req.files)) {
+    res.status(400).send('Invalid request: No files uploaded');
+    return;
+  }
+
+  // Access uploaded files via req.files
+  const uploadedFiles = req.files as Express.Multer.File[];
+
+  // Process each uploaded file to determine its type
+  const fileTypes: FileType[] = [];
+  const fileTypePromises = uploadedFiles.map(file => {
+    return new Promise<void>((resolve) => {
+      determineFileType(file, (type) => {
+        fileTypes.push({ name: file.originalname, type: type });
+        resolve();
+      });
+    });
+  });
+
+  // Wait for all file type determinations to complete
+  Promise.all(fileTypePromises)
+    .then(() => {
+      // Iterate over each file type
+      fileTypes.forEach(fileType => {
+        const { name, type } = fileType;
+        // Process the file based on its type
+        switch (type) {
+          case 'node':
+            // Process node file
+            console.log(`Processing node file: ${name}`);
+            break;
+          case 'edge':
+            // Process edge file
+            console.log(`Processing edge file: ${name}`);
+            break;
+          case 'employee':
+            // Process employee file
+            console.log(`Processing employee file: ${name}`);
+            break;
+          default:
+            // Handle unknown file type
+            console.log(`Unknown file type: ${name}`);
+        }
+      });
+
+      res.send('Files uploaded and processed successfully');
+    })
+    .catch((error) => {
+      console.error('Error determining file types:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
 router.get("/download/nodes", async function (req: Request, res: Response) {
   try {
     const nodes = await PrismaClient.nodes.findMany();
@@ -272,6 +354,58 @@ router.get("/download/edges", async function (req: Request, res: Response) {
     res.attachment("edges.csv");
     res.send(csvData);
   } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.get("/download/all", async function (req: Request, res: Response) {
+  try {
+    const zip = new JSZip();
+    const appendFilesPromises = [];
+
+    const appendFileToZip = async (filename: string, data: string) => {
+      zip.file(filename, data);
+    };
+
+    const nodesPromise = PrismaClient.nodes
+      .findMany()
+      .then((nodes) => appendFileToZip("nodes.csv", objectsToCSV(nodes)));
+    appendFilesPromises.push(nodesPromise);
+
+    const edgesPromise = PrismaClient.edges
+      .findMany()
+      .then((edges) => appendFileToZip("edges.csv", objectsToCSV(edges)));
+    appendFilesPromises.push(edgesPromise);
+
+    const servicesPromise = PrismaClient.requests
+      .findMany()
+      .then((requests) =>
+        appendFileToZip("services.csv", objectsToCSV(requests))
+      );
+    appendFilesPromises.push(servicesPromise);
+
+    const employeesPromise = PrismaClient.employees
+      .findMany()
+      .then((employees) =>
+        appendFileToZip("employees.csv", objectsToCSV(employees))
+      );
+    appendFilesPromises.push(employeesPromise);
+
+    const employeeJobsPromise = PrismaClient.employeeJobs
+      .findMany()
+      .then((jobs) => appendFileToZip("employeeJobs.csv", objectsToCSV(jobs)));
+    appendFilesPromises.push(employeeJobsPromise);
+
+    await Promise.all(appendFilesPromises);
+
+    zip.generateAsync({ type: "nodebuffer" }).then(function (content) {
+      fs.writeFileSync("data.zip", content);
+      res.download("data.zip", "data.zip", () => {
+        fs.unlinkSync("data.zip");
+      });
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
