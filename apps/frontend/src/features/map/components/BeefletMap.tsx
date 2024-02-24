@@ -190,9 +190,9 @@ export default function BeefletMap() {
 
   useMemo(() => {
     if (map != null) {
-      map.flyTo(new LatLng(-center[1], center[0]), 1);
+      map.flyTo(new LatLng(-center[1], center[0]), center[2]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center]);
 
   function MapGetter() {
@@ -362,7 +362,9 @@ export default function BeefletMap() {
                   >
                     <Popup className="leaflet-popup-content-wrapper">
                       {(() => {
-                        const reqNum = requests.filter((req) => req.nodeID === node.nodeID).length;
+                        const reqNum = requests.filter(
+                          (req) => req.nodeID === node.nodeID,
+                        ).length;
                         if (viewRequests) {
                           return (
                             <table className="table">
@@ -418,9 +420,21 @@ export default function BeefletMap() {
                                     e.stopPropagation();
                                     setViewRequests(true);
                                   }}
-                                  disabled = {(() => {if (reqNum <= 0) {return true;} else {return false;}})()}
+                                  disabled={(() => {
+                                    if (reqNum <= 0) {
+                                      return true;
+                                    } else {
+                                      return false;
+                                    }
+                                  })()}
                                 >
-                                  {(() => {if (reqNum > 0) {return ("View Requests (" + reqNum + ")");} else {return "No Requests";}})()}
+                                  {(() => {
+                                    if (reqNum > 0) {
+                                      return "View Requests (" + reqNum + ")";
+                                    } else {
+                                      return "No Requests";
+                                    }
+                                  })()}
                                 </Button>
                               )}
                               {isAuthenticated && (
