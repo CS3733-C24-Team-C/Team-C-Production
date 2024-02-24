@@ -9,7 +9,7 @@ import {
   Dropdown,
 } from "flowbite-react";
 import { CiMenuBurger, CiSearch } from "react-icons/ci";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Nodes } from "database";
 import { MapContext } from "../components";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
@@ -68,50 +68,82 @@ const Sidebar = () => {
     setEndLocation,
     setStartID,
     setEndID,
+    floorSections,
+    setFloorSections,
+    selectedFID,
+    setSelectedFID,
   } = useContext(MapContext);
 
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
-  //const [selectedFloorID, setSelectedFloorID] = useState("");
+  const [splitDirections, setSplitDirections] = useState<NodeFloorID[]>([]);
 
   let bgAlt = 0;
 
-  const nodeDirections = path.map(
-    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
-  );
-
   // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
-  function separateFloors(newDirections: Nodes[]) {
-    let lastFloor = "";
-    const floors: NodeFloorID[] = [];
-    let floorID = 0;
-    for (const node of newDirections) {
-      if (lastFloor != node.floor) {
-        lastFloor = node.floor;
-        floorID = (floorID + 1) % 10;
+
+  function chooseFID(floor: string): string {
+    for (const anFID in floorSections) {
+      if (anFID.substring(0, anFID.length - 1) == floor) {
+        return anFID;
       }
-      floors.push(new NodeFloorID(node, node.floor + floorID));
     }
-    return floors;
+    return floorSections[0] as string;
   }
 
-  const splitDirections = separateFloors(nodeDirections);
-
-  // Set to store unique floorID values
-  const uniqueFloorIDSet = new Set<string>();
-
-  const splitFloors = splitDirections.filter((item) => {
-    // Check if the 'type' is not in the Set
-    if (!uniqueFloorIDSet.has(item.floorID)) {
-      // Add the 'type' to the Set and return the item
-      uniqueFloorIDSet.add(item.floorID);
-      return true;
+  useEffect(() => {
+    //console.log("Path updated");
+    function separateFloors(newDirections: Nodes[]) {
+      let lastFloor = "";
+      const floors: NodeFloorID[] = [];
+      let floorID = 0;
+      for (const node of newDirections) {
+        if (lastFloor != node.floor) {
+          lastFloor = node.floor;
+          floorID = (floorID + 1) % 10;
+        }
+        floors.push(new NodeFloorID(node, node.floor + floorID));
+      }
+      return floors;
     }
-    // If the 'type' is already in the Set, return undefined (filtered out)
-    return false;
-  });
 
-  console.log(splitFloors);
+    const nodeDirections = path.map(
+      (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
+    );
+
+    setSplitDirections(separateFloors(nodeDirections));
+  }, [path, nodes]);
+
+  useEffect(() => {
+    // Set to store unique floorID values
+    const uniqueFloorIDSet = new Set<string>();
+
+    setFloorSections(
+      splitDirections.filter((item) => {
+        // Check if the 'type' is not in the Set
+        if (!uniqueFloorIDSet.has(item.floorID)) {
+          // Add the 'type' to the Set and return the item
+          uniqueFloorIDSet.add(item.floorID);
+          return true;
+        }
+        // If the 'type' is already in the Set, return undefined (filtered out)
+        return false;
+      }),
+    );
+    setSelectedFID(
+      splitDirections[0] ? splitDirections[0].floorID : chooseFID("1"),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [splitDirections]);
+
+  useEffect(() => {
+    if (!openFloors.includes(selectedFID)) {
+      // If not open, add it to the open floors
+      setOpenFloors([selectedFID]);
+      setSelectedFloor(adhocConverterChangePlease(selectedFID));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFID]);
 
   const [openFloors, setOpenFloors] = useState<string[]>([]);
 
@@ -126,6 +158,7 @@ const Sidebar = () => {
       // If not open, add it to the open floors
       setOpenFloors((prevOpenFloors) => [...prevOpenFloors, floorID]);
       setSelectedFloor(adhocConverterChangePlease(floorID));
+      setSelectedFID(floorID);
     }
   };
 
@@ -173,7 +206,7 @@ const Sidebar = () => {
               {"Head towards " + currDirection.node.longName}
             </div>
           );
-        case nodeDirections.length - 1:
+        case splitDirections.length - 1:
           return (
             <div className="ml-3 mr-3">
               {"Arrive at " + currDirection.node.longName}
@@ -398,16 +431,18 @@ const Sidebar = () => {
     return "gray-200";
   }
 
-  setStartID(
-    nodes
-      .filter((node) => node["longName"] === startLocation)
-      .map((node) => node.nodeID)[0],
-  );
-  setEndID(
-    nodes
-      .filter((node) => node["longName"] === endLocation)
-      .map((node) => node.nodeID)[0],
-  );
+  useEffect(() => {
+    setStartID(
+      nodes
+        .filter((node) => node["longName"] === startLocation)
+        .map((node) => node.nodeID)[0],
+    );
+    setEndID(
+      nodes
+        .filter((node) => node["longName"] === endLocation)
+        .map((node) => node.nodeID)[0],
+    );
+  }, [endLocation, nodes, setEndID, setStartID, startLocation]);
 
   return (
     <FlowbiteSidebar aria-label="Map sidebar" theme={sidebarTheme}>
@@ -431,35 +466,50 @@ const Sidebar = () => {
           <div className={"w-full"}>
             <Button.Group className="w-full flex justify-center">
               <Button
-                onClick={() => setSelectedFloor(lowerLevel2)}
+                onClick={() => {
+                  setSelectedFloor(lowerLevel2);
+                  setSelectedFID(chooseFID("L2"));
+                }}
                 color={selectedFloor === lowerLevel2 ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 L2
               </Button>
               <Button
-                onClick={() => setSelectedFloor(lowerLevel1)}
+                onClick={() => {
+                  setSelectedFloor(lowerLevel1);
+                  setSelectedFID(chooseFID("L1"));
+                }}
                 color={selectedFloor === lowerLevel1 ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 L1
               </Button>
               <Button
-                onClick={() => setSelectedFloor(firstFloor)}
+                onClick={() => {
+                  setSelectedFloor(firstFloor);
+                  setSelectedFID(chooseFID("1"));
+                }}
                 color={selectedFloor === firstFloor ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 1
               </Button>
               <Button
-                onClick={() => setSelectedFloor(secondFloor)}
+                onClick={() => {
+                  setSelectedFloor(secondFloor);
+                  setSelectedFID(chooseFID("2"));
+                }}
                 color={selectedFloor === secondFloor ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 2
               </Button>
               <Button
-                onClick={() => setSelectedFloor(thirdFloor)}
+                onClick={() => {
+                  setSelectedFloor(thirdFloor);
+                  setSelectedFID(chooseFID("3"));
+                }}
                 color={selectedFloor === thirdFloor ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
@@ -710,7 +760,8 @@ const Sidebar = () => {
                           0,
                         )} dark:bg-${colorPicker(bgAlt, 1)}`}
                       >
-                        {i < nodeDirections.length && turnDirection(floorID, i)}
+                        {i < splitDirections.length &&
+                          turnDirection(floorID, i)}
                       </List>
                     ))}
                 </List>
@@ -724,12 +775,15 @@ const Sidebar = () => {
 };
 
 const adhocConverterChangePlease = (floorID: string) => {
-  if (floorID.length > 3) {
-    return floorID;
+  if (floorID) {
+    if (floorID.length > 3) {
+      return floorID;
+    }
+    const floor = floorID.substring(0, floorID.length - 1);
+    // @ts-expect-error nope
+    return floorToAsset(floor);
   }
-  const floor = floorID.substring(0, floorID.length - 1);
-  // @ts-expect-error nope
-  return floorToAsset(floor);
+  return floorToAsset("1");
 };
 
 function angleBetweenVectors(

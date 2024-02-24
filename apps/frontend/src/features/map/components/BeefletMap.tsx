@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from "react";
+import React, { useContext, useState, useMemo, useEffect } from "react";
 import {
   MapContainer,
   ImageOverlay,
@@ -31,6 +31,7 @@ import lowerLevel2 from "../assets/00_thelowerlevel2.png";
 import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
+import { MdDoubleArrow } from "react-icons/md";
 
 lowerLevel1;
 lowerLevel2;
@@ -58,6 +59,9 @@ export default function BeefletMap() {
     endID,
     setEndID,
     requests,
+    floorSections,
+    selectedFID,
+    setSelectedFID,
   } = useContext(MapContext);
 
   const navigate = useNavigate();
@@ -74,6 +78,7 @@ export default function BeefletMap() {
   const [map, setMap] = useState<any>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [lastFloor, setLastFloor] = useState<any>();
+  const [floors, setFloors] = useState<newNodeFloorID[]>([]);
 
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID),
@@ -114,12 +119,9 @@ export default function BeefletMap() {
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
   }
 
-  const floors = [prevFloors[0]].concat(floorChanges);
-
-  const [currPath, setCurrPath] = useState<string>("");
-
-  console.log(prevFloors[0]);
-  console.log(floors);
+  useEffect(() => {
+    setFloors(floorSections ? (floorSections as newNodeFloorID[]) : []);
+  }, [floorSections]);
 
   const handleSubmit = async (s: string, e: string) => {
     if (s === undefined || e === undefined || s === "" || e === "") {
@@ -147,7 +149,7 @@ export default function BeefletMap() {
       const data = await res.json();
       //setDirections(data.path);
       setPath(data.path);
-      setCurrPath(floors[0].floorID);
+      //setCurrPath(floors[0].floorID);
     } catch (error) {
       alert("Failed to find path. Please try again.");
     }
@@ -603,25 +605,33 @@ export default function BeefletMap() {
             transform: "translateX(-50%)",
           }}
         >
-          {floors.length > 1 && (
-            <Button.Group>
-              {floors.map((floor, i) => (
+          {floors.length > 1 &&
+            (floors as newNodeFloorID[]).map((floor, i) => (
+              <div className={"flex"}>
+                {i > 0 && (
+                  <MdDoubleArrow
+                    className={"align-content-center"}
+                    size={38}
+                    color={"#0E7490"}
+                  />
+                )}
                 <Button
-                  outline
+                  pill
                   key={floor.floorID} // Make sure to provide a unique key
                   className={"pointer-events-auto focus:ring-2"}
                   style={{ width: "50px" }}
-                  color={floors[i].floorID === currPath ? undefined : "gray"}
+                  color={floor.floorID === selectedFID ? undefined : "gray"}
                   onClick={() => {
-                    setSelectedFloor(adhocConverterChangePlease(floor.floorID));
-                    setCurrPath(floors[i].floorID);
+                    setSelectedFloor(
+                      adhocConverterChangePlease(floor.node.floor),
+                    );
+                    setSelectedFID(floor.floorID);
                   }}
                 >
-                  {floor.floorID}
+                  {floor.node.floor}
                 </Button>
-              ))}
-            </Button.Group>
-          )}
+              </div>
+            ))}
         </div>
       </MapContainer>
     </div>
