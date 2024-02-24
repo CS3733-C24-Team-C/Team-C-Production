@@ -129,7 +129,6 @@ const Drawer = () => {
               icon={FaSignInAlt}
               as={Link}
               to="/auth/sign-in"
-              active={location.pathname === "/auth/sign-in"}
             >
               Sign In
             </FlowbiteSidebar.Item>
