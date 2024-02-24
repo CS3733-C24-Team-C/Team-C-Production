@@ -292,7 +292,8 @@ router.post("/upload/all", upload.any(), async (req, res) => {
   // Process each uploaded file to determine its type
   const fileTypes: FileType[] = [];
   const fileTypePromises = uploadedFiles.map(file => {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve
+      ) => {
       determineFileType(file, (type) => {
         fileTypes.push({ name: file.originalname, type: type });
         resolve();
@@ -360,6 +361,7 @@ router.get("/download/edges", async function (req: Request, res: Response) {
 
 router.get("/download/all", async function (req: Request, res: Response) {
   try {
+    const timestamp = new Date().toISOString().replace(/:/g, '-');
     const zip = new JSZip();
     const appendFilesPromises = [];
 
@@ -369,31 +371,31 @@ router.get("/download/all", async function (req: Request, res: Response) {
 
     const nodesPromise = PrismaClient.nodes
       .findMany()
-      .then((nodes) => appendFileToZip("nodes.csv", objectsToCSV(nodes)));
+      .then((nodes) => appendFileToZip(`${timestamp}_nodes.csv`, objectsToCSV(nodes)));
     appendFilesPromises.push(nodesPromise);
 
     const edgesPromise = PrismaClient.edges
       .findMany()
-      .then((edges) => appendFileToZip("edges.csv", objectsToCSV(edges)));
+      .then((edges) => appendFileToZip(`${timestamp}_edges.csv`, objectsToCSV(edges)));
     appendFilesPromises.push(edgesPromise);
 
     const servicesPromise = PrismaClient.requests
       .findMany()
       .then((requests) =>
-        appendFileToZip("services.csv", objectsToCSV(requests))
+        appendFileToZip(`${timestamp}_services.csv`, objectsToCSV(requests))
       );
     appendFilesPromises.push(servicesPromise);
 
     const employeesPromise = PrismaClient.employees
       .findMany()
       .then((employees) =>
-        appendFileToZip("employees.csv", objectsToCSV(employees))
+        appendFileToZip(`${timestamp}_employees.csv`, objectsToCSV(employees))
       );
     appendFilesPromises.push(employeesPromise);
 
     const employeeJobsPromise = PrismaClient.employeeJobs
       .findMany()
-      .then((jobs) => appendFileToZip("employeeJobs.csv", objectsToCSV(jobs)));
+      .then((jobs) => appendFileToZip(`${timestamp}_employeeJobs.csv`, objectsToCSV(jobs)));
     appendFilesPromises.push(employeeJobsPromise);
 
     await Promise.all(appendFilesPromises);
