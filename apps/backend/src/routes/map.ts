@@ -304,18 +304,28 @@ router.post("/upload/all", upload.any(), async (req, res) => {
   
   let newEdges:Record<string, unknown>[];
   let newNodes:Record<string, unknown>[];
-  //let newEmployees:Record<string, unknown>[];
+  let newEmployees:Record<string, unknown>[];
 
   for(let i = 0; i < fileTypes.length; i++){
     if(fileTypes[i].type == 'edge'){
       newEdges = readCSV(req.files[i].path);
+      newEdges.forEach((edge) => {
+        edge.weight = Number(edge.weight);
+      });
     }
     if(fileTypes[i].type == 'node'){
       newNodes = readCSV(req.files[i].path);
+      newNodes.forEach((node) => {
+        node.xcoord = Number(node.xcoord);
+        node.ycoord = Number(node.ycoord);
+      });
     }
-    // if(fileTypes[i].type == 'employee'){
-    //   newEmployees = readCSV(req.files[i].path);
-    // }
+    if(fileTypes[i].type == 'employee'){
+      newEmployees = readCSV(req.files[i].path);
+      newEmployees.forEach((employee) => {
+        employee.id = Number(employee.id);
+      });
+    }
   }
 
   // Wait for all file type determinations to complete
@@ -404,6 +414,42 @@ router.post("/upload/all", upload.any(), async (req, res) => {
             break;
           case 'employee':
             // Process employee file
+            PrismaClient.$transaction(async (tx) => {
+              // 1. Get all the existing data and hold them in-memory
+              const existingNodes = await tx.nodes.findMany();
+              const existingEdges = await tx.edges.findMany();
+              // const existingEmployees = await tx.employees.findMany();
+              const existingEmployeeJobs = await tx.employeeJobs.findMany();
+              const existingRequests = await tx.requests.findMany();
+        
+              // 2. Drop all the tables in the order of foreign key dependencies
+              await tx.edges.deleteMany();
+              await tx.requests.deleteMany();
+              await tx.employeeJobs.deleteMany();
+              await tx.employees.deleteMany();
+              await tx.nodes.deleteMany();
+        
+              // 3. Re-seed the database
+              await tx.nodes.createMany({
+                data: existingNodes,
+              });
+        
+              await tx.edges.createMany({
+                data: existingEdges,
+              });
+        
+              await tx.employees.createMany({
+                data: newEmployees as unknown as Prisma.EmployeesCreateManyInput,
+              });
+        
+              await tx.employeeJobs.createMany({
+                data: existingEmployeeJobs,
+              });
+        
+              await tx.requests.createMany({
+                data: existingRequests,
+              });
+            });
             console.log(`Processing employee file: ${name}`);
             break;
           default:
