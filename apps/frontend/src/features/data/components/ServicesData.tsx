@@ -12,7 +12,7 @@ import {downloadCSV} from "../utils";
 import {RequestStatus, Requests} from "database";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import {useNavigate} from "react-router-dom";
-import {PieChart, DonutChart} from "@/components";
+import {PieChart, DonutChart, StackedHorizontalBarChart} from "@/components";
 
 const ServicesContext = createContext<{
     services: Requests[];
@@ -85,7 +85,7 @@ const ServicesData = () => {
         MEDI: "Medicine Delivery",
         RELC: "Patient Relocation",
         CONS: "Patient Consultation",
-        CUST: "Customer Service",
+        CUST: "Other",
     };
 
     const completionStatusLabelsMap: Record<string, string> = {
@@ -97,6 +97,7 @@ const ServicesData = () => {
 
     const totalRequests = pieChartServices.length;
 
+    // Data for PieChart
     const requestTypesMap = pieChartServices.reduce(
         (map, service) => {
             const type = service.type;
@@ -111,7 +112,7 @@ const ServicesData = () => {
     );
     const labelsPie = Object.keys(requestTypesMap);
 
-
+    // Data for DonutChart
     const completionStatusMap = pieChartServices.reduce(
         (map, service) => {
             const status = service.completionStatus;
@@ -126,6 +127,44 @@ const ServicesData = () => {
         Number(((count / totalRequests) * 100).toFixed(2)),
     );
     const labelsDonut = Object.keys(completionStatusMap);
+
+
+    // Data for StackedHorizontalBarChart
+    type StatusCount = {
+        status: string;
+        count: number;
+    };
+    const getStatusCountsForAllTypes = (status: string, data: Requests[]): StatusCount[] => {
+        const statusMap: Record<string, number> = {};
+        // Filter data based on the provided status
+        const filteredData = data.filter((service) => service.completionStatus === status);
+        // Count the occurrences of each status for the filtered data
+        filteredData.forEach((service) => {
+            const type = service.type;
+            statusMap[type] = (statusMap[type] || 0) + 1;
+        });
+        // Convert the statusMap into an array of objects
+        const statusCounts: StatusCount[] = Object.entries(statusMap).map(([type, count]) => ({
+            status: type,
+            count,
+        }));
+        return statusCounts;
+    };
+
+    // Calculate labelsBar
+    const labels = Object.keys(requestTypesMap);
+    //const countForEachLabel = Object.values(requestTypesMap);
+    const labelsBar = labels.map((type) => typeLabelsMap[type]);
+    const statuses = Object.keys(completionStatusLabelsMap);
+
+    // Calculate seriesBar
+    const seriesBar = statuses.map((status) => {
+        const statusCounts = getStatusCountsForAllTypes(status, pieChartServices);
+        return {
+            type: status,
+            data: statusCounts.map((statusCount) => statusCount.count),
+        };
+    });
 
     return (
         <>
@@ -171,6 +210,9 @@ const ServicesData = () => {
                             series={seriesDonut}
                             labels={labelsDonut}
                         />
+                    </div>
+                    <div className="px-16 py-8">
+                        <StackedHorizontalBarChart series={seriesBar} labels={labelsBar}/>
                     </div>
                 </Card>
             </div>
