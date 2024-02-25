@@ -138,54 +138,57 @@ const Sidebar = () => {
   }, [splitDirections]);
 
   useEffect(() => {
-    if (!openFloors.includes(selectedFID)) {
-      // If not open, add it to the open floors
-      setOpenFloors([selectedFID]);
-      setSelectedFloor(adhocConverterChangePlease(selectedFID));
+    console.log("SelectedFID changed, now " + selectedFID);
+    if (selectedFID) {
+      if (!openFloors.includes(selectedFID)) {
+        // If not open, add it to the open floors
+        setOpenFloors([selectedFID]);
+        setSelectedFloor(adhocConverterChangePlease(selectedFID));
+      }
+      ////--// This whole zoom thing should be moved to the useEffect for selectedFID, but that's in a different branch rn
+      // Find reference points to zoom
+      const floorDirections = splitDirections.filter(
+        (direction, i, arr) =>
+          direction?.floorID === selectedFID ||
+          (i > 0 && arr[i - 1].floorID === selectedFID) ||
+          (i === arr.length - 1 && arr[i].floorID === selectedFID),
+      );
+      let maxX = 0.1;
+      let maxY = 0.1;
+      let minX = 0.1;
+      let minY = 0.1;
+      for (const aNode of floorDirections) {
+        if (maxX % 1 != 0) {
+          maxX = aNode.node.xcoord;
+        }
+        if (maxY % 1 != 0) {
+          maxY = aNode.node.ycoord;
+        }
+        if (minX % 1 != 0) {
+          minX = aNode.node.xcoord;
+        }
+        if (minY % 1 != 0) {
+          minY = aNode.node.ycoord;
+        }
+        if (aNode.node.xcoord > maxX) {
+          maxX = aNode.node.xcoord;
+        }
+        if (aNode.node.ycoord > maxY) {
+          maxY = aNode.node.ycoord;
+        }
+        if (aNode.node.xcoord < minX) {
+          minX = aNode.node.xcoord;
+        }
+        if (aNode.node.ycoord < minY) {
+          minY = aNode.node.ycoord;
+        }
+      }
+      setCenter([
+        minX + (maxX - minX) / 2,
+        minY + (maxY - minY) / 2,
+        -0.00035 * Math.sqrt((maxX - minX) ** 2 + (maxY - minY) ** 2),
+      ]);
     }
-    ////--// This whole zoom thing should be moved to the useEffect for selectedFID, but that's in a different branch rn
-    // Find reference points to zoom
-    const floorDirections = splitDirections.filter(
-      (direction, i, arr) =>
-        direction?.floorID === selectedFID ||
-        (i > 0 && arr[i - 1].floorID === selectedFID) ||
-        (i === arr.length - 1 && arr[i].floorID === selectedFID),
-    );
-    let maxX = 0.1;
-    let maxY = 0.1;
-    let minX = 0.1;
-    let minY = 0.1;
-    for (const aNode of floorDirections) {
-      if (maxX % 1 != 0) {
-        maxX = aNode.node.xcoord;
-      }
-      if (maxY % 1 != 0) {
-        maxY = aNode.node.ycoord;
-      }
-      if (minX % 1 != 0) {
-        minX = aNode.node.xcoord;
-      }
-      if (minY % 1 != 0) {
-        minY = aNode.node.ycoord;
-      }
-      if (aNode.node.xcoord > maxX) {
-        maxX = aNode.node.xcoord;
-      }
-      if (aNode.node.ycoord > maxY) {
-        maxY = aNode.node.ycoord;
-      }
-      if (aNode.node.xcoord < minX) {
-        minX = aNode.node.xcoord;
-      }
-      if (aNode.node.ycoord < minY) {
-        minY = aNode.node.ycoord;
-      }
-    }
-    setCenter([
-      minX + (maxX - minX) / 2,
-      minY + (maxY - minY) / 2,
-      -0.00035 * Math.sqrt((maxX - minX) ** 2 + (maxY - minY) ** 2),
-    ]);
     //--////
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFID]);

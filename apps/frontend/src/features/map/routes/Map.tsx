@@ -17,7 +17,7 @@ const Map = () => {
   const [requests, setRequests] = useState<Requests[]>([]);
   const [center, setCenter] = useState<number[]>([0, 0]);
   const [floorSections, setFloorSections] = useState<unknown[]>([]);
-  const [selectedFID, setSelectedFID] = useState("1");
+  const [selectedFID, setSelectedFID] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fetchNodes = async () => {
