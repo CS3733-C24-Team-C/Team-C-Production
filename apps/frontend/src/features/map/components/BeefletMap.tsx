@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from "react";
+import React, { useContext, useState, useMemo, useEffect } from "react";
 import {
   MapContainer,
   ImageOverlay,
@@ -17,9 +17,10 @@ import L, { LatLngBounds, CRS, LatLng } from "leaflet";
 import { MapContext } from "../components";
 import "./forBeef.css";
 import "leaflet/dist/leaflet.css";
-import { Button } from "flowbite-react";
+import { Button, Alert, Card, ToggleSwitch } from "flowbite-react";
+import { HiInformationCircle } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import CustomButton from "@/features/map/components/Description.tsx";
+//import CustomButton from "@/features/map/components/Description.tsx";
 import { assetToFloor, floorToAsset } from "../utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Nodes } from "database";
@@ -30,6 +31,7 @@ import lowerLevel2 from "../assets/00_thelowerlevel2.png";
 import firstFloor from "../assets/01_thefirstfloor.png";
 import secondFloor from "../assets/02_thesecondfloor.png";
 import thirdFloor from "../assets/03_thethirdfloor.png";
+import { MdDoubleArrow } from "react-icons/md";
 
 lowerLevel1;
 lowerLevel2;
@@ -57,6 +59,9 @@ export default function BeefletMap() {
     endID,
     setEndID,
     requests,
+    floorSections,
+    selectedFID,
+    setSelectedFID,
     center,
   } = useContext(MapContext);
 
@@ -74,6 +79,7 @@ export default function BeefletMap() {
   const [map, setMap] = useState<any>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [lastFloor, setLastFloor] = useState<any>();
+  const [floors, setFloors] = useState<newNodeFloorID[]>([]);
 
   const nodePath = path.map((nodeID) =>
     nodes.filter((node) => node.nodeID == nodeID),
@@ -114,6 +120,10 @@ export default function BeefletMap() {
     paths[currentFloor].push(nodePath.slice(lastCut, nodePath.length));
   }
 
+  useEffect(() => {
+    setFloors(floorSections ? (floorSections as newNodeFloorID[]) : []);
+  }, [floorSections]);
+
   const handleSubmit = async (s: string, e: string) => {
     if (s === undefined || e === undefined || s === "" || e === "") {
       return;
@@ -140,6 +150,7 @@ export default function BeefletMap() {
       const data = await res.json();
       //setDirections(data.path);
       setPath(data.path);
+      //setCurrPath(floors[0].floorID);
     } catch (error) {
       alert("Failed to find path. Please try again.");
     }
@@ -562,44 +573,89 @@ export default function BeefletMap() {
               </Tooltip>
             </Marker>
           ))}
-        <div>
-          <CustomButton
-            title={"Toggle Edges"}
-            onClick={() => setToggledEdges(!toggledEdges)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Names"}
-            onClick={() => setToggledNames(!toggledNames)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Hallways"}
-            onClick={() => setToggledHallways(!toggledHallways)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Colorblind"}
-            onClick={() => setColorBlind(!colorBlind)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={"Toggle Nodes"}
-            onClick={() => setToggledNodes(!toggledNodes)}
-            className={"custom-toggle-button"}
-            position={"bottomleft"}
-          />
-          <CustomButton
-            title={
-              "How To Use Map <br>  Control click node to set as start location <br> Right click node to set as end location"
-            }
-            className={"instructions"}
-            position={"bottomright"}
-          />
+        <Card className="leaflet-left leaflet-bottom bg-gray-50 dark:bg-gray-800">
+          <ToggleSwitch
+            onChange={() => setToggledEdges(!toggledEdges)}
+            checked={toggledEdges}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Edges"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setToggledNames(!toggledNames)}
+            checked={toggledNames}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Names"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setToggledHallways(!toggledHallways)}
+            checked={toggledHallways}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Hallways"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setColorBlind(!colorBlind)}
+            checked={colorBlind}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Colorblind"}
+          ></ToggleSwitch>
+          <ToggleSwitch
+            onChange={() => setToggledNodes(!toggledNodes)}
+            checked={toggledNodes}
+            //position={"bottomleft"}
+            className={" pointer-events-auto focus:ring-0"}
+            label={"Nodes"}
+          ></ToggleSwitch>
+        </Card>
+        <Alert
+          color="cyan"
+          className={"leaflet-bottom leaflet-right pointer-events-auto"}
+          //position={"bottomright"}
+          icon={HiInformationCircle}
+          rounded
+        >
+          How To Use Map: <br /> Control click node to set as start location{" "}
+          <br /> Right click node to set as end location
+        </Alert>
+        <div
+          className={"flex leaflet-top leaflet-center"}
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          {floors.length > 1 &&
+            (floors as newNodeFloorID[]).map((floor, i) => (
+              <div className={"flex"}>
+                {i > 0 && (
+                  <MdDoubleArrow
+                    className={"align-content-center"}
+                    size={38}
+                    color={"#0E7490"}
+                  />
+                )}
+                <Button
+                  pill
+                  key={floor.floorID} // Make sure to provide a unique key
+                  className={"pointer-events-auto focus:ring-2"}
+                  style={{ width: "50px" }}
+                  color={floor.floorID === selectedFID ? undefined : "gray"}
+                  onClick={() => {
+                    setSelectedFloor(
+                      adhocConverterChangePlease(floor.node.floor),
+                    );
+                    setSelectedFID(floor.floorID);
+                  }}
+                >
+                  {floor.node.floor}
+                </Button>
+              </div>
+            ))}
         </div>
       </MapContainer>
     </div>
