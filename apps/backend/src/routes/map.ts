@@ -303,8 +303,7 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
 
         const graph = await GraphSingleton.getInstance();
         let strategy;
-
-        // Choose the strategy based on the algorithm parameter
+      
         switch (algorithm) {
             case "AStar":
                 strategy = new AStarPathfindingStrategy();
@@ -319,7 +318,6 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
                 strategy = new BFSPathfindingStrategy();
                 break;
             default:
-                // This case should never be hit because of the earlier check
                 return res.status(400).send("Unsupported algorithm");
         }
 
