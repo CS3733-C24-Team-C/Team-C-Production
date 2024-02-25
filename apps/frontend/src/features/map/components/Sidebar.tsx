@@ -69,11 +69,15 @@ const Sidebar = () => {
     setEndLocation,
     setStartID,
     setEndID,
+    floorSections,
+    setFloorSections,
+    selectedFID,
+    setSelectedFID,
   } = useContext(MapContext);
 
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
-  //const [selectedFloorID, setSelectedFloorID] = useState("");
+  const [splitDirections, setSplitDirections] = useState<NodeFloorID[]>([]);
 
   useEffect(() => {
     setStartID(
@@ -93,26 +97,71 @@ const Sidebar = () => {
 
   let bgAlt = 0;
 
-  const nodeDirections = path.map(
-    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
-  );
-
   // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
-  function separateFloors(newDirections: Nodes[]) {
-    let lastFloor = "";
-    const floors: NodeFloorID[] = [];
-    let floorID = 0;
-    for (const node of newDirections) {
-      if (lastFloor != node.floor) {
-        lastFloor = node.floor;
-        floorID = (floorID + 1) % 10;
+
+  function chooseFID(floor: string): string {
+    for (const anFID in floorSections) {
+      if (anFID.substring(0, anFID.length - 1) == floor) {
+        return anFID;
       }
-      floors.push(new NodeFloorID(node, node.floor + floorID));
     }
-    return floors;
+    return floorSections[0] as string;
   }
 
-  const splitDirections = separateFloors(nodeDirections);
+  useEffect(() => {
+    //console.log("Path updated");
+    function separateFloors(newDirections: Nodes[]) {
+      let lastFloor = "";
+      const floors: NodeFloorID[] = [];
+      let floorID = 0;
+      for (const node of newDirections) {
+        if (lastFloor != node.floor) {
+          lastFloor = node.floor;
+          floorID = (floorID + 1) % 10;
+        }
+        floors.push(new NodeFloorID(node, node.floor + floorID));
+      }
+      return floors;
+    }
+
+    const nodeDirections = path.map(
+      (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
+    );
+
+    setSplitDirections(separateFloors(nodeDirections));
+  }, [path, nodes]);
+
+  useEffect(() => {
+    // Set to store unique floorID values
+    const uniqueFloorIDSet = new Set<string>();
+
+    setFloorSections(
+      splitDirections.filter((item) => {
+        // Check if the 'type' is not in the Set
+        if (!uniqueFloorIDSet.has(item.floorID)) {
+          // Add the 'type' to the Set and return the item
+          uniqueFloorIDSet.add(item.floorID);
+          return true;
+        }
+        // If the 'type' is already in the Set, return undefined (filtered out)
+        return false;
+      })
+    );
+    setSelectedFID(
+      splitDirections[0] ? splitDirections[0].floorID : chooseFID("1")
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [splitDirections]);
+
+  useEffect(() => {
+    if (!openFloors.includes(selectedFID)) {
+      // If not open, add it to the open floors
+      setOpenFloors([selectedFID]);
+      setSelectedFloor(adhocConverterChangePlease(selectedFID));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFID]);
+
   const [openFloors, setOpenFloors] = useState<string[]>([]);
 
   const handleFloorClick = (floorID: string) => {
@@ -126,6 +175,7 @@ const Sidebar = () => {
       // If not open, add it to the open floors
       setOpenFloors((prevOpenFloors) => [...prevOpenFloors, floorID]);
       setSelectedFloor(adhocConverterChangePlease(floorID));
+      setSelectedFID(floorID);
     }
   };
 
@@ -173,7 +223,7 @@ const Sidebar = () => {
               {"Head towards " + currDirection.node.longName}
             </div>
           );
-        case nodeDirections.length - 1:
+        case splitDirections.length - 1:
           return (
             <div className="ml-3 mr-3">
               {"Arrive at " + currDirection.node.longName}
@@ -227,8 +277,9 @@ const Sidebar = () => {
                 if (angle2 >= -15 && angle2 < 15) {
                   return (
                     <div className="ml-3 mr-3">
-                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                      {"Turn left towards " + nextNextDirection.node.longName}
+                      <BsArrowUpCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Head straight towards " +
+                        nextNextDirection.node.longName}
                     </div>
                   );
                 }
@@ -397,186 +448,252 @@ const Sidebar = () => {
     return "gray-200";
   }
 
-  return (
-    <>
-      <MapDrawer />
+  useEffect(() => {
+    setStartID(
+      nodes
+        .filter((node) => node["longName"] === startLocation)
+        .map((node) => node.nodeID)[0]
+    );
+    setEndID(
+      nodes
+        .filter((node) => node["longName"] === endLocation)
+        .map((node) => node.nodeID)[0]
+    );
+  }, [endLocation, nodes, setEndID, setStartID, startLocation]);
 
-      <FlowbiteSidebar aria-label="Map sidebar" theme={sidebarTheme}>
-        <div className="flex space-x-4 items-center">
-          <Button
-            type="button"
-            data-drawer-target={drawerId}
-            data-drawer-show={drawerId}
-            aria-controls={drawerId}
-            outline
-            label="Open navigation drawer"
-          >
-            <CiMenuBurger />
-            <span className="sr-only">Open navigation drawer</span>
-          </Button>
-          <Link
-            to="/"
-            className="h-full flex-1 flex justify-center items-center"
-          >
-            <img src={logoUrl} alt="Hospital logo" />
-          </Link>
+  return (
+    <FlowbiteSidebar aria-label="Map sidebar" theme={sidebarTheme}>
+      <div className="flex space-x-4 items-center">
+        <Button
+          data-drawer-target={drawerId}
+          data-drawer-show={drawerId}
+          aria-controls={drawerId}
+          outline
+          label="Open navigation drawer"
+        >
+          <CiMenuBurger />
+          <span className="sr-only">Open navigation drawer</span>
+        </Button>
+        <FlowbiteSidebar.Logo href="/" img={logoUrl} imgAlt="Hospital logo" />
+      </div>
+
+      <div className="flex flex-col space-y-4 my-4">
+        <div className="flex flex-col space-y-2">
+          <Label htmlFor="mapFloor" value="Select a floor" />
+          <div className={"w-full"}>
+            <Button.Group className="w-full flex justify-center">
+              <Button
+                onClick={() => {
+                  setSelectedFloor(lowerLevel2);
+                  setSelectedFID(chooseFID("L2"));
+                }}
+                color={selectedFloor === lowerLevel2 ? undefined : "gray"}
+                className={"w-1/5 focus:ring-2"}
+              >
+                L2
+              </Button>
+              <Button
+                onClick={() => {
+                  setSelectedFloor(lowerLevel1);
+                  setSelectedFID(chooseFID("L1"));
+                }}
+                color={selectedFloor === lowerLevel1 ? undefined : "gray"}
+                className={"w-1/5 focus:ring-2"}
+              >
+                L1
+              </Button>
+              <Button
+                onClick={() => {
+                  setSelectedFloor(firstFloor);
+                  setSelectedFID(chooseFID("1"));
+                }}
+                color={selectedFloor === firstFloor ? undefined : "gray"}
+                className={"w-1/5 focus:ring-2"}
+              >
+                1
+              </Button>
+              <Button
+                onClick={() => {
+                  setSelectedFloor(secondFloor);
+                  setSelectedFID(chooseFID("2"));
+                }}
+                color={selectedFloor === secondFloor ? undefined : "gray"}
+                className={"w-1/5 focus:ring-2"}
+              >
+                2
+              </Button>
+              <Button
+                onClick={() => {
+                  setSelectedFloor(thirdFloor);
+                  setSelectedFID(chooseFID("3"));
+                }}
+                color={selectedFloor === thirdFloor ? undefined : "gray"}
+                className={"w-1/5 focus:ring-2"}
+              >
+                3
+              </Button>
+            </Button.Group>
+          </div>
         </div>
 
-        <div className="flex flex-col space-y-4 my-4">
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor="mapFloor" value="Select a floor" />
-            <div className={"w-full"}>
-              <Button.Group className="w-full flex justify-center">
-                <Button
-                  onClick={() => setSelectedFloor(lowerLevel2)}
-                  color={selectedFloor === lowerLevel2 ? undefined : "gray"}
-                  className={"w-1/5 focus:ring-2"}
-                >
-                  L2
-                </Button>
-                <Button
-                  onClick={() => setSelectedFloor(lowerLevel1)}
-                  color={selectedFloor === lowerLevel1 ? undefined : "gray"}
-                  className={"w-1/5 focus:ring-2"}
-                >
-                  L1
-                </Button>
-                <Button
-                  onClick={() => setSelectedFloor(firstFloor)}
-                  color={selectedFloor === firstFloor ? undefined : "gray"}
-                  className={"w-1/5 focus:ring-2"}
-                >
-                  1
-                </Button>
-                <Button
-                  onClick={() => setSelectedFloor(secondFloor)}
-                  color={selectedFloor === secondFloor ? undefined : "gray"}
-                  className={"w-1/5 focus:ring-2"}
-                >
-                  2
-                </Button>
-                <Button
-                  onClick={() => setSelectedFloor(thirdFloor)}
-                  color={selectedFloor === thirdFloor ? undefined : "gray"}
-                  className={"w-1/5 focus:ring-2"}
-                >
-                  3
-                </Button>
-              </Button.Group>
-            </div>
-          </div>
-
-          <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
-            <Autocomplete
-              suggestions={startSuggestions}
-              setSuggestions={setStartSuggestions}
-              value={startLocation}
-              setValue={setStartLocation}
-              id="startLocation"
-              htmlFor="startLocation"
-              label="Enter starting point"
-              placeholder="Medical Records Conference Room Floor L1"
-              required
-              rightIcon={CiSearch}
-              onFocus={(e) => {
-                setStartLocation(e.target.value);
-                setStartID(
+        <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
+          <Autocomplete
+            suggestions={startSuggestions}
+            setSuggestions={setStartSuggestions}
+            value={startLocation}
+            setValue={setStartLocation}
+            id="startLocation"
+            htmlFor="startLocation"
+            label="Enter starting point"
+            placeholder="Medical Records Conference Room Floor L1"
+            required
+            rightIcon={CiSearch}
+            onFocus={(e) => {
+              setStartLocation(e.target.value);
+              setStartID(
+                nodes
+                  .filter((node) => node["longName"] === startLocation)
+                  .map((node) => node.nodeID)[0]
+              );
+              if (e.target.value.length > 0) {
+                setStartSuggestions(
                   nodes
-                    .filter((node) => node["longName"] === startLocation)
-                    .map((node) => node.nodeID)[0]
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    )
+                    .filter(
+                      (loc) =>
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
+                        loc.toLowerCase() ===
+                          "carrie m. hall conference center floor 2"
+                    )
+                    .sort()
+                    .slice(0, 10)
                 );
-                if (e.target.value.length > 0) {
-                  setStartSuggestions(
-                    nodes
-                      .map((loc) => loc.longName)
-                      .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
-                      .filter(
-                        (loc) =>
-                          (!loc.toLowerCase().includes("hall") &&
-                            !loc.toLowerCase().includes("stair") &&
-                            !loc.toLowerCase().includes("elevator")) ||
-                          loc.toLowerCase() ===
-                            "carrie m. hall conference center floor 2"
-                      )
-                      .sort()
-                      .slice(0, 10)
-                  );
-                } else {
-                  setStartSuggestions(
-                    nodes
-                      .map((loc) => loc.longName)
-                      .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
-                      .filter(
-                        (loc) =>
-                          (!loc.toLowerCase().includes("hall") &&
-                            !loc.toLowerCase().includes("stair") &&
-                            !loc.toLowerCase().includes("elevator")) ||
-                          loc.toLowerCase() ===
-                            "carrie m. hall conference center floor 2"
-                      )
-                      .sort()
-                  );
-                }
-              }}
-              onBlur={() => {
-                setStartID(
+              } else {
+                setStartSuggestions(
                   nodes
-                    .filter((node) => node["longName"] === startLocation)
-                    .map((node) => node.nodeID)[0]
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    )
+                    .filter(
+                      (loc) =>
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
+                        loc.toLowerCase() ===
+                          "carrie m. hall conference center floor 2"
+                    )
+                    .sort()
                 );
-                setTimeout(() => setStartSuggestions([]), 200);
-              }}
-              onChange={(e) => {
-                setStartLocation(e.target.value);
-                setStartID(
+              }
+            }}
+            onBlur={() => {
+              setStartID(
+                nodes
+                  .filter((node) => node["longName"] === startLocation)
+                  .map((node) => node.nodeID)[0]
+              );
+              setTimeout(() => setStartSuggestions([]), 200);
+            }}
+            onChange={(e) => {
+              setStartLocation(e.target.value);
+              setStartID(
+                nodes
+                  .filter((node) => node["longName"] === startLocation)
+                  .map((node) => node.nodeID)[0]
+              );
+              if (e.target.value.length > 0) {
+                setStartSuggestions(
                   nodes
-                    .filter((node) => node["longName"] === startLocation)
-                    .map((node) => node.nodeID)[0]
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    )
+                    .filter(
+                      (loc) =>
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
+                        loc.toLowerCase() ===
+                          "carrie m. hall conference center floor 2"
+                    )
+                    .sort()
+                    .slice(0, 10)
                 );
-                if (e.target.value.length > 0) {
-                  setStartSuggestions(
-                    nodes
-                      .map((loc) => loc.longName)
-                      .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
-                      .filter(
-                        (loc) =>
-                          (!loc.toLowerCase().includes("hall") &&
-                            !loc.toLowerCase().includes("stair") &&
-                            !loc.toLowerCase().includes("elevator")) ||
-                          loc.toLowerCase() ===
-                            "carrie m. hall conference center floor 2"
-                      )
-                      .sort()
-                      .slice(0, 10)
-                  );
-                } else {
-                  setStartSuggestions([]);
-                }
-              }}
-            />
-            <Autocomplete
-              suggestions={endSuggestions}
-              setSuggestions={setEndSuggestions}
-              value={endLocation}
-              setValue={setEndLocation}
-              id="endLocation"
-              htmlFor="endLocation"
-              label="Enter destination"
-              placeholder="Nuclear Medicine Floor L1"
-              required
-              rightIcon={CiSearch}
-              onChange={(e) => {
-                setEndLocation(e.target.value);
-                setEndID(
+              } else {
+                setStartSuggestions([]);
+              }
+            }}
+          />
+          <Autocomplete
+            suggestions={endSuggestions}
+            setSuggestions={setEndSuggestions}
+            value={endLocation}
+            setValue={setEndLocation}
+            id="endLocation"
+            htmlFor="endLocation"
+            label="Enter destination"
+            placeholder="Nuclear Medicine Floor L1"
+            required
+            rightIcon={CiSearch}
+            onChange={(e) => {
+              setEndLocation(e.target.value);
+              setEndID(
+                nodes
+                  .filter((node) => node["longName"] === endLocation)
+                  .map((node) => node.nodeID)[0]
+              );
+              if (e.target.value.length > 0) {
+                setEndSuggestions(
                   nodes
-                    .filter((node) => node["longName"] === endLocation)
-                    .map((node) => node.nodeID)[0]
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    )
+                    .filter(
+                      (loc) =>
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
+                        loc.toLowerCase() ===
+                          "carrie m. hall conference center floor 2"
+                    )
+                    .sort()
+                    .slice(0, 10)
+                );
+              } else {
+                setEndSuggestions([]);
+              }
+            }}
+            onFocus={(e) => {
+              setEndLocation(e.target.value);
+              setEndID(
+                nodes
+                  .filter((node) => node["longName"] === endLocation)
+                  .map((node) => node.nodeID)[0]
+              );
+              if (e.target.value.length > 0) {
+                setEndSuggestions(
+                  nodes
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    )
+                    .filter(
+                      (loc) =>
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
+                        loc.toLowerCase() ===
+                          "carrie m. hall conference center floor 2"
+                    )
+                    .sort()
+                    .slice(0, 10)
                 );
                 if (e.target.value.length > 0) {
                   setEndSuggestions(
@@ -604,118 +721,96 @@ const Sidebar = () => {
                 setEndLocation(e.target.value);
                 setEndID(
                   nodes
-                    .filter((node) => node["longName"] === endLocation)
-                    .map((node) => node.nodeID)[0]
+                    .map((loc) => loc.longName)
+                    .filter((loc) =>
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
+                    )
+                    .filter(
+                      (loc) =>
+                        (!loc.toLowerCase().includes("hall") &&
+                          !loc.toLowerCase().includes("stair") &&
+                          !loc.toLowerCase().includes("elevator")) ||
+                        loc.toLowerCase() ===
+                          "carrie m. hall conference center floor 2"
+                    )
+                    .sort()
                 );
-                if (e.target.value.length > 0) {
-                  setEndSuggestions(
-                    nodes
-                      .map((loc) => loc.longName)
-                      .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
-                      .filter(
-                        (loc) =>
-                          (!loc.toLowerCase().includes("hall") &&
-                            !loc.toLowerCase().includes("stair") &&
-                            !loc.toLowerCase().includes("elevator")) ||
-                          loc.toLowerCase() ===
-                            "carrie m. hall conference center floor 2"
-                      )
-                      .sort()
-                      .slice(0, 10)
-                  );
-                } else {
-                  setEndSuggestions(
-                    nodes
-                      .map((loc) => loc.longName)
-                      .filter((loc) =>
-                        loc.toLowerCase().includes(e.target.value.toLowerCase())
-                      )
-                      .filter(
-                        (loc) =>
-                          (!loc.toLowerCase().includes("hall") &&
-                            !loc.toLowerCase().includes("stair") &&
-                            !loc.toLowerCase().includes("elevator")) ||
-                          loc.toLowerCase() ===
-                            "carrie m. hall conference center floor 2"
-                      )
-                      .sort()
-                  );
-                }
-              }}
-              onBlur={() => {
-                setTimeout(() => setEndSuggestions([]), 200);
-              }}
-            />
-            <Dropdown
-              label={`Search Method${algorithm ? `: ${algorithm}` : ""}`}
-              size="xs"
-              dismissOnClick={true}
-            >
-              <Dropdown.Item onClick={() => setAlgorithm("AStar")}>
-                AStar
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setAlgorithm("BFS")}>
-                BFS
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setAlgorithm("DFS")}>
-                DFS
-              </Dropdown.Item>
-            </Dropdown>
-            <Button type="submit">Submit</Button>
-          </form>
-          {/* Displaying directions organized by floor */}
-          <div className="mt-4 space-y-2">
-            {Array.from(
-              new Set(splitDirections.map((direction) => direction?.floorID))
-            ).map((floorID) => (
-              <div key={floorID}>
-                <Button
-                  className="w-full"
-                  outline
-                  label={`Floor ${floorID}`}
-                  onClick={() => handleFloorClick(floorID)}
-                >
-                  {openFloors.includes(floorID) ? (
-                    <>
-                      {`Hide Directions for Floor ${floorID.substring(
-                        0,
-                        floorID.length - 1
-                      )}`}
-                      <HiChevronUp className="ml-4 h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      {`Show Directions for Floor ${floorID.substring(
-                        0,
-                        floorID.length - 1
-                      )}`}
-                      <HiChevronDown className="ml-4 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-                {openFloors.includes(floorID) && (
-                  <List key={floorID}>
-                    {splitDirections
-                      .filter((direction) => direction?.floorID === floorID)
-                      .map((row, i: number) => (
-                        <List
-                          key={i}
-                          className={`bg-${colorPicker(
-                            bgAlt,
-                            0
-                          )} dark:bg-${colorPicker(bgAlt, 1)}`}
-                        >
-                          {i < nodeDirections.length &&
-                            turnDirection(floorID, i)}
-                        </List>
-                      ))}
-                  </List>
+              }
+            }}
+            onBlur={() => {
+              setTimeout(() => setEndSuggestions([]), 200);
+            }}
+          />
+          <Dropdown
+            label={`Search Method${algorithm ? `: ${algorithm}` : ""}`}
+            size="xs"
+            dismissOnClick={true}
+          >
+            <Dropdown.Item onClick={() => setAlgorithm("AStar")}>
+              AStar
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setAlgorithm("BFS")}>
+              BFS
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setAlgorithm("DFS")}>
+              DFS
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setAlgorithm("Dijkstra")}>
+              Dijkstra
+            </Dropdown.Item>
+          </Dropdown>
+          <Button type="submit">Submit</Button>
+        </form>
+        {/* Displaying directions organized by floor */}
+        <div className="mt-4 space-y-2">
+          {Array.from(
+            new Set(splitDirections.map((direction) => direction?.floorID))
+          ).map((floorID) => (
+            <div key={floorID}>
+              <Button
+                className="w-full"
+                outline
+                label={`Floor ${floorID}`}
+                onClick={() => handleFloorClick(floorID)}
+              >
+                {openFloors.includes(floorID) ? (
+                  <>
+                    {`Hide Directions for Floor ${floorID.substring(
+                      0,
+                      floorID.length - 1
+                    )}`}
+                    <HiChevronUp className="ml-4 h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    {`Show Directions for Floor ${floorID.substring(
+                      0,
+                      floorID.length - 1
+                    )}`}
+                    <HiChevronDown className="ml-4 h-4 w-4" />
+                  </>
                 )}
-              </div>
-            ))}
-          </div>
+              </Button>
+              {openFloors.includes(floorID) && (
+                <List key={floorID}>
+                  {splitDirections
+                    .filter((direction) => direction?.floorID === floorID)
+                    .map((row, i: number) => (
+                      <List
+                        key={i}
+                        className={`bg-${colorPicker(
+                          bgAlt,
+                          0
+                        )} dark:bg-${colorPicker(bgAlt, 1)}`}
+                      >
+                        {i < splitDirections.length &&
+                          turnDirection(floorID, i)}
+                      </List>
+                    ))}
+                </List>
+              )}
+            </div>
+          ))}
         </div>
       </FlowbiteSidebar>
     </>
@@ -723,12 +818,15 @@ const Sidebar = () => {
 };
 
 const adhocConverterChangePlease = (floorID: string) => {
-  if (floorID.length > 3) {
-    return floorID;
+  if (floorID) {
+    if (floorID.length > 3) {
+      return floorID;
+    }
+    const floor = floorID.substring(0, floorID.length - 1);
+    // @ts-expect-error nope
+    return floorToAsset(floor);
   }
-  const floor = floorID.substring(0, floorID.length - 1);
-  // @ts-expect-error nope
-  return floorToAsset(floor);
+  return floorToAsset("1");
 };
 
 function angleBetweenVectors(
