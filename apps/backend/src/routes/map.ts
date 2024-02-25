@@ -331,15 +331,15 @@ router.post("/upload/all", upload.any(), async (req, res) => {
   }
 
   // Wait for all file type determinations to complete
-  Promise.all(fileTypePromises)
-    .then(() => {
+  await Promise.all(fileTypePromises)
+    .then(async () => {
       // Iterate over each file type
-      fileTypes.forEach(fileType => {
+      for (const fileType of fileTypes) {
         const { name, type } = fileType;
         // Process the file based on its type
         switch (type) {
           case 'node':
-            PrismaClient.$transaction(async (tx) => {
+            await PrismaClient.$transaction(async (tx) => {
               // 1. Get all the existing data and hold them in-memory
               const existingEdges = await tx.edges.findMany();
               const existingEmployees = await tx.employees.findMany();
@@ -377,7 +377,7 @@ router.post("/upload/all", upload.any(), async (req, res) => {
             console.log(`Processing node file: ${name}`);
             break;
           case 'edge':            
-            PrismaClient.$transaction(async (tx) => {
+            await PrismaClient.$transaction(async (tx) => {
               // 1. Get all the existing data and hold them in-memory
               const existingNodes = await tx.nodes.findMany();
               const existingEmployees = await tx.employees.findMany();
@@ -416,7 +416,7 @@ router.post("/upload/all", upload.any(), async (req, res) => {
             break;
           case 'employee':
             // Process employee file
-            PrismaClient.$transaction(async (tx) => {
+            await PrismaClient.$transaction(async (tx) => {
               // 1. Get all the existing data and hold them in-memory
               const existingNodes = await tx.nodes.findMany();
               const existingEdges = await tx.edges.findMany();
@@ -458,7 +458,7 @@ router.post("/upload/all", upload.any(), async (req, res) => {
             // Handle unknown file type
             console.log(`Unknown file type: ${name}`);
         }
-      });
+      };
 
       res.send('Files uploaded and processed successfully');
     })
