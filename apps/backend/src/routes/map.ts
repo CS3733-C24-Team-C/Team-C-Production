@@ -277,7 +277,13 @@ interface FileType {
 
 router.post("/upload/all", upload.any(), async (req, res) => {
 
+
   if (!req.files) {
+    res.status(400).send('No files uploaded');
+    return;
+  }
+
+  if (req.files.length == 0) {
     res.status(400).send('No files uploaded');
     return;
   }
