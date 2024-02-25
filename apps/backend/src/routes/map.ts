@@ -283,7 +283,7 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
     return res.status(400).send("Both startNodeId and endNodeId are required");
   }
 
-  if (!["AStar", "BFS", "DFS"].includes(algorithm)) {
+  if (!["AStar", "BFS", "DFS", "Dijkstra"].includes(algorithm)) {
     return res
       .status(400)
       .send(
@@ -304,6 +304,9 @@ router.post("/pathfinding", async function (req: Request, res: Response) {
     const context = new PathfindingContext(new BFSPathfindingStrategy());
 
     switch (algorithm) {
+      case "Dijkstra":
+        context.setStrategy(new DijkstraPathfindingStrategy());
+        break;  
       case "DFS":
         context.setStrategy(new DFSPathfindingStrategy());
         break;
