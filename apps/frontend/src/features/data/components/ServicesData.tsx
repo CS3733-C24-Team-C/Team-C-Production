@@ -9,58 +9,98 @@ import {
   Card,
 } from "flowbite-react";
 import { downloadCSV } from "../utils";
-import { RequestStatus, Requests } from "database";
+import { Employees, RequestStatus, Requests } from "database";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
 import { PieChart, DonutChart, StackedHorizontalBarChart } from "@/components";
 
-const ServicesContext = createContext<{
-  services: Requests[];
-  setServices: React.Dispatch<React.SetStateAction<Requests[]>>;
+const typeLabelsMap: Record<Requests["type"], string> = {
+  JANI: "Janitorial",
+  MECH: "Mechanical Maintenance",
+  MEDI: "Medicine Delivery",
+  RELC: "Patient Relocation",
+  CONS: "Patient Consultation",
+  CUST: "Other",
+};
+
+const completionStatusLabelsMap: Record<Requests["completionStatus"], string> =
+  {
+    UNASSIGNED: "Unassigned",
+    ASSIGNED: "Assigned",
+    IN_PROGRESS: "In Progress",
+    COMPLETED: "Completed",
+  };
+
+const ServicesWithEmployeesContext = createContext<{
+  servicesWithEmployees: (Requests & {
+    employee: Employees | null;
+  })[];
+  setServicesWithEmployees: React.Dispatch<
+    React.SetStateAction<
+      (Requests & {
+        employee: Employees | null;
+      })[]
+    >
+  >;
 }>({
-  services: [],
+  servicesWithEmployees: [],
   // eslint-disable-next-line no-empty-function
-  setServices: () => {},
+  setServicesWithEmployees: () => {},
 });
 
 const ServicesData = () => {
-  const [services, setServices] = useState<Requests[]>([]);
-  const [file, setFile] = useState("");
   const navigate = useNavigate();
 
-  const [pieChartServices, setPieChartServices] = useState<Requests[]>([]);
+  const [servicesWithEmployees, setServicesWithEmployees] = useState<
+    (Requests & {
+      employee: Employees | null;
+    })[]
+  >([]);
+  const [file, setFile] = useState("");
   const [selectedEmployeeType, setSelectedEmployeeType] = useState<
-    string | null
-  >(null);
+    Employees["role"] | ""
+  >("");
+  const [seriesPie, setSeriesPie] = useState<number[]>([]);
+
+  // Data for PieChart
+  const requestTypesMap = servicesWithEmployees.reduce((map, service) => {
+    const type = service.type;
+    const userFriendlyLabel = typeLabelsMap[type];
+    map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
+    return map;
+  }, {} as Record<string, number>);
+  const labelsPie = Object.keys(requestTypesMap);
 
   useEffect(() => {
-    const fetchServices = async () => {
+    const fetchServicesWithEmployees = async () => {
       try {
-        const res = await fetch("/api/services");
+        const res = await fetch("/api/services/with-employee");
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
-
-        const employeesRes = await fetch("/api/employees");
-        if (!employeesRes.ok) throw new Error(employeesRes.statusText);
-        const employeesData = await employeesRes.json();
-
-        const filteredDataForPieChart = selectedEmployeeType
-          ? data.filter((service: { employeeID: string }) => {
-              const employee = employeesData.find(
-                (emp: { id: string }) => emp.id === service.employeeID
-              );
-              return employee?.role === selectedEmployeeType;
-            })
-          : data;
-
-        setServices(data);
-        setPieChartServices(filteredDataForPieChart);
+        setServicesWithEmployees(data);
       } catch (error) {
-        console.error("Failed to fetch nodes:", error);
+        console.error("Failed to fetch services:", error);
       }
     };
-    fetchServices();
-  }, [selectedEmployeeType]);
+    fetchServicesWithEmployees();
+  }, []);
+
+  useEffect(() => {
+    // filter seriesPie based on selectedEmployeeType
+    const filteredServices = selectedEmployeeType
+      ? servicesWithEmployees.filter(
+          (service) => service.employee?.role === selectedEmployeeType
+        )
+      : servicesWithEmployees;
+    const requestTypesMap = filteredServices.reduce((map, service) => {
+      const type = service.type;
+      const userFriendlyLabel = typeLabelsMap[type];
+      map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
+      return map;
+    }, {} as Record<string, number>);
+    const seriesPie = Object.values(requestTypesMap);
+    setSeriesPie(seriesPie);
+  }, [servicesWithEmployees, selectedEmployeeType]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,38 +118,8 @@ const ServicesData = () => {
     }
   };
 
-  const typeLabelsMap: Record<string, string> = {
-    JANI: "Janitorial",
-    MECH: "Mechanical Maintenance",
-    MEDI: "Medicine Delivery",
-    RELC: "Patient Relocation",
-    CONS: "Patient Consultation",
-    CUST: "Other",
-  };
-
-  const completionStatusLabelsMap: Record<string, string> = {
-    UNASSIGNED: "Unassigned",
-    ASSIGNED: "Assigned",
-    IN_PROGRESS: "In Progress",
-    COMPLETED: "Completed",
-  };
-
-  const totalRequests = pieChartServices.length;
-
-  // Data for PieChart
-  const requestTypesMap = pieChartServices.reduce((map, service) => {
-    const type = service.type;
-    const userFriendlyLabel = typeLabelsMap[type];
-    map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
-    return map;
-  }, {} as Record<string, number>);
-  const seriesPie = Object.values(requestTypesMap).map((count) =>
-    Number(((count / totalRequests) * 100).toFixed(2))
-  );
-  const labelsPie = Object.keys(requestTypesMap);
-
   // Data for DonutChart
-  const completionStatusMap = pieChartServices.reduce((map, service) => {
+  const completionStatusMap = servicesWithEmployees.reduce((map, service) => {
     const status = service.completionStatus;
     const userFriendlyLabel = completionStatusLabelsMap[status];
     map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
@@ -117,14 +127,14 @@ const ServicesData = () => {
   }, {} as Record<string, number>);
 
   const seriesDonut = Object.values(completionStatusMap).map((count) =>
-    Number(((count / totalRequests) * 100).toFixed(2))
+    Number(((count / servicesWithEmployees.length) * 100).toFixed(2))
   );
   const labelsDonut = Object.keys(completionStatusMap);
 
   // Data for StackedHorizontalBarChart
   // Calculate labelsBar
   const types = Array.from(
-    new Set(pieChartServices.map((request) => request.type))
+    new Set(servicesWithEmployees.map((request) => request.type))
   );
   const typesBar = types.map((type) => typeLabelsMap[type]);
   const statuses = Object.keys(completionStatusLabelsMap);
@@ -144,10 +154,10 @@ const ServicesData = () => {
   // Calculate seriesBar
   const seriesBar = statuses.map((status) => {
     const dataForStatus: number[] = types.map((type) =>
-      getStatusCountsForType(status, type, pieChartServices)
+      getStatusCountsForType(status, type, servicesWithEmployees)
     );
     return {
-      name: completionStatusLabelsMap[status],
+      name: status,
       data: dataForStatus,
     };
   });
@@ -156,7 +166,7 @@ const ServicesData = () => {
     <>
       <div className="px-16 py-8">
         <Card className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)]">
-          <div className="flex justify-between space-x-8">
+          <div className="flex space-x-8">
             <div>
               <form
                 action="/api/services/upload"
@@ -168,7 +178,7 @@ const ServicesData = () => {
                   <Label htmlFor="csv-upload" value="Upload new CSV Data:" />
                 </div>
                 <FileInput
-                  className="w-50vw"
+                  className="w-50%"
                   id="csv-upload"
                   name="csv-upload"
                   accept="text/csv"
@@ -188,11 +198,31 @@ const ServicesData = () => {
                 </Button>
               </div>
             </div>
-            <PieChart
-              series={seriesPie}
-              labels={labelsPie}
-              onChangeEmployeeType={setSelectedEmployeeType}
-            />
+            <div className="flex flex-col space-y-2 w-[500px]">
+              <Label htmlFor="status" value="Filter by employee role:" />
+              <Select
+                id="status"
+                sizing="sm"
+                className="w-32"
+                value={selectedEmployeeType}
+                onChange={(e) => {
+                  setSelectedEmployeeType(
+                    e.target.value as Employees["role"] | ""
+                  );
+                }}
+              >
+                <option value={""}>All</option>
+                <option value="REGULAR">Regular</option>
+                <option value="ADMIN">Admin</option>
+              </Select>
+              <div className="w-full flex-1">
+                <PieChart
+                  title="Requests statistics"
+                  series={seriesPie}
+                  labels={labelsPie}
+                />
+              </div>
+            </div>
             <DonutChart series={seriesDonut} labels={labelsDonut} />
           </div>
           <div className="px-16 py-8">
@@ -202,20 +232,27 @@ const ServicesData = () => {
       </div>
 
       <div className="flex flex-col px-16 py-8">
-        <ServicesContext.Provider value={{ services, setServices }}>
+        <ServicesWithEmployeesContext.Provider
+          value={{
+            servicesWithEmployees,
+            setServicesWithEmployees,
+          }}
+        >
           <DataTable
             columns={requestsTableColumns}
-            data={services}
-            searchColumn="employeeID"
+            data={servicesWithEmployees}
+            searchColumn="employee"
             onAddRow={() => navigate("/services")}
           />
-        </ServicesContext.Provider>
+        </ServicesWithEmployeesContext.Provider>
       </div>
     </>
   );
 };
 
-const requestsTableColumns: ColumnDef<Requests>[] = [
+const requestsTableColumns: ColumnDef<
+  Requests & { employee: Employees | null }
+>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -263,6 +300,15 @@ const requestsTableColumns: ColumnDef<Requests>[] = [
       <DataTableColumnHeader column={column} title="Employee ID" />
     ),
     cell: ({ row }) => row.getValue("employeeID"),
+  },
+  {
+    accessorKey: "employee",
+    accessorFn: (row) =>
+      row.employee?.firstName + " " + row.employee?.lastName || "Unassigned",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Employee Name" />
+    ),
+    cell: ({ row }) => row.getValue("employee"),
   },
   {
     accessorKey: "urgency",
@@ -354,7 +400,10 @@ type ServicesActionsProps = {
 };
 
 const ServicesActions = ({ row }: ServicesActionsProps) => {
-  const { services, setServices } = useContext(ServicesContext);
+  const {
+    servicesWithEmployees: services,
+    setServicesWithEmployees: setServices,
+  } = useContext(ServicesWithEmployeesContext);
 
   const changeCompletionStatus = async (
     id: number,
