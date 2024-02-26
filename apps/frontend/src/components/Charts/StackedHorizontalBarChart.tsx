@@ -2,66 +2,64 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 
 interface StackedHorizontalBarChartProps {
-    data: {
-        name: string;
-        data: number[];
-    }[];
-    categories: string[];
+  data: {
+    name: string;
+    data: number[];
+  }[];
+  categories: string[];
 }
 
 const StackedHorizontalBarChart: React.FC<StackedHorizontalBarChartProps> = ({
-     data,
-     categories,
- }) => {
-    const options = {
-        chart: {
+  data,
+  categories,
+}) => {
+  return (
+    <div className="max-w-3xl w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+      <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
+        Request types completion status
+      </h5>
+      <ReactApexChart
+        options={{
+          chart: {
             type: "bar",
             height: 350,
             stacked: true,
             stackType: "100%",
-        },
-        plotOptions: {
+          },
+          plotOptions: {
             bar: {
-                horizontal: true,
+              horizontal: true,
             },
-        },
-        stroke: {
+          },
+          stroke: {
             width: 1,
             colors: ["#fff"],
-        },
-        xaxis: {
+          },
+          xaxis: {
             categories: categories,
-        },
-        tooltip: {
+          },
+          tooltip: {
             y: {
-                formatter: function (val: number) {
-                    return val;
-                },
+              formatter: function (val: number) {
+                return val.toString();
+              },
             },
-        },
-        fill: {
+          },
+          fill: {
             opacity: 1,
-        },
-        legend: {
+          },
+          legend: {
             position: "top",
             horizontalAlign: "left",
             offsetX: 40,
-        },
-    };
-
-    return (
-        <div className="max-w-3xl w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
-            <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
-                Request types completion status
-            </h5>
-            <ReactApexChart
-                options={options}
-                series={data}
-                type="bar"
-                height={400}
-            />
-        </div>
-    );
+          },
+        }}
+        series={data}
+        type="bar"
+        height={400}
+      />
+    </div>
+  );
 };
 
-export {StackedHorizontalBarChart};
+export { StackedHorizontalBarChart };
