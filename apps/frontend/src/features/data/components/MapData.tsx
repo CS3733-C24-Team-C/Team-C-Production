@@ -72,25 +72,24 @@ const MapData = () => {
 
   const handleSubmitAll = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     const formData = new FormData();
     selectedFiles.forEach((file, index) => {
       formData.append(`file${index + 1}`, file);
     });
-  
+
     try {
-      const res = await fetch('api/map/upload/all', {
-        method: 'POST',
+      const res = await fetch("api/map/upload/all", {
+        method: "POST",
         body: formData,
       });
-  
+
       if (!res.ok) throw new Error(res.statusText);
       setSelectedFiles([]);
       alert("Files uploaded successfully!");
     } catch (error) {
       alert("Failed to upload files. Please try again.");
     }
-  
   };
 
   return (
@@ -158,7 +157,10 @@ const MapData = () => {
                 onSubmit={handleSubmitAll}
               >
                 <div className="mb-2 block">
-                  <Label htmlFor="csv-upload" value="Upload new Nodes/Edges/Employee Data:" />
+                  <Label
+                    htmlFor="csv-upload"
+                    value="Upload new Nodes/Edges/Employee Data:"
+                  />
                 </div>
                 <FileInput
                   className="w-50%"
