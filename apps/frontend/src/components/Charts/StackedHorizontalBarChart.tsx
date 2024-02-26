@@ -2,18 +2,21 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 
 interface StackedHorizontalBarChartProps {
-    series: {
-        type: string;
+    data: {
+        name: string;
         data: number[];
     }[];
-    labels: string[];
+    categories: string[];
 }
 
-const StackedHorizontalBarChart: React.FC<StackedHorizontalBarChartProps> = ({ series, labels }) => {
-    const options= {
+const StackedHorizontalBarChart: React.FC<StackedHorizontalBarChartProps> = ({
+     data,
+     categories,
+ }) => {
+    const options = {
         chart: {
-            type: 'bar',
-            height: 400,
+            type: "bar",
+            height: 350,
             stacked: true,
             stackType: "100%",
         },
@@ -27,13 +30,23 @@ const StackedHorizontalBarChart: React.FC<StackedHorizontalBarChartProps> = ({ s
             colors: ["#fff"],
         },
         xaxis: {
-            categories: labels,
+            categories: categories,
         },
-        yaxis: {
-            title: {
-                text: "Request Types",
+        tooltip: {
+            y: {
+                formatter: function (val: number) {
+                    return val;
+                },
             },
-        }
+        },
+        fill: {
+            opacity: 1,
+        },
+        legend: {
+            position: "top",
+            horizontalAlign: "left",
+            offsetX: 40,
+        },
     };
 
     return (
@@ -41,10 +54,12 @@ const StackedHorizontalBarChart: React.FC<StackedHorizontalBarChartProps> = ({ s
             <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
                 Request types completion status
             </h5>
-
-            <div className="py-6">
-                <ReactApexChart options={options} series={series} type="bar" height={400} />
-            </div>
+            <ReactApexChart
+                options={options}
+                series={data}
+                type="bar"
+                height={400}
+            />
         </div>
     );
 };

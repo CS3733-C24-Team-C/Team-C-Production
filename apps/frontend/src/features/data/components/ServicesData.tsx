@@ -130,39 +130,25 @@ const ServicesData = () => {
 
 
     // Data for StackedHorizontalBarChart
-    type StatusCount = {
-        status: string;
-        count: number;
-    };
-    const getStatusCountsForAllTypes = (status: string, data: Requests[]): StatusCount[] => {
-        const statusMap: Record<string, number> = {};
-        // Filter data based on the provided status
-        const filteredData = data.filter((service) => service.completionStatus === status);
-        // Count the occurrences of each status for the filtered data
-        filteredData.forEach((service) => {
-            const type = service.type;
-            statusMap[type] = (statusMap[type] || 0) + 1;
-        });
-        // Convert the statusMap into an array of objects
-        const statusCounts: StatusCount[] = Object.entries(statusMap).map(([type, count]) => ({
-            status: type,
-            count,
-        }));
-        return statusCounts;
-    };
-
     // Calculate labelsBar
-    const labels = Object.keys(requestTypesMap);
-    //const countForEachLabel = Object.values(requestTypesMap);
-    const labelsBar = labels.map((type) => typeLabelsMap[type]);
+    const types = Array.from(new Set(pieChartServices.map((request) => request.type)));
+    const typesBar = types.map(type => typeLabelsMap[type]);
     const statuses = Object.keys(completionStatusLabelsMap);
+    const getStatusCountsForType = (status: string, type: string, data: Requests[]): number => {
+        // Filter data based on the provided status and type
+        const filteredData = data.filter((service) => service.completionStatus === status && service.type === type);
+        // Return the count of filtered data
+        return filteredData.length;
+    };
 
     // Calculate seriesBar
     const seriesBar = statuses.map((status) => {
-        const statusCounts = getStatusCountsForAllTypes(status, pieChartServices);
+        const dataForStatus: number[] = types.map((type) =>
+            getStatusCountsForType(status, type, pieChartServices)
+        );
         return {
-            type: status,
-            data: statusCounts.map((statusCount) => statusCount.count),
+            name: completionStatusLabelsMap[status],
+            data: dataForStatus,
         };
     });
 
@@ -212,7 +198,10 @@ const ServicesData = () => {
                         />
                     </div>
                     <div className="px-16 py-8">
-                        <StackedHorizontalBarChart series={seriesBar} labels={labelsBar}/>
+                        <StackedHorizontalBarChart
+                            data={seriesBar}
+                            categories={typesBar}
+                        />
                     </div>
                 </Card>
             </div>
