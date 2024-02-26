@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import firstFloor from "../assets/01_thefirstfloor.png";
-import { Sidebar, MapContext } from "../components";
+import { Sidebar, MapContext, NodeFloorID } from "../components";
 import BeefletMap from "@/features/map/components/BeefletMap.tsx";
 import { Edges, Nodes, Requests } from "database";
 
@@ -15,6 +15,9 @@ const Map = () => {
   const [startID, setStartID] = useState("");
   const [endID, setEndID] = useState("");
   const [requests, setRequests] = useState<Requests[]>([]);
+  const [floorSections, setFloorSections] = useState<NodeFloorID[]>([]);
+  const [selectedFID, setSelectedFID] = useState("");
+  const [center, setCenter] = useState<number[]>([0, 0]);
 
   useEffect(() => {
     const fetchNodes = async () => {
@@ -75,6 +78,12 @@ const Map = () => {
         setEndID,
         requests,
         setRequests,
+        floorSections,
+        setFloorSections,
+        selectedFID,
+        setSelectedFID,
+        center,
+        setCenter,
       }}
     >
       <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-neutral-900">

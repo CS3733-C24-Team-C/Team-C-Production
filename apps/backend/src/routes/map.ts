@@ -9,6 +9,8 @@ import {
   DFSPathfindingStrategy,
   GraphSingleton,
   PathfindingContext,
+  DijkstraPathfindingStrategy,
+  NearestPOIFindingStrategy,
 } from "../pathfinding";
 
 const router: Router = express.Router();
@@ -276,52 +278,85 @@ router.get("/download/edges", async function (req: Request, res: Response) {
   }
 });
 
+const poiTypes = ['ELEV', 'REST', 'STAI', 'DEPT', 'LABS', 'INFO', 'CONF', 'EXIT', 'RETL', 'SERV', 'HALL', 'BATH'];
+
 router.post("/pathfinding", async function (req: Request, res: Response) {
-  const { startNodeId, endNodeId, algorithm } = req.body;
+    const { startNodeId, endNodeId, algorithm, poiType } = req.body;
 
-  if (!startNodeId || !endNodeId) {
-    return res.status(400).send("Both startNodeId and endNodeId are required");
-  }
 
-  if (!["AStar", "BFS", "DFS"].includes(algorithm)) {
-    return res
-      .status(400)
-      .send(
-        "Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'DFS'."
-      );
-  }
-
-  try {
-    const nodes = await PrismaClient.nodes.findMany({
-      where: { nodeID: { in: [startNodeId, endNodeId] } },
-    });
-
-    if (nodes.length < 2) {
-      return res.status(404).send("One or both node IDs not found");
+    if (!startNodeId) {
+        return res.status(400).send("startNodeId is required");
     }
 
-    const graph = await GraphSingleton.getInstance();
-    const context = new PathfindingContext(new BFSPathfindingStrategy());
 
-    switch (algorithm) {
-      case "DFS":
-        context.setStrategy(new DFSPathfindingStrategy());
-        break;
-      case "AStar":
-        context.setStrategy(new AStarPathfindingStrategy());
-        break;
-      case "BFS":
-        break;
-      default:
-        return res.status(400).send("Unsupported algorithm");
+    if (poiType && !poiTypes.includes(poiType)) {
+        return res.status(400).send(`Invalid POI Type. Valid options are: ${poiTypes.join(', ')}.`);
     }
 
-    const pathNodeIds = await context.findPath(startNodeId, endNodeId, graph);
-    res.json({ path: pathNodeIds });
-  } catch (error) {
-    console.error("Error processing pathfinding request:", error);
-    res.status(500).send("Internal server error");
-  }
+
+    if (poiType && !endNodeId) {
+        try {
+            const graph = await GraphSingleton.getInstance();
+            const poiStrategy = new NearestPOIFindingStrategy([poiType]);
+            const context = new PathfindingContext(poiStrategy);
+            const pathNodeIds = await context.findPath(startNodeId, '', graph);
+            return res.json({ path: pathNodeIds });
+        } catch (error) {
+            console.error("Error processing nearest POI request:", error);
+            return res.status(500).send("Internal server error");
+        }
+    }
+
+
+    if (!endNodeId) {
+        return res.status(400).send("endNodeId is required for specific destination pathfinding");
+    }
+
+
+    if (!["AStar", "BFS", "DFS", "Dijkstra"].includes(algorithm)) {
+        return res
+            .status(400)
+            .send(
+                "Invalid or missing algorithm type. Valid options are: 'AStar', 'BFS', 'DFS', 'Dijkstra'."
+            );
+    }
+
+    try {
+        const nodes = await PrismaClient.nodes.findMany({
+            where: { nodeID: { in: [startNodeId, endNodeId] } },
+        });
+
+        if (nodes.length < 2 && !poiType) {
+            return res.status(404).send("One or both node IDs not found");
+        }
+
+        const graph = await GraphSingleton.getInstance();
+        let strategy;
+
+        switch (algorithm) {
+            case "AStar":
+                strategy = new AStarPathfindingStrategy();
+                break;
+            case "Dijkstra":
+                strategy = new DijkstraPathfindingStrategy();
+                break;
+            case "DFS":
+                strategy = new DFSPathfindingStrategy();
+                break;
+            case "BFS":
+                strategy = new BFSPathfindingStrategy();
+                break;
+            default:
+                return res.status(400).send("Unsupported algorithm");
+        }
+
+        const context = new PathfindingContext(strategy);
+        const pathNodeIds = await context.findPath(startNodeId, endNodeId, graph);
+        res.json({ path: pathNodeIds });
+    } catch (error) {
+        console.error("Error processing pathfinding request:", error);
+        res.status(500).send("Internal server error");
+    }
 });
 
 export default router;

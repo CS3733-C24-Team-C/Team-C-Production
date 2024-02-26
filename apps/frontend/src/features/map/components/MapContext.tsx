@@ -1,5 +1,6 @@
 import { Edges, Nodes, Requests } from "database";
 import { createContext, Dispatch, SetStateAction } from "react";
+import { NodeFloorID } from "./Sidebar";
 
 const MapContext = createContext<{
   nodes: Nodes[];
@@ -22,6 +23,12 @@ const MapContext = createContext<{
   setEndID: Dispatch<SetStateAction<string>>;
   requests: Requests[];
   setRequests: Dispatch<SetStateAction<Requests[]>>;
+  floorSections: NodeFloorID[];
+  setFloorSections: Dispatch<SetStateAction<NodeFloorID[]>>;
+  selectedFID: string;
+  setSelectedFID: Dispatch<SetStateAction<string>>;
+  center: number[];
+  setCenter: Dispatch<number[]>;
 }>({
   nodes: [],
   // eslint-disable-next-line no-empty-function
@@ -53,6 +60,15 @@ const MapContext = createContext<{
   requests: [],
   // eslint-disable-next-line no-empty-function
   setRequests: () => {},
+  floorSections: [],
+  // eslint-disable-next-line no-empty-function
+  setFloorSections: () => {},
+  selectedFID: "",
+  // eslint-disable-next-line no-empty-function
+  setSelectedFID: () => {},
+  center: [],
+  // eslint-disable-next-line no-empty-function
+  setCenter: () => {},
 });
 
 export { MapContext };

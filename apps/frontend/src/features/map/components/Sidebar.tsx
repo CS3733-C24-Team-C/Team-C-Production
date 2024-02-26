@@ -9,7 +9,8 @@ import {
   Dropdown,
 } from "flowbite-react";
 import { CiMenuBurger, CiSearch } from "react-icons/ci";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Nodes } from "database";
 import { MapContext } from "../components";
 import lowerLevel1 from "../assets/00_thelowerlevel1.png";
@@ -43,7 +44,7 @@ const sidebarTheme: CustomFlowbiteTheme["sidebar"] = {
 };
 
 // A class to temporarily hold nodes with an associated floorID, so that nodes on separate areas of the same floor can be differentiated
-class NodeFloorID {
+export class NodeFloorID {
   node: Nodes;
   floorID: string;
 
@@ -68,34 +69,130 @@ const Sidebar = () => {
     setEndLocation,
     setStartID,
     setEndID,
+    floorSections,
+    setFloorSections,
+    selectedFID,
+    setSelectedFID,
+    setCenter,
   } = useContext(MapContext);
 
   const [startSuggestions, setStartSuggestions] = useState<string[]>([]);
   const [endSuggestions, setEndSuggestions] = useState<string[]>([]);
-  //const [selectedFloorID, setSelectedFloorID] = useState("");
+  const [splitDirections, setSplitDirections] = useState<NodeFloorID[]>([]);
 
   let bgAlt = 0;
 
-  const nodeDirections = path.map(
-    (ID) => nodes.filter((node) => node["nodeID"] === ID)[0],
-  );
-
   // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
-  function separateFloors(newDirections: Nodes[]) {
-    let lastFloor = "";
-    const floors: NodeFloorID[] = [];
-    let floorID = 0;
-    for (const node of newDirections) {
-      if (lastFloor != node.floor) {
-        lastFloor = node.floor;
-        floorID = (floorID + 1) % 10;
-      }
-      floors.push(new NodeFloorID(node, node.floor + floorID));
+
+  function chooseFID(floor: string): string {
+    if (!floorSections[0]) {
+      return "";
     }
-    return floors;
+    for (const anFID in floorSections) {
+      if (anFID.substring(0, anFID.length - 1) == floor) {
+        return anFID;
+      }
+    }
+    return floorSections[0].floorID;
   }
 
-  const splitDirections = separateFloors(nodeDirections);
+  useEffect(() => {
+    function separateFloors(newDirections: Nodes[]) {
+      let lastFloor = "";
+      const floors: NodeFloorID[] = [];
+      let floorID = 0;
+      for (const node of newDirections) {
+        if (lastFloor != node.floor) {
+          lastFloor = node.floor;
+          floorID = (floorID + 1) % 10;
+        }
+        floors.push(new NodeFloorID(node, node.floor + floorID));
+      }
+      return floors;
+    }
+
+    const nodeDirections = path.map(
+      (ID) => nodes.filter((node) => node["nodeID"] === ID)[0]
+    );
+
+    setSplitDirections(separateFloors(nodeDirections));
+  }, [path, nodes]);
+
+  useEffect(() => {
+    // Set to store unique floorID values
+    const uniqueFloorIDSet = new Set<string>();
+
+    setFloorSections(
+      splitDirections.filter((item) => {
+        // Check if the 'type' is not in the Set
+        if (!uniqueFloorIDSet.has(item.floorID)) {
+          // Add the 'type' to the Set and return the item
+          uniqueFloorIDSet.add(item.floorID);
+          return true;
+        }
+        // If the 'type' is already in the Set, return undefined (filtered out)
+        return false;
+      })
+    );
+    setSelectedFID(
+      splitDirections[0] ? splitDirections[0].floorID : chooseFID("")
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [splitDirections]);
+
+  useEffect(() => {
+    if (selectedFID === "") {
+      return;
+    }
+    if (!openFloors.includes(selectedFID)) {
+      // If not open, add it to the open floors
+      setOpenFloors([selectedFID]);
+      setSelectedFloor(adhocConverterChangePlease(selectedFID));
+      const floorDirections = splitDirections.filter(
+        (direction, i, arr) =>
+          direction?.floorID === selectedFID ||
+          (i > 0 && arr[i - 1].floorID === selectedFID) ||
+          (i === arr.length - 1 && arr[i].floorID === selectedFID)
+      );
+      let maxX = 0.1;
+      let maxY = 0.1;
+      let minX = 0.1;
+      let minY = 0.1;
+      for (const aNode of floorDirections) {
+        if (maxX % 1 != 0) {
+          maxX = aNode.node.xcoord;
+        }
+        if (maxY % 1 != 0) {
+          maxY = aNode.node.ycoord;
+        }
+        if (minX % 1 != 0) {
+          minX = aNode.node.xcoord;
+        }
+        if (minY % 1 != 0) {
+          minY = aNode.node.ycoord;
+        }
+        if (aNode.node.xcoord > maxX) {
+          maxX = aNode.node.xcoord;
+        }
+        if (aNode.node.ycoord > maxY) {
+          maxY = aNode.node.ycoord;
+        }
+        if (aNode.node.xcoord < minX) {
+          minX = aNode.node.xcoord;
+        }
+        if (aNode.node.ycoord < minY) {
+          minY = aNode.node.ycoord;
+        }
+      }
+      setCenter([
+        minX + (maxX - minX) / 2,
+        minY + (maxY - minY) / 2,
+        -0.00035 * Math.sqrt((maxX - minX) ** 2 + (maxY - minY) ** 2),
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFID]);
+
   const [openFloors, setOpenFloors] = useState<string[]>([]);
 
   const handleFloorClick = (floorID: string) => {
@@ -103,12 +200,13 @@ const Sidebar = () => {
     if (openFloors.includes(floorID)) {
       // If open, close the floor
       setOpenFloors((prevOpenFloors) =>
-        prevOpenFloors.filter((openFloor) => openFloor !== floorID),
+        prevOpenFloors.filter((openFloor) => openFloor !== floorID)
       );
     } else {
       // If not open, add it to the open floors
       setOpenFloors((prevOpenFloors) => [...prevOpenFloors, floorID]);
       setSelectedFloor(adhocConverterChangePlease(floorID));
+      setSelectedFID(floorID);
     }
   };
 
@@ -119,7 +217,7 @@ const Sidebar = () => {
       (direction, i, arr) =>
         direction?.floorID === floor ||
         (i > 0 && arr[i - 1].floorID === floor) ||
-        (i === arr.length - 1 && arr[i].floorID === floor),
+        (i === arr.length - 1 && arr[i].floorID === floor)
     );
 
     const currDirection = floorDirections[index];
@@ -156,7 +254,7 @@ const Sidebar = () => {
               {"Head towards " + currDirection.node.longName}
             </div>
           );
-        case nodeDirections.length - 1:
+        case splitDirections.length - 1:
           return (
             <div className="ml-3 mr-3">
               {"Arrive at " + currDirection.node.longName}
@@ -195,7 +293,7 @@ const Sidebar = () => {
 
             const angle = angleBetweenVectors(vector1, vector2);
             // Use crossProductValue to determine left or right turn
-            if (angle < -30) {
+            if (angle < -35) {
               if (nextNextDirection) {
                 const vector3 = {
                   x: nextDirection.node.xcoord - currDirection.node.xcoord,
@@ -207,11 +305,12 @@ const Sidebar = () => {
                 };
 
                 const angle2 = angleBetweenVectors(vector3, vector4);
-                if (angle2 >= -15 && angle2 < 15) {
+                if (angle2 >= -20 && angle2 < 20) {
                   return (
                     <div className="ml-3 mr-3">
-                      <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
-                      {"Turn left towards " + nextNextDirection.node.longName}
+                      <BsArrowUpCircle className="mr-2 ml-1 w-4 h-4 inline" />
+                      {"Head straight towards " +
+                        nextNextDirection.node.longName}
                     </div>
                   );
                 }
@@ -222,7 +321,7 @@ const Sidebar = () => {
                   {"Turn left towards " + nextDirection.node.longName}
                 </div>
               );
-            } else if (angle >= -30 && angle < -15) {
+            } else if (angle >= -35 && angle < -20) {
               if (nextNextDirection) {
                 const vector3 = {
                   x: nextDirection.node.xcoord - currDirection.node.xcoord,
@@ -249,7 +348,7 @@ const Sidebar = () => {
                   {"Bear left towards " + nextDirection.node.longName}
                 </div>
               );
-            } else if (angle >= -15 && angle < 15) {
+            } else if (angle >= -20 && angle < 20) {
               if (nextNextDirection) {
                 const vector3 = {
                   x: nextDirection.node.xcoord - currDirection.node.xcoord,
@@ -261,7 +360,7 @@ const Sidebar = () => {
                 };
 
                 const angle2 = angleBetweenVectors(vector3, vector4);
-                if (angle2 >= -15 && angle2 < 15) {
+                if (angle2 >= -20 && angle2 < 20) {
                   bgAlt--;
                   return;
                 }
@@ -273,7 +372,7 @@ const Sidebar = () => {
                 </div>
               );
               //return "Head straight towards " + currDirection.longName;
-            } else if (angle >= 15 && angle < 30) {
+            } else if (angle >= 20 && angle < 35) {
               if (nextNextDirection) {
                 const vector3 = {
                   x: nextDirection.node.xcoord - currDirection.node.xcoord,
@@ -285,7 +384,7 @@ const Sidebar = () => {
                 };
 
                 const angle2 = angleBetweenVectors(vector3, vector4);
-                if (angle2 >= -15 && angle2 < 15) {
+                if (angle2 >= -20 && angle2 < 20) {
                   return (
                     <div className="ml-3 mr-3">
                       <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
@@ -300,7 +399,7 @@ const Sidebar = () => {
                   {"Bear right towards " + nextDirection.node.longName}
                 </div>
               );
-            } else if (angle >= 30) {
+            } else if (angle >= 35) {
               if (nextNextDirection) {
                 const vector3 = {
                   x: nextDirection.node.xcoord - currDirection.node.xcoord,
@@ -312,7 +411,7 @@ const Sidebar = () => {
                 };
 
                 const angle2 = angleBetweenVectors(vector3, vector4);
-                if (angle2 >= -15 && angle2 < 15) {
+                if (angle2 >= -20 && angle2 < 20) {
                   return (
                     <div className="ml-3 mr-3">
                       <BsArrowUpRightCircle className="mr-2 ml-1 w-4 h-4 inline" />
@@ -380,16 +479,18 @@ const Sidebar = () => {
     return "gray-200";
   }
 
-  setStartID(
-    nodes
-      .filter((node) => node["longName"] === startLocation)
-      .map((node) => node.nodeID)[0],
-  );
-  setEndID(
-    nodes
-      .filter((node) => node["longName"] === endLocation)
-      .map((node) => node.nodeID)[0],
-  );
+  useEffect(() => {
+    setStartID(
+      nodes
+        .filter((node) => node["longName"] === startLocation)
+        .map((node) => node.nodeID)[0]
+    );
+    setEndID(
+      nodes
+        .filter((node) => node["longName"] === endLocation)
+        .map((node) => node.nodeID)[0]
+    );
+  }, [endLocation, nodes, setEndID, setStartID, startLocation]);
 
   return (
     <FlowbiteSidebar aria-label="Map sidebar" theme={sidebarTheme}>
@@ -404,7 +505,9 @@ const Sidebar = () => {
           <CiMenuBurger />
           <span className="sr-only">Open navigation drawer</span>
         </Button>
-        <FlowbiteSidebar.Logo href="/" img={logoUrl} imgAlt="Hospital logo" />
+        <Link to="/" className="h-full flex-1 flex justify-center items-center">
+          <img src={logoUrl} alt="Hospital logo" />
+        </Link>
       </div>
 
       <div className="flex flex-col space-y-4 my-4">
@@ -413,35 +516,50 @@ const Sidebar = () => {
           <div className={"w-full"}>
             <Button.Group className="w-full flex justify-center">
               <Button
-                onClick={() => setSelectedFloor(lowerLevel2)}
+                onClick={() => {
+                  setSelectedFloor(lowerLevel2);
+                  setSelectedFID(chooseFID("L2"));
+                }}
                 color={selectedFloor === lowerLevel2 ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 L2
               </Button>
               <Button
-                onClick={() => setSelectedFloor(lowerLevel1)}
+                onClick={() => {
+                  setSelectedFloor(lowerLevel1);
+                  setSelectedFID(chooseFID("L1"));
+                }}
                 color={selectedFloor === lowerLevel1 ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 L1
               </Button>
               <Button
-                onClick={() => setSelectedFloor(firstFloor)}
+                onClick={() => {
+                  setSelectedFloor(firstFloor);
+                  setSelectedFID(chooseFID("1"));
+                }}
                 color={selectedFloor === firstFloor ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 1
               </Button>
               <Button
-                onClick={() => setSelectedFloor(secondFloor)}
+                onClick={() => {
+                  setSelectedFloor(secondFloor);
+                  setSelectedFID(chooseFID("2"));
+                }}
                 color={selectedFloor === secondFloor ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
                 2
               </Button>
               <Button
-                onClick={() => setSelectedFloor(thirdFloor)}
+                onClick={() => {
+                  setSelectedFloor(thirdFloor);
+                  setSelectedFID(chooseFID("3"));
+                }}
                 color={selectedFloor === thirdFloor ? undefined : "gray"}
                 className={"w-1/5 focus:ring-2"}
               >
@@ -468,14 +586,14 @@ const Sidebar = () => {
               setStartID(
                 nodes
                   .filter((node) => node["longName"] === startLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -483,17 +601,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -501,9 +619,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -511,7 +629,7 @@ const Sidebar = () => {
               setStartID(
                 nodes
                   .filter((node) => node["longName"] === startLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               setTimeout(() => setStartSuggestions([]), 200);
             }}
@@ -520,14 +638,14 @@ const Sidebar = () => {
               setStartID(
                 nodes
                   .filter((node) => node["longName"] === startLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setStartSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -535,10 +653,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setStartSuggestions([]);
@@ -561,14 +679,14 @@ const Sidebar = () => {
               setEndID(
                 nodes
                   .filter((node) => node["longName"] === endLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -576,10 +694,10 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions([]);
@@ -590,14 +708,14 @@ const Sidebar = () => {
               setEndID(
                 nodes
                   .filter((node) => node["longName"] === endLocation)
-                  .map((node) => node.nodeID)[0],
+                  .map((node) => node.nodeID)[0]
               );
               if (e.target.value.length > 0) {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -605,17 +723,17 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
                     .sort()
-                    .slice(0, 10),
+                    .slice(0, 10)
                 );
               } else {
                 setEndSuggestions(
                   nodes
                     .map((loc) => loc.longName)
                     .filter((loc) =>
-                      loc.toLowerCase().includes(e.target.value.toLowerCase()),
+                      loc.toLowerCase().includes(e.target.value.toLowerCase())
                     )
                     .filter(
                       (loc) =>
@@ -623,9 +741,9 @@ const Sidebar = () => {
                           !loc.toLowerCase().includes("stair") &&
                           !loc.toLowerCase().includes("elevator")) ||
                         loc.toLowerCase() ===
-                          "carrie m. hall conference center floor 2",
+                          "carrie m. hall conference center floor 2"
                     )
-                    .sort(),
+                    .sort()
                 );
               }
             }}
@@ -647,26 +765,32 @@ const Sidebar = () => {
             <Dropdown.Item onClick={() => setAlgorithm("DFS")}>
               DFS
             </Dropdown.Item>
+            <Dropdown.Item onClick={() => setAlgorithm("Dijkstra")}>
+              Dijkstra
+            </Dropdown.Item>
           </Dropdown>
           <Button type="submit">Submit</Button>
         </form>
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
           {Array.from(
-            new Set(splitDirections.map((direction) => direction?.floorID)),
+            new Set(splitDirections.map((direction) => direction?.floorID))
           ).map((floorID) => (
             <div key={floorID}>
               <Button
                 className="w-full"
                 outline
                 label={`Floor ${floorID}`}
-                onClick={() => handleFloorClick(floorID)}
+                onClick={() => {
+                  handleFloorClick(floorID);
+                  setSelectedFID(floorID);
+                }}
               >
                 {openFloors.includes(floorID) ? (
                   <>
                     {`Hide Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1,
+                      floorID.length - 1
                     )}`}
                     <HiChevronUp className="ml-4 h-4 w-4" />
                   </>
@@ -674,7 +798,7 @@ const Sidebar = () => {
                   <>
                     {`Show Directions for Floor ${floorID.substring(
                       0,
-                      floorID.length - 1,
+                      floorID.length - 1
                     )}`}
                     <HiChevronDown className="ml-4 h-4 w-4" />
                   </>
@@ -685,15 +809,36 @@ const Sidebar = () => {
                   {splitDirections
                     .filter((direction) => direction?.floorID === floorID)
                     .map((row, i: number) => (
-                      <List
+                      <div
                         key={i}
                         className={`bg-${colorPicker(
                           bgAlt,
-                          0,
-                        )} dark:bg-${colorPicker(bgAlt, 1)}`}
+                          0
+                        )} dark:bg-${colorPicker(bgAlt, 1)} text-left w-full`}
+                        role="button"
+                        aria-label="direction"
+                        tabIndex={0}
+                        onClick={() => {
+                          const floorDirections = splitDirections.filter(
+                            (direction, i, arr) =>
+                              direction?.floorID === floorID ||
+                              (i > 0 && arr[i - 1].floorID === floorID) ||
+                              (i === arr.length - 1 &&
+                                arr[i].floorID === floorID)
+                          );
+
+                          const currDirection = floorDirections[i];
+                          setCenter([
+                            currDirection.node.xcoord,
+                            currDirection.node.ycoord,
+                            1,
+                          ]);
+                          setSelectedFloor(adhocConverterChangePlease(floorID));
+                        }}
                       >
-                        {i < nodeDirections.length && turnDirection(floorID, i)}
-                      </List>
+                        {i < splitDirections.length &&
+                          turnDirection(floorID, i)}
+                      </div>
                     ))}
                 </List>
               )}
@@ -706,17 +851,20 @@ const Sidebar = () => {
 };
 
 const adhocConverterChangePlease = (floorID: string) => {
-  if (floorID.length > 3) {
-    return floorID;
+  if (floorID) {
+    if (floorID.length > 3) {
+      return floorID;
+    }
+    const floor = floorID.substring(0, floorID.length - 1);
+    // @ts-expect-error nope
+    return floorToAsset(floor);
   }
-  const floor = floorID.substring(0, floorID.length - 1);
-  // @ts-expect-error nope
-  return floorToAsset(floor);
+  return floorToAsset("1");
 };
 
 function angleBetweenVectors(
   v1: { x: number; y: number },
-  v2: { x: number; y: number },
+  v2: { x: number; y: number }
 ): number {
   // Calculate the angle in radians using the arctangent function
   const angleRad = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
