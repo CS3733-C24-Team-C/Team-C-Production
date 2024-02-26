@@ -4,7 +4,7 @@ import multer from "multer";
 import JSZip from "jszip";
 import fs from "fs";
 import { readCSV, objectsToCSV } from "../utils";
-import { Prisma } from "database";
+import { NodeType, Prisma } from "database";
 import {
   AStarPathfindingStrategy,
   BFSPathfindingStrategy,
@@ -556,20 +556,7 @@ router.get("/download/all", async function (req: Request, res: Response) {
   }
 });
 
-const poiTypes = [
-  "ELEV",
-  "REST",
-  "STAI",
-  "DEPT",
-  "LABS",
-  "INFO",
-  "CONF",
-  "EXIT",
-  "RETL",
-  "SERV",
-  "HALL",
-  "BATH",
-];
+const poiTypes = Object.values(NodeType);
 
 router.post("/pathfinding", async function (req: Request, res: Response) {
   const { startNodeId, endNodeId, algorithm, poiType } = req.body;

@@ -10,7 +10,6 @@ const MapData = () => {
   const [edges, setEdges] = useState([]);
   const [nodesFile, setNodesFile] = useState("");
   const [edgesFile, setEdgesFile] = useState("");
-
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   useEffect(() => {
@@ -70,9 +69,8 @@ const MapData = () => {
     }
   };
 
-  const handleSubmitAll = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSubmitAll = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const formData = new FormData();
     selectedFiles.forEach((file, index) => {
       formData.append(`file${index + 1}`, file);
@@ -340,7 +338,7 @@ const edgesTableColumns: ColumnDef<Edges>[] = [
   {
     accessorKey: "weight",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Weight " />
+      <DataTableColumnHeader column={column} title="Weight" />
     ),
     cell: ({ row }) => row.getValue("weight"),
   },
