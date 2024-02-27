@@ -177,6 +177,14 @@ const EmployeesData = () => {
             onAddRow={() => {
               setOpenCreateModal(true);
             }}
+            columnNames={[
+              "id",
+              "firstName",
+              "lastName",
+              "role",
+              "username",
+              "password",
+            ]}
           />
           <Modal
             dismissible
@@ -302,6 +310,7 @@ const employeesTableColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: "id",
+    accessorFn: (row) => row.id?.toString(),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),

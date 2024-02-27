@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchColumn: string;
   onAddRow?: () => void;
+  columnNames: string[];
 }
 
 function DataTable<TData, TValue>({
@@ -37,14 +38,16 @@ function DataTable<TData, TValue>({
   data,
   searchColumn,
   onAddRow,
+  columnNames,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [filterColumn, setFilterColumn] = React.useState(searchColumn);
 
   const table = useReactTable({
     data,
@@ -64,13 +67,14 @@ function DataTable<TData, TValue>({
       rowSelection,
     },
   });
-
+  //console.log(columnNames);
+  console.log(table.getColumn(filterColumn));
   return (
     <Card className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)]">
       <div className="mx-auto max-w-full px-4 lg:px-12">
         <div className="relative shadow-md sm:rounded-lg overflow-hidden">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-            <div className="w-full md:w-1/2">
+            <div className="flex w-full md:w-1/2 space-x-4">
               <form className="flex items-center">
                 <Label htmlFor="simple-search" className="sr-only">
                   Search
@@ -80,19 +84,38 @@ function DataTable<TData, TValue>({
                   type="search"
                   icon={CiSearch}
                   className="w-full"
-                  placeholder={`Search by ${searchColumn}`}
+                  placeholder={`Search by ${filterColumn}`}
                   value={
                     (table
-                      .getColumn(searchColumn)
+                      .getColumn(filterColumn)
                       ?.getFilterValue() as string) ?? ""
                   }
                   onChange={(event) =>
                     table
-                      .getColumn(searchColumn)
+                      .getColumn(filterColumn)
                       ?.setFilterValue(event.target.value)
                   }
                 />
               </form>
+              <Dropdown
+                id="filterDropdown"
+                type="button"
+                color="info"
+                outline
+                label="Filter by"
+              >
+                {columnNames.map((column, i) => (
+                  <Dropdown.Item
+                    key={i}
+                    onClick={() => {
+                      setFilterColumn(column);
+                      table.getColumn(filterColumn)?.setFilterValue("");
+                    }}
+                  >
+                    {column}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown>
             </div>
             <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
               {onAddRow && (
@@ -132,7 +155,7 @@ function DataTable<TData, TValue>({
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext()
+                              header.getContext(),
                             )}
                       </FlowbiteTable.HeadCell>
                     ))}
@@ -150,7 +173,7 @@ function DataTable<TData, TValue>({
                         <FlowbiteTable.Cell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </FlowbiteTable.Cell>
                       ))}
