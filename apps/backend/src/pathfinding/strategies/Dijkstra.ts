@@ -23,7 +23,7 @@ class DijkstraPathfindingStrategy extends BasePathfindingStrategy {
   protected async algorithm(
     startNodeId: string,
     endNodeId: string,
-    graph: Graph,
+    graph: Graph
   ): Promise<string[]> {
     while (this.nodesQueue.length > 0) {
       this.nodesQueue.sort((a, b) => a.cost - b.cost);

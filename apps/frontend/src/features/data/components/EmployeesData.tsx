@@ -108,7 +108,7 @@ const EmployeesData = () => {
   };
 
   const handleFormFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     switch (e.target.id) {
       case "firstName":
@@ -376,7 +376,7 @@ const EmployeesActions = ({ row }: EmployeesActionsProps) => {
   const [password, setPassword] = useState<string>(row.getValue("password"));
 
   const handleFormFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     switch (e.target.id) {
       case "firstName":
@@ -417,7 +417,7 @@ const EmployeesActions = ({ row }: EmployeesActionsProps) => {
       if (!res.ok) throw new Error(res.statusText);
       const data = await res.json();
       setEmployees(
-        employees.map((employee) => (employee.id === id ? data : employee)),
+        employees.map((employee) => (employee.id === id ? data : employee))
       );
     } catch (error) {
       alert("Failed to edit employee. Please try again.");

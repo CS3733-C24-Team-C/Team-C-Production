@@ -63,15 +63,12 @@ const ServicesData = () => {
   const [seriesPie, setSeriesPie] = useState<number[]>([]);
 
   // Data for PieChart
-  const requestTypesMap = servicesWithEmployees.reduce(
-    (map, service) => {
-      const type = service.type;
-      const userFriendlyLabel = typeLabelsMap[type];
-      map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
-      return map;
-    },
-    {} as Record<string, number>,
-  );
+  const requestTypesMap = servicesWithEmployees.reduce((map, service) => {
+    const type = service.type;
+    const userFriendlyLabel = typeLabelsMap[type];
+    map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
+    return map;
+  }, {} as Record<string, number>);
   const labelsPie = Object.keys(requestTypesMap);
 
   useEffect(() => {
@@ -92,18 +89,15 @@ const ServicesData = () => {
     // filter seriesPie based on selectedEmployeeType
     const filteredServices = selectedEmployeeType
       ? servicesWithEmployees.filter(
-          (service) => service.employee?.role === selectedEmployeeType,
+          (service) => service.employee?.role === selectedEmployeeType
         )
       : servicesWithEmployees;
-    const requestTypesMap = filteredServices.reduce(
-      (map, service) => {
-        const type = service.type;
-        const userFriendlyLabel = typeLabelsMap[type];
-        map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
-        return map;
-      },
-      {} as Record<string, number>,
-    );
+    const requestTypesMap = filteredServices.reduce((map, service) => {
+      const type = service.type;
+      const userFriendlyLabel = typeLabelsMap[type];
+      map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
+      return map;
+    }, {} as Record<string, number>);
     const seriesPie = Object.values(requestTypesMap);
     setSeriesPie(seriesPie);
   }, [servicesWithEmployees, selectedEmployeeType]);
@@ -125,36 +119,33 @@ const ServicesData = () => {
   };
 
   // Data for DonutChart
-  const completionStatusMap = servicesWithEmployees.reduce(
-    (map, service) => {
-      const status = service.completionStatus;
-      const userFriendlyLabel = completionStatusLabelsMap[status];
-      map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
-      return map;
-    },
-    {} as Record<string, number>,
-  );
+  const completionStatusMap = servicesWithEmployees.reduce((map, service) => {
+    const status = service.completionStatus;
+    const userFriendlyLabel = completionStatusLabelsMap[status];
+    map[userFriendlyLabel] = (map[userFriendlyLabel] || 0) + 1;
+    return map;
+  }, {} as Record<string, number>);
 
   const seriesDonut = Object.values(completionStatusMap).map((count) =>
-    Number(((count / servicesWithEmployees.length) * 100).toFixed(2)),
+    Number(((count / servicesWithEmployees.length) * 100).toFixed(2))
   );
   const labelsDonut = Object.keys(completionStatusMap);
 
   // Data for StackedHorizontalBarChart
   // Calculate labelsBar
   const types = Array.from(
-    new Set(servicesWithEmployees.map((request) => request.type)),
+    new Set(servicesWithEmployees.map((request) => request.type))
   );
   const typesBar = types.map((type) => typeLabelsMap[type]);
   const statuses = Object.keys(completionStatusLabelsMap);
   const getStatusCountsForType = (
     status: string,
     type: string,
-    data: Requests[],
+    data: Requests[]
   ): number => {
     // Filter data based on the provided status and type
     const filteredData = data.filter(
-      (service) => service.completionStatus === status && service.type === type,
+      (service) => service.completionStatus === status && service.type === type
     );
     // Return the count of filtered data
     return filteredData.length;
@@ -163,7 +154,7 @@ const ServicesData = () => {
   // Calculate seriesBar
   const seriesBar = statuses.map((status) => {
     const dataForStatus: number[] = types.map((type) =>
-      getStatusCountsForType(status, type, servicesWithEmployees),
+      getStatusCountsForType(status, type, servicesWithEmployees)
     );
     return {
       name: status,
@@ -216,7 +207,7 @@ const ServicesData = () => {
                 value={selectedEmployeeType}
                 onChange={(e) => {
                   setSelectedEmployeeType(
-                    e.target.value as Employees["role"] | "",
+                    e.target.value as Employees["role"] | ""
                   );
                 }}
               >
@@ -390,8 +381,8 @@ const requestsTableColumns: ColumnDef<
       row.getValue("hazardousWaste") === null
         ? row.getValue("hazardousWaste")
         : row.getValue("hazardousWaste")
-          ? "Yes"
-          : "No",
+        ? "Yes"
+        : "No",
   },
   {
     accessorKey: "department",
@@ -428,7 +419,7 @@ const ServicesActions = ({ row }: ServicesActionsProps) => {
 
   const changeCompletionStatus = async (
     id: number,
-    newStatus: RequestStatus,
+    newStatus: RequestStatus
   ) => {
     try {
       const res = await fetch(`/api/services/${id}`, {
@@ -442,7 +433,7 @@ const ServicesActions = ({ row }: ServicesActionsProps) => {
       const updatedServices = services.map((service) =>
         service.id === id
           ? { ...service, completionStatus: newStatus }
-          : service,
+          : service
       );
       setServices(updatedServices);
     } catch (error) {

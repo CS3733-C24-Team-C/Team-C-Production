@@ -20,7 +20,7 @@ class AStarPathfindingStrategy extends BasePathfindingStrategy {
   protected async algorithm(
     startNodeId: string,
     endNodeId: string,
-    graph: Graph,
+    graph: Graph
   ): Promise<string[]> {
     const startNode = graph.getNode(startNodeId);
     const endNode = graph.getNode(endNodeId);
@@ -53,7 +53,7 @@ class AStarPathfindingStrategy extends BasePathfindingStrategy {
       const verticalDistance = Math.abs(nodeAFloor - nodeBFloor);
       const horizontalDistance = Math.sqrt(
         Math.pow(nodeA.xcoord - nodeB.xcoord, 2) +
-          Math.pow(nodeA.ycoord - nodeB.ycoord, 2),
+          Math.pow(nodeA.ycoord - nodeB.ycoord, 2)
       );
 
       const verticalCostMultiplier =
@@ -71,7 +71,7 @@ class AStarPathfindingStrategy extends BasePathfindingStrategy {
 
     while (this.openSet.length > 0) {
       let current = this.openSet.reduce((prev, curr) =>
-        prev.fCost < curr.fCost ? prev : curr,
+        prev.fCost < curr.fCost ? prev : curr
       );
 
       if (current.nodeId === endNodeId) {
@@ -85,7 +85,7 @@ class AStarPathfindingStrategy extends BasePathfindingStrategy {
       }
 
       this.openSet = this.openSet.filter(
-        (node) => node.nodeId !== current.nodeId,
+        (node) => node.nodeId !== current.nodeId
       );
       this.closedSet.add(current.nodeId);
 
@@ -103,7 +103,7 @@ class AStarPathfindingStrategy extends BasePathfindingStrategy {
 
         const tentativeGCost = current.gCost + neighbor.weight;
         let neighborNode = this.openSet.find(
-          (n) => n.nodeId === neighbor.endNode,
+          (n) => n.nodeId === neighbor.endNode
         );
         let isNewPathShorter = false;
 
