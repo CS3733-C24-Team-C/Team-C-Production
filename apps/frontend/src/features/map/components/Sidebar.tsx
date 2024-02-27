@@ -135,7 +135,6 @@ const Sidebar = () => {
   }
 
   useEffect(() => {
-    //console.log("path changed: " + path);
     // assigns nodes IDs so that nodes on separate areas of the same floor can be differentiated
     function separateFloors(newDirections: Nodes[]) {
       let lastFloor = "";
@@ -159,9 +158,6 @@ const Sidebar = () => {
   }, [path, nodes]);
 
   useEffect(() => {
-    console.log("Directions changed: ");
-    console.log(splitDirections);
-
     // Set to store unique floorID values
     const uniqueFloorIDSet = new Set<string>();
     const tempFloorSections = splitDirections.filter((item) => {
@@ -177,9 +173,6 @@ const Sidebar = () => {
     setFloorSections(tempFloorSections);
     floorSectionsRef.current = tempFloorSections;
 
-    console.log(tempFloorSections);
-    console.log("floorSections changed:");
-    console.log(floorSectionsRef.current);
     setSelectedFID(
       splitDirections[0] ? splitDirections[0].floorID : chooseFID("")
     );
@@ -187,7 +180,6 @@ const Sidebar = () => {
   }, [splitDirections]);
 
   useEffect(() => {
-    //console.log("selectedFID changed: " + selectedFID);
     if (selectedFID === "") {
       return;
     }

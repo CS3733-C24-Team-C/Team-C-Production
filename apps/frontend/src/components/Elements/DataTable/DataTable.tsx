@@ -42,7 +42,7 @@ function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -67,8 +67,7 @@ function DataTable<TData, TValue>({
       rowSelection,
     },
   });
-  //console.log(columnNames);
-  console.log(table.getColumn(filterColumn));
+
   return (
     <Card className="shadow-[0_0px_25px_0px_rgba(45,105,135,.5)]">
       <div className="mx-auto max-w-full px-4 lg:px-12">
@@ -155,7 +154,7 @@ function DataTable<TData, TValue>({
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext(),
+                              header.getContext()
                             )}
                       </FlowbiteTable.HeadCell>
                     ))}
@@ -173,7 +172,7 @@ function DataTable<TData, TValue>({
                         <FlowbiteTable.Cell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </FlowbiteTable.Cell>
                       ))}
