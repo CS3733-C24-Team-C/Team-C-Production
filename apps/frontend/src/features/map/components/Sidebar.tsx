@@ -827,7 +827,7 @@ const Sidebar = () => {
                     setStartID(
                       nodes
                         .filter((node) => node["longName"] === startLocation)
-                        .map((node) => node.nodeID)[0]
+                        .map((node) => node.nodeID)[0],
                     );
                     if (e.target.value.length > 0) {
                       setStartSuggestions(
@@ -836,7 +836,7 @@ const Sidebar = () => {
                           .filter((loc) =>
                             loc
                               .toLowerCase()
-                              .includes(e.target.value.toLowerCase())
+                              .includes(e.target.value.toLowerCase()),
                           )
                           .filter(
                             (loc) =>
@@ -844,10 +844,10 @@ const Sidebar = () => {
                                 !loc.toLowerCase().includes("stair") &&
                                 !loc.toLowerCase().includes("elevator")) ||
                               loc.toLowerCase() ===
-                                "carrie m. hall conference center floor 2"
+                                "carrie m. hall conference center floor 2",
                           )
                           .sort()
-                          .slice(0, 10)
+                          .slice(0, 10),
                       );
                     } else {
                       setStartSuggestions(
@@ -856,7 +856,7 @@ const Sidebar = () => {
                           .filter((loc) =>
                             loc
                               .toLowerCase()
-                              .includes(e.target.value.toLowerCase())
+                              .includes(e.target.value.toLowerCase()),
                           )
                           .filter(
                             (loc) =>
@@ -864,9 +864,9 @@ const Sidebar = () => {
                                 !loc.toLowerCase().includes("stair") &&
                                 !loc.toLowerCase().includes("elevator")) ||
                               loc.toLowerCase() ===
-                                "carrie m. hall conference center floor 2"
+                                "carrie m. hall conference center floor 2",
                           )
-                          .sort()
+                          .sort(),
                       );
                     }
                   }}
@@ -874,7 +874,7 @@ const Sidebar = () => {
                     setStartID(
                       nodes
                         .filter((node) => node["longName"] === startLocation)
-                        .map((node) => node.nodeID)[0]
+                        .map((node) => node.nodeID)[0],
                     );
                     setTimeout(() => setStartSuggestions([]), 200);
                   }}
@@ -883,7 +883,7 @@ const Sidebar = () => {
                     setStartID(
                       nodes
                         .filter((node) => node["longName"] === startLocation)
-                        .map((node) => node.nodeID)[0]
+                        .map((node) => node.nodeID)[0],
                     );
                     if (e.target.value.length > 0) {
                       setStartSuggestions(
@@ -892,7 +892,7 @@ const Sidebar = () => {
                           .filter((loc) =>
                             loc
                               .toLowerCase()
-                              .includes(e.target.value.toLowerCase())
+                              .includes(e.target.value.toLowerCase()),
                           )
                           .filter(
                             (loc) =>
@@ -900,10 +900,10 @@ const Sidebar = () => {
                                 !loc.toLowerCase().includes("stair") &&
                                 !loc.toLowerCase().includes("elevator")) ||
                               loc.toLowerCase() ===
-                                "carrie m. hall conference center floor 2"
+                                "carrie m. hall conference center floor 2",
                           )
                           .sort()
-                          .slice(0, 10)
+                          .slice(0, 10),
                       );
                     } else {
                       setStartSuggestions([]);
@@ -999,32 +999,37 @@ const Sidebar = () => {
         </form>
         {/* Displaying directions organized by floor */}
         <div className="mt-4 space-y-2">
-          <div className={"flex space-x-2"}>
-            <Button
-              outline
-              onClick={() => {
-                if (floorSectionsRef.current) {
-                  const openAll: string[] = [];
-                  floorSectionsRef.current.map((aNode) => {
-                    openAll.push(aNode.floorID);
-                  });
-                  setOpenFloors(openAll);
-                }
-              }}
-            >
-              Expand all
-            </Button>
-            <Button
-              outline
-              onClick={() => {
-                setOpenFloors([]);
-              }}
-            >
-              Collapse all
-            </Button>
+          <div className={"flex space-x-2 justify-between"}>
+            <div className={"flex space-x-2"}>
+              <Button
+                outline
+                size={"xs"}
+                onClick={() => {
+                  if (floorSectionsRef.current) {
+                    const openAll: string[] = [];
+                    floorSectionsRef.current.map((aNode) => {
+                      openAll.push(aNode.floorID);
+                    });
+                    setOpenFloors(openAll);
+                  }
+                }}
+              >
+                Expand all
+              </Button>
+              <Button
+                outline
+                size={"xs"}
+                onClick={() => {
+                  setOpenFloors([]);
+                }}
+              >
+                Collapse all
+              </Button>
+            </div>
             <Button
               color="failure"
               outline
+              size={"xs"}
               onClick={() => {
                 setOpenFloors([]);
                 setStartLocation("");
