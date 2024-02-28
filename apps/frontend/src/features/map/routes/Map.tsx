@@ -15,9 +15,9 @@ const Map = () => {
   const [startID, setStartID] = useState("");
   const [endID, setEndID] = useState("");
   const [requests, setRequests] = useState<
-  (Requests & {
-    employee: Employees | null;
-  })[]
+    (Requests & {
+      employee: Employees | null;
+    })[]
   >([]);
   const [floorSections, setFloorSections] = useState<NodeFloorID[]>([]);
   const [selectedFID, setSelectedFID] = useState("");
@@ -44,16 +44,6 @@ const Map = () => {
         console.error("Failed to fetch edges:", error);
       }
     };
-    const fetchServices = async () => {
-      try {
-        const res = await fetch("/api/services");
-        if (!res.ok) throw new Error(res.statusText);
-        const data = await res.json();
-        setRequests(data);
-      } catch (error) {
-        console.error("Failed to fetch services:", error);
-      }
-    };
     const fetchServicesWithEmployees = async () => {
       try {
         const res = await fetch("/api/services/with-employee");
@@ -66,7 +56,6 @@ const Map = () => {
     };
     fetchNodes();
     fetchEdges();
-    fetchServices();
     fetchServicesWithEmployees();
   }, []);
 

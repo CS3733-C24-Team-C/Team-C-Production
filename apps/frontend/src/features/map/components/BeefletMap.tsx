@@ -322,28 +322,20 @@ export default function BeefletMap() {
                       return 7;
                     })()}
                     pathOptions={{
-                      color: (() => {
-                        if (reqNum > 0) {
-                          return "black";
-                        }
-                        return "#0E7490";
-                      })(),
+                      color: reqNum > 0 ? "black" : "#0E7490",
                       weight: 2,
-                      fillColor: (() => {
-                        if (node.nodeID == startID) {
-                          return "blue";
-                        } else if (node.nodeID == endID) {
-                          return "yellow";
-                        } else if (reqNum > 0) {
-                          if (colorBlind) {
-                            return "#F200FF";
-                          }
-                          return "red";
-                        } else if (colorBlind) {
-                          return "lime";
-                        }
-                        return "#52BAC2";
-                      })(),
+                      fillColor:
+                        node.nodeID === startID
+                          ? "blue"
+                          : node.nodeID === endID
+                          ? "yellow"
+                          : reqNum > 0
+                          ? colorBlind
+                            ? "#F200FF"
+                            : "red"
+                          : colorBlind
+                          ? "lime"
+                          : "#52BAC2",
                     }}
                     eventHandlers={{
                       mouseover: (e) => {
@@ -378,7 +370,6 @@ export default function BeefletMap() {
                   >
                     <Popup>
                       {(() => {
-                        
                         if (viewRequests) {
                           return (
                             <table className="table">
@@ -397,7 +388,11 @@ export default function BeefletMap() {
                                   )
                                   .map((item, index) => (
                                     <tr key={index}>
-                                      <td>{item.employee?.firstName + " " + item.employee?.lastName}</td>
+                                      <td>
+                                        {item.employee?.firstName +
+                                          " " +
+                                          item.employee?.lastName}
+                                      </td>
                                       <td>{item.urgency}</td>
                                       <td>{item.type}</td>
                                       <td>{item.completionStatus}</td>
