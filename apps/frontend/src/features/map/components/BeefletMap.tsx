@@ -376,7 +376,7 @@ export default function BeefletMap() {
                       },
                     }}
                   >
-                    <Popup className="custom-popup">
+                    <Popup>
                       {(() => {
                         
                         if (viewRequests) {
@@ -387,6 +387,7 @@ export default function BeefletMap() {
                                   <th>Employee</th>
                                   <th>Urgency</th>
                                   <th>Type</th>
+                                  <th>Status</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -399,6 +400,7 @@ export default function BeefletMap() {
                                       <td>{item.employee?.firstName + " " + item.employee?.lastName}</td>
                                       <td>{item.urgency}</td>
                                       <td>{item.type}</td>
+                                      <td>{item.completionStatus}</td>
                                     </tr>
                                   ))}
                               </tbody>
